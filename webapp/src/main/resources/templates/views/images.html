@@ -1,0 +1,85 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title th:text="#{images.label}"></title>
+	
+	<!-- Select2 -->
+	<link rel="stylesheet" th:href="@{'/webjars/select2/'+#{application.dependency.select2}+'/dist/css/select2.min.css'}"/>
+</head>
+<body th:with="menu='images'">
+
+	<div layout:fragment="content">
+
+		<div class="container-fluid">
+			<div class="container-sidebar col-3" style="background-color: #80bdff; height: 8rem; float: right;">
+				<div class="card" style="margin-top: 10px;">
+					<h5 class="card-header" th:text="#{images.card.search.title}">Search</h5>
+					<div class="card-body">
+						<form>
+							<div class="form-group">
+								<select class="form-control select2-multiple" size="4" multiple="multiple">
+									<optgroup
+										th:each="ty : ${T(karstenroethig.imagetags.webapp.domain.enums.TagTypeEnum).values()}"
+										th:if="${allTags.hasTagsForType(ty)}"
+										th:label="${#messages.msg('tag.type.'+ty.name()+'.label')}" label="[type]">
+										<option th:each="tag : ${allTags.getTagsByType(ty)}" th:value="${tag.id}" th:text="${tag.name}">[name]</option>
+									</optgroup>
+								</select>
+							</div>
+							<button type="submit" class="btn btn-primary" th:text="#{default.button.search.label}">Search</button>
+						</form>
+						<p class="lead font-italic text-center" style="margin-top: 10px;">
+							<a href="#" style="color: #6c757d;"><i class="fas fa-chevron-left fa-lg"></i></a>
+							<span th:text=""></span>
+							1 / 102.253
+							<a href="#" style="color: #6c757d;"><i class="fas fa-chevron-right fa-lg"></i></a>
+						</p>
+					</div>
+				</div>
+				<div class="card" style="margin-top: 10px;">
+					<h5 class="card-header" th:text="#{images.card.image.title}">Current Image</h5>
+					<div class="card-body">
+						<form>
+							<div class="form-group">
+								<select class="form-control select2-multiple" size="4" multiple="multiple">
+									<optgroup
+										th:each="ty : ${T(karstenroethig.imagetags.webapp.domain.enums.TagTypeEnum).values()}"
+										th:if="${allTags.hasTagsForType(ty)}"
+										th:label="${#messages.msg('tag.type.'+ty.name()+'.label')}" label="[type]">
+										<option th:each="tag : ${allTags.getTagsByType(ty)}" th:value="${tag.id}" th:text="${tag.name}">[name]</option>
+									</optgroup>
+								</select>
+							</div>
+							<button type="submit" class="btn btn-primary" th:text="#{default.button.save.label}">Save</button>
+							<a th:href="@{/tag/list}" class="btn btn-outline-danger" th:text="#{default.button.delete.label}">Delete</a>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="container-body col-9" style="background-color: #957bbe; height: 8rem; padding-top: 10px;">
+				<img th:src="@{/images/show/1}" class="img-fluid mx-auto d-block">
+				<img th:src="@{/images/show/2}" class="img-fluid mx-auto d-block">
+				<p class="text-center text-muted lead">
+					<i class="fas fa-spinner fa-pulse fa-10x"></i>
+				</p>
+				<p class="text-center text-muted">
+					<i class="fas fa-exclamation-circle fa-10x"></i><br>
+					<span th:text="#{images.loading.error}"></span>
+				</p>
+			</div>
+		</div>
+
+	</div>
+	
+	<div layout:fragment="additionalJs">
+		<!-- Select2 -->
+		<script th:src="@{'/webjars/select2/'+#{application.dependency.select2}+'/dist/js/select2.min.js'}"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('.select2-multiple').select2();
+			});
+		</script>
+	</div>
+
+</body>
+</html>

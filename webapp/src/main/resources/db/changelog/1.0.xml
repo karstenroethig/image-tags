@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet id="1" author="roethig">
+
+		<!-- =========== -->
+		<!-- Table "Tag" -->
+		<!-- =========== -->
+		<createTable tableName="Tag">
+			<column name="id" type="${type.id}" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="name" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="type" type="int">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
+		<addUniqueConstraint tableName="Tag" columnNames="name" constraintName="unique_tag_name"/>
+
+		<!-- ============= -->
+		<!-- Table "Image" -->
+		<!-- ============= -->
+		<createTable tableName="Image">
+			<column name="id" type="${type.id}" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="file_extension" type="varchar(50)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="file_size" type="int">
+				<constraints nullable="false"/>
+			</column>
+			<column name="hash" type="varchar(256)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
+		<!-- ================ -->
+		<!-- Table "ImageTag" -->
+		<!-- ================ -->
+		<createTable tableName="ImageTag">
+			<column name="image_id" type="${type.id}">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="tag_id" type="${type.id}">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+		</createTable>
+
+	</changeSet>
+
+</databaseChangeLog>

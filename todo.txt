@@ -1,0 +1,46 @@
+todo
+----
+- DTOs für Rest-API definieren
+	- DTO für gesuchte und zu speichernde Tags
+	- Current Page
+		- current page number
+		- max page number
+		- current image id
+- Rest-API und DTOs definieren
+	- /api/1.0/
+- Über die Oberfläche könnte man einen File-/Directory-Upload anbieten
+- SELECT-Statements für
+	- alle Images ohne Tags
+	- alle Images mit einer Liste von Tags (jede Image muss jeden Tag enthalten)
+
+http://localhost:4080/h2-console
+
+
+Öffne Images-Seite:  /api/1.0/image/list
+Klick auf Suche:     /api/1.0/image/list?tags=1,2,3
+Klick auf Next Page: /api/1.0/image/list?tags=1,2,3&page=2
+DTO:
+- Input: ?
+	- tags
+	- page
+- Result: Page
+	- page number
+	- max page number
+	- image id
+	- image tags
+
+Speichere Tags für Image: /api/1.0/image/edit/{id}
+DTO:
+- Input: ?
+	- tags
+	- image id
+
+Lösche Image:
+--> nicht über Rest-API
+--> Request:
+	- Löscht die Datei
+	- Löst die Suche neu aus
+	- Springt im Zähler eine Seite zurück
+
+
+Images-Seite muss sich mit Tags und Seite initialisieren lassen

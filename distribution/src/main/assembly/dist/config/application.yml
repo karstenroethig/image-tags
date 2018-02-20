@@ -1,0 +1,7 @@
+#
+# Spring Boot configuration
+#  - options: https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-docs/src/main/asciidoc/appendix-application-properties.adoc
+#
+
+server:
+  port: 8080

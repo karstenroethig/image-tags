@@ -1,0 +1,62 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title th:text="#{tag.label.plural}+' - '+#{tag.edit.label}"></title>
+</head>
+<body th:with="menu='tag'">
+
+	<div layout:fragment="content">
+
+		<div class="container">
+		
+			<h1 style="padding-top: 10px;">
+				<span th:text="#{tag.edit.label}">Edit tags</span>:
+				<span th:text="${tag.name}">[name]</span>
+			</h1>
+		
+			<div th:replace="fragments/messages"></div>
+		
+			<form style="padding-top: 10px;" th:object="${tag}" th:action="@{/tag/update}" action="#" method="post">
+				<input type="hidden" th:field="*{id}"/>
+				<div class="form-group row">
+					<label class="col-sm-2 col-form-label text-right">
+						<span class="required">*</span> <span th:text="#{tag.name.label}">Name</span>
+					</label>
+					<div class="col-sm-10">
+						<input type="text" th:field="*{name}" class="form-control" th:classappend="${#fields.hasErrors('name')} ? is-invalid">
+						<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:each="err : ${#fields.errors('name')}" th:text="${err}">validation error</div>
+					</div>
+				</div>
+				<fieldset class="form-group">
+					<div class="row">
+						<legend class="col-form-label col-sm-2 pt-0 text-right">
+							<span class="required">*</span> <span th:text="#{tag.type.label}">Type</span>
+						</legend>
+						<div class="col-sm-10">
+							<div class="form-check" th:each="ty : ${T(karstenroethig.imagetags.webapp.domain.enums.TagTypeEnum).values()}">
+								<input type="radio" th:field="*{type}" th:value="${ty}" class="form-check-input" th:classappend="${#fields.hasErrors('type')} ? is-invalid">
+								<label class="form-check-label" th:text="${#messages.msg('tag.type.'+ty.name()+'.label')}">[type]</label>
+							</div>
+							<div class="invalid-feedback" th:if="${#fields.hasErrors('type')}" th:each="err : ${#fields.errors('type')}" th:text="${err}">validation error</div>
+						</div>
+					</div>
+				</fieldset>
+				<div class="form-group row">
+					<div class="offset-sm-2 col-sm-10">
+						<span class="required">*</span> <span th:text="#{default.form.required}">required</span>
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="offset-sm-2 col-sm-10">
+						<input type="submit" class="btn btn-primary" th:value="#{default.button.save.label}" value="Save">
+						<a th:href="@{/tag/list}" class="btn btn-secondary" th:text="#{default.button.cancel.label}">Cancel</a>
+					</div>
+				</div>
+			</form>
+		
+		</div>
+
+	</div>
+
+</body>
+</html>

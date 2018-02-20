@@ -1,0 +1,46 @@
+#
+# Spring Boot configuration
+#  - options: https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-docs/src/main/asciidoc/appendix-application-properties.adoc
+#
+
+server:
+  port: 4080
+
+spring:
+
+  jpa:
+    databasePlatform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+
+  h2:
+    console:
+      enabled: true
+
+  datasource:
+    url: jdbc:h2:mem:image-tags-db
+    username: ImageTagsUser
+    password: ImageTagsUser
+    poolName: SpringBootHikariCP
+    maximumPoolSize: 5
+    minimumIdle: 3
+    maxLifetime: 2000000
+    connectionTimeout: 30000
+    idleTimeout: 30000
+    pool-prepared-statements: true
+    max-open-prepared-statements: 250
+
+  resources:
+    chain:
+      cache: true
+      html-application-cache: true
+      strategy:
+        content:
+          enabled: true
+          paths: /css/**, /images/**, /js/**
+
+  thymeleaf:
+    mode: LEGACYHTML5
+
+liquibase:
+  change-log: classpath:/db/changelog/master.xml

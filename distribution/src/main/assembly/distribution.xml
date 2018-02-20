@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
+
+	<id>bin</id>
+	<formats>
+		<format>tar.gz</format>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<dependencySets>
+
+		<!-- Die durch Spring Boot generierte .jar-Datei (enthält bereits alle abhängigen Klassen). -->
+		<dependencySet>
+			<useProjectAttachments>true</useProjectAttachments>
+			<useTransitiveDependencies>false</useTransitiveDependencies>
+			<includes>
+				<include>${project.groupId}:image-tags-webapp:jar</include>
+			</includes>
+			<outputFileNameMapping>${app.name.id}.${artifact.extension}</outputFileNameMapping>
+			<outputDirectory>lib</outputDirectory>
+		</dependencySet>
+
+	</dependencySets>
+
+	<fileSets>
+
+		<!-- Die Verzeichnisstruktur inkl. einiger Standard-Dateien. -->
+		<fileSet>
+			<directory>${basedir}/src/main/assembly/dist/</directory>
+			<excludes>
+				<exclude>**/bin/run.conf</exclude>
+			</excludes>
+			<outputDirectory></outputDirectory>
+			<filtered>true</filtered>
+		</fileSet>
+
+		<!-- Übernahme von Dateien, die auf keinen Fall gefiltert werden dürfen. -->
+		<fileSet>
+			<directory>${basedir}/src/main/assembly/dist/</directory>
+			<includes>
+				<include>**/*.pdf</include>
+			</includes>
+			<outputDirectory></outputDirectory>
+			<filtered>false</filtered>
+		</fileSet>
+
+	</fileSets>
+
+	<files>
+
+		<!-- Übernahme von Dateien, die umbenannt werden müssen. -->
+		<file>
+			<source>${basedir}/src/main/assembly/dist/bin/run.conf</source>
+			<outputDirectory>bin</outputDirectory>
+			<destName>run.conf.example</destName>
+			<filtered>false</filtered>
+		</file>
+
+	</files>
+
+</assembly>

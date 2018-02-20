@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>karstenroethig.image-tags</groupId>
+		<artifactId>image-tags-project</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>image-tags-distribution</artifactId>
+	<packaging>pom</packaging>
+
+	<name>Image Tags :: Distribution</name>
+	<description>Mit diesem Modul wird die komplette Distribution der Anwendung als ZIP-Datei zusammengepackt.</description>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>${app.name.files}_V${project.version}</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors>
+								<descriptor>src/main/assembly/distribution.xml</descriptor>
+							</descriptors>
+							<attach>true</attach>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<!-- Das Programm -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>image-tags-webapp</artifactId>
+		</dependency>
+
+	</dependencies>
+
+</project>

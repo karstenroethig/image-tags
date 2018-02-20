@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+	<head>
+
+		<title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE" th:text="#{application.name}"></title>
+		
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+
+		<link th:replace="fragments/style"/>
+
+	</head>
+	
+	<body>
+
+		<div th:replace="fragments/header"></div>
+
+		<div layout:fragment="content"></div>
+
+		<div th:replace="fragments/js"></div>
+		<div layout:fragment="additionalJs"></div>
+
+	</body>
+</html>

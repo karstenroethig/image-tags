@@ -1,0 +1,38 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title th:text="#{dashboard.label}"></title>
+	
+	<!-- jQCloud -->
+	<link rel="stylesheet" th:href="@{'/webjars/jqcloud2/'+#{application.dependency.jqcloud}+'/dist/jqcloud.min.css'}"/>
+</head>
+<body th:with="menu='dashboard'">
+
+	<div layout:fragment="content">
+
+		<div class="container-fluid" id="demo" style="height: 40rem; background-color: #957bbe;"></div>
+
+	</div>
+	
+	<div layout:fragment="additionalJs">
+		<!-- jQCloud -->
+		<script defer th:src="@{'/webjars/jqcloud2/'+#{application.dependency.jqcloud}+'/dist/jqcloud.min.js'}"></script>
+		
+		<script type="text/javascript">
+		$(document).ready(function() {
+
+			var words = [
+			{text: "Lorem", weight: 13, link: "http://github.com/mistic100/jQCloud"},
+			{text: "Ipsum Test", weight: 10.5, link: "http://www.strangeplanet.fr"},
+			{text: "Ipsum", weight: 100, link: "http://www.strangeplanet.fr"},
+			{text: "Dolor", weight: 9.4, link: "http://piwigo.org"}
+			];
+		
+			$('#demo').jQCloud(words);
+
+		});
+		</script>
+	</div>
+
+</body>
+</html>

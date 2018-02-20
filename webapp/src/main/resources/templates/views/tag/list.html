@@ -1,0 +1,64 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title th:text="#{tag.label.plural}"></title>
+</head>
+<body th:with="menu='tag'">
+
+	<div layout:fragment="content">
+	
+		<div class="container">
+	
+			<h1 style="padding-top: 10px;" th:text="#{tag.label.plural}">Tags</h1>
+			
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th th:text="#{tag.name.label}">Name</th>
+						<th th:text="#{tag.type.label}">Type</th>
+						<th th:text="#{default.table.operations.label}">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${#lists.isEmpty(allTags)}">
+						<td colspan="3" align="center" th:text="#{default.table.empty.text}">Data can not be found.</td>
+					</tr>
+					<tr th:each="tag : ${allTags}">
+						<td th:text="${tag.name}">[name]</td>
+						<td>
+							<span class="badge badge-secondary" th:classappend="${'tag-type-'+tag.type.name().toLowerCase()}" th:text="${#messages.msg('tag.type.'+tag.type.name()+'.label')}">[type]</span>
+						</td>
+						<td>
+							<a th:href="@{/tag/edit/{id}(id=${tag.id})}" th:text="#{default.button.edit.label}">Edit</a> |
+							<a href="" th:text="#{default.button.delete.label}" data-toggle="modal" data-target="#deleteModal" th:attr="data-id=${tag.id}">Delete</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="deleteModalLabel" th:text="#{tag.deletePopup.title}">Delete tag</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<span th:text="#{tag.deletePopup.question}">Do you really want to delete this tag?</span>
+						</div>
+						<div class="modal-footer">
+							<a href="" th:attr="data-href-template=@{/tag/delete/{id}}" class="btn btn-danger" th:text="#{default.button.delete.label}">Delete</a>
+							<button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{default.button.cancel.label}">Cancel</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		
+		</div>
+		
+	</div>
+
+</body>
+</html>
