@@ -73,7 +73,7 @@ public class ImageServiceImpl
 		imagesPage.setCurrentPageNumber(page);
 		imagesPage.setMaxPageNumber(count);
 
-		return null;
+		return imagesPage;
 	}
 
 	public byte [] getImageData(Long imageId) throws IOException

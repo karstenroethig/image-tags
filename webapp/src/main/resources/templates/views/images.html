@@ -29,10 +29,13 @@
 							<button type="submit" class="btn btn-primary" th:text="#{default.button.search.label}">Search</button>
 						</form>
 						<p class="lead font-italic text-center" style="margin-top: 10px;">
-							<a href="#" style="color: #6c757d;"><i class="fas fa-chevron-left fa-lg"></i></a>
-							<span th:text=""></span>
-							1 / 102.253
-							<a href="#" style="color: #6c757d;"><i class="fas fa-chevron-right fa-lg"></i></a>
+							<a th:href="@{/images?page={page}(page=${imagesPage.currentPageNumber-1})}" th:if="${imagesPage.hasPreviousPage()}"><i class="fas fa-chevron-left fa-lg text-primary"></i></a>
+							<i th:if="${!imagesPage.hasPreviousPage()}" class="fas fa-chevron-left fa-lg text-muted"></i>
+							<span th:text="${#numbers.formatInteger(imagesPage.currentPageNumber,1,'POINT')}">[currentPageNumber]</span>
+							/
+							<span th:text="${#numbers.formatInteger(imagesPage.maxPageNumber,1,'POINT')}">[maxPageNumber]</span>
+							<a th:href="@{/images?page={page}(page=${imagesPage.currentPageNumber+1})}" th:if="${imagesPage.hasNextPage()}"><i class="fas fa-chevron-right fa-lg text-primary"></i></a>
+							<i th:if="${!imagesPage.hasNextPage()}" class="fas fa-chevron-right fa-lg text-muted"></i>
 						</p>
 					</div>
 				</div>
@@ -57,8 +60,7 @@
 				</div>
 			</div>
 			<div class="container-body col-9" style="background-color: #957bbe; height: 8rem; padding-top: 10px;">
-				<img th:src="@{/images/show/1}" class="img-fluid mx-auto d-block">
-				<img th:src="@{/images/show/2}" class="img-fluid mx-auto d-block">
+				<img th:src="@{/images/show/{id}(id=${imagesPage.currentImage.id})}" class="img-fluid mx-auto d-block">
 				<p class="text-center text-muted lead">
 					<i class="fas fa-spinner fa-pulse fa-10x"></i>
 				</p>

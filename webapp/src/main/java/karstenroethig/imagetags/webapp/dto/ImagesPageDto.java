@@ -10,4 +10,14 @@ public class ImagesPageDto
 	private Integer currentPageNumber;
 	private Integer maxPageNumber;
 	private ImageDto currentImage;
+
+	public boolean hasPreviousPage()
+	{
+		return currentPageNumber > 1;
+	}
+
+	public boolean hasNextPage()
+	{
+		return maxPageNumber > currentPageNumber;
+	}
 }

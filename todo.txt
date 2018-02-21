@@ -44,3 +44,12 @@ Lösche Image:
 
 
 Images-Seite muss sich mit Tags und Seite initialisieren lassen
+
+
+
+
+GET  /images              Initiale Startseite
+POST /images/search       Führe eine neue Suche mit den übergebenen POST-Parametern durch
+GET  /images/tag/{tag}    Führe eine neue Suche mit diesem einen Tag durch
+GET  /images/page/{page}  Wechsle auf die Seite der Suchergebnisse
+GET  /images/delete       Lösche das Image und aktualisiere die Suchergebnisse

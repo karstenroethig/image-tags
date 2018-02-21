@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import karstenroethig.imagetags.webapp.controller.exceptions.NotFoundException;
 import karstenroethig.imagetags.webapp.controller.util.UrlMappings;
@@ -40,10 +41,10 @@ public class ImagesController
 	@RequestMapping(
 		method = RequestMethod.GET
 	)
-	public String images(Model model)
+	public String images(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page, Model model)
 	{
 		model.addAttribute("allTags", tagService.getAllTagsByType());
-		model.addAttribute("imagesPage", imageService.findImages(null));
+		model.addAttribute("imagesPage", imageService.findImages(page));
 
 		return ViewEnum.IMAGES.getViewName();
 	}
