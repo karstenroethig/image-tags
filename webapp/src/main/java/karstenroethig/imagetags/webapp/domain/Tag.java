@@ -10,6 +10,7 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import karstenroethig.imagetags.webapp.domain.enums.TagTypeEnum;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 
 @Entity
 @Table(

@@ -46,7 +46,7 @@
 		<!-- ================ -->
 		<!-- Table "ImageTag" -->
 		<!-- ================ -->
-		<createTable tableName="ImageTag">
+		<createTable tableName="Image_Tag">
 			<column name="image_id" type="${type.id}">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>

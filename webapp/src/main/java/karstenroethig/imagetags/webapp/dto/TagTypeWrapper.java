@@ -47,4 +47,16 @@ public class TagTypeWrapper
 			.sorted( Comparator.comparing( TagDto::getName))
 			.collect(Collectors.toList());
 	}
+
+	public List<TagDto> getAllTags()
+	{
+		List<TagDto> tags = new ArrayList<>();
+
+		for (List<TagDto> list : tagsByTypeMap.values())
+		{
+			tags.addAll(list);
+		}
+
+		return tags;
+	}
 }

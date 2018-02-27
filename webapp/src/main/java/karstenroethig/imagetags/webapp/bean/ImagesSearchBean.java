@@ -8,7 +8,6 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
-import karstenroethig.imagetags.webapp.dto.ImageDto;
 import karstenroethig.imagetags.webapp.dto.ImagesPageDto;
 import karstenroethig.imagetags.webapp.dto.ImagesSearchDto;
 import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
@@ -44,14 +43,13 @@ public class ImagesSearchBean
 	{
 		ImagesPageDto imagesPageDto = new ImagesPageDto();
 		imagesPageDto.setCurrentPageNumber(currentPage);
-		imagesPageDto.setCurrentImage(getImageForCurrentPage());
 		imagesPageDto.setMaxPageNumber(searchResultImageIds.size());
 		imagesPageDto.setErrorMessageKey(errorMessageKey);
 
 		return imagesPageDto;
 	}
 
-	private ImageDto getImageForCurrentPage()
+	public Long getImageIdForCurrentPage()
 	{
 		if (searchResultImageIds == null || searchResultImageIds.isEmpty() || currentPage < 1)
 		{
@@ -59,12 +57,7 @@ public class ImagesSearchBean
 			return null;
 		}
 
-		Long imageId = searchResultImageIds.get(currentPage - 1);
-
-		ImageDto image = new ImageDto();
-		image.setId(imageId);
-
-		return image;
+		return searchResultImageIds.get(currentPage - 1);
 	}
 
 	public void switchToCurrentPage(int page)

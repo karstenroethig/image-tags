@@ -11,7 +11,6 @@ public class ImagesPageDto
 {
 	private Integer currentPageNumber;
 	private Integer maxPageNumber;
-	private ImageDto currentImage;
 	private String errorMessageKey;
 
 	public boolean hasPreviousPage()
@@ -26,7 +25,7 @@ public class ImagesPageDto
 
 	public boolean hasImage()
 	{
-		return currentImage != null;
+		return !hasError();
 	}
 
 	public boolean hasError()

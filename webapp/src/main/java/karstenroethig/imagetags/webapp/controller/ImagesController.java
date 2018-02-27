@@ -27,6 +27,7 @@ import karstenroethig.imagetags.webapp.bean.ImagesSearchBean;
 import karstenroethig.imagetags.webapp.controller.exceptions.NotFoundException;
 import karstenroethig.imagetags.webapp.controller.util.UrlMappings;
 import karstenroethig.imagetags.webapp.controller.util.ViewEnum;
+import karstenroethig.imagetags.webapp.dto.ImageDto;
 import karstenroethig.imagetags.webapp.dto.ImagesSearchDto;
 import karstenroethig.imagetags.webapp.dto.TagDto;
 import karstenroethig.imagetags.webapp.service.impl.ImageServiceImpl;
@@ -99,6 +100,7 @@ public class ImagesController
 		model.addAttribute("allTags", tagService.getAllTagsByType());
 		model.addAttribute("searchParams", imagesSearchBean.getSearchParams());
 		model.addAttribute("imagesPage", imagesSearchBean.getCurrentImagesPage());
+		model.addAttribute("image", imageService.findImage(imagesSearchBean.getImageIdForCurrentPage()));
 
 		return ViewEnum.IMAGES.getViewName();
 	}
@@ -129,6 +131,17 @@ public class ImagesController
 		ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(data, headers, HttpStatus.OK);
 
 		return responseEntity;
+	}
+
+	@RequestMapping(
+		value = UrlMappings.ACTION_UPDATE,
+		method = RequestMethod.POST
+	)
+	public String update(@ModelAttribute("image") @Valid ImageDto image, BindingResult bindingResult, Model model)
+	{
+		imageService.editImage(image);
+
+		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGES, "/page/" + imagesSearchBean.getCurrentPage());
 	}
 
 	private String executeNewSearch(ImagesSearchDto searchParams)
