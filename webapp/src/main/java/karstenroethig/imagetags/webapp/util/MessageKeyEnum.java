@@ -7,6 +7,13 @@ public enum MessageKeyEnum
 	APPLICATION_VERSION( "application.version" ),
 
 	/* ********************
+	 * Images.
+	 * ********************
+	 */
+	/** "Images > Search": Keine Daten gefunden. */
+	IMAGES_SEARCH_EMPTY_RESULT("images.search.empty-result"),
+
+	/* ********************
 	 * Tag.
 	 * ********************
 	 */
