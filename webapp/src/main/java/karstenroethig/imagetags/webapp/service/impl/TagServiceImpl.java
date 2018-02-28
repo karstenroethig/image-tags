@@ -10,12 +10,15 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import karstenroethig.imagetags.webapp.domain.Tag;
 import karstenroethig.imagetags.webapp.dto.DtoTransformer;
 import karstenroethig.imagetags.webapp.dto.TagDto;
 import karstenroethig.imagetags.webapp.dto.TagTypeWrapper;
+import karstenroethig.imagetags.webapp.dto.api.TagApiDto;
 import karstenroethig.imagetags.webapp.repository.TagRepository;
 import karstenroethig.imagetags.webapp.service.exceptions.TagAlreadyExistsException;
 
@@ -23,6 +26,9 @@ import karstenroethig.imagetags.webapp.service.exceptions.TagAlreadyExistsExcept
 @Transactional
 public class TagServiceImpl
 {
+	@Autowired
+	protected JdbcTemplate jdbcTemplate;
+
 	@Autowired
 	protected TagRepository tagRepository;
 
@@ -33,30 +39,30 @@ public class TagServiceImpl
 		return tagDto;
 	}
 
-	public TagDto saveTag( TagDto tagDto ) throws TagAlreadyExistsException
+	public TagDto saveTag(TagDto tagDto) throws TagAlreadyExistsException
 	{
 		List<Tag> existingTags = tagRepository.findByNameIgnoreCase(
-			StringUtils.trim( tagDto.getName() ) );
+			StringUtils.trim(tagDto.getName()));
 
-		if ( existingTags != null && existingTags.isEmpty() == false )
+		if (existingTags != null && existingTags.isEmpty() == false)
 		{
 			throw new TagAlreadyExistsException();
 		}
 
 		Tag tag = new Tag();
 
-		tag = DtoTransformer.merge( tag, tagDto );
+		tag = DtoTransformer.merge(tag, tagDto);
 
-		return DtoTransformer.transform( tagRepository.save( tag ) );
+		return DtoTransformer.transform(tagRepository.save(tag));
 	}
 
-	public Boolean deleteTag( Long tagId )
+	public Boolean deleteTag(Long tagId)
 	{
-		Tag temp = tagRepository.findOne( tagId );
+		Tag temp = tagRepository.findOne(tagId);
 
-		if ( temp != null )
+		if (temp != null)
 		{
-			tagRepository.delete( temp );
+			tagRepository.delete(temp);
 
 			return true;
 		}
@@ -64,45 +70,46 @@ public class TagServiceImpl
 		return false;
 	}
 
-	public TagDto editTag( TagDto tagDto ) throws TagAlreadyExistsException
+	public TagDto editTag(TagDto tagDto) throws TagAlreadyExistsException
 	{
 		List<Tag> existingTags = tagRepository.findByNameIgnoreCase(
-			StringUtils.trim( tagDto.getName() ) );
+			StringUtils.trim(tagDto.getName()));
 
-		if ( existingTags != null && existingTags.isEmpty() == false
-			&& existingTags.get( 0 ).getId().equals( tagDto.getId() ) == false )
+		if (existingTags != null
+			&& existingTags.isEmpty() == false
+			&& existingTags.get(0).getId().equals(tagDto.getId()) == false)
 		{
 			throw new TagAlreadyExistsException();
 		}
 
-		Tag tag = tagRepository.findOne( tagDto.getId() );
+		Tag tag = tagRepository.findOne(tagDto.getId());
 
-		tag = DtoTransformer.merge( tag, tagDto );
+		tag = DtoTransformer.merge(tag, tagDto);
 
-		return DtoTransformer.transform( tagRepository.save( tag ) );
+		return DtoTransformer.transform(tagRepository.save(tag));
 	}
 
-	public TagDto findTag( Long tagId )
+	public TagDto findTag(Long tagId)
 	{
-		return DtoTransformer.transform( tagRepository.findOne( tagId ) );
+		return DtoTransformer.transform(tagRepository.findOne(tagId));
 	}
 
 	public List<TagDto> getAllTags()
 	{
-		return transformTags( tagRepository.findAll() );
+		return transformTags(tagRepository.findAll());
 	}
 
-	private List<TagDto> transformTags( Iterable<Tag> tags )
+	private List<TagDto> transformTags(Iterable<Tag> tags)
 	{
-		return transformTags( StreamSupport.stream( tags.spliterator(), false ) );
+		return transformTags(StreamSupport.stream(tags.spliterator(), false));
 	}
 
-	private List<TagDto> transformTags( Stream<Tag> tagsStream )
+	private List<TagDto> transformTags(Stream<Tag> tagsStream)
 	{
 		List<TagDto> transformedTags = tagsStream
-			.map( DtoTransformer::transform )
-			.sorted( Comparator.comparing( TagDto::getName ) )
-			.collect( Collectors.toList() );
+			.map(DtoTransformer::transform )
+			.sorted(Comparator.comparing(TagDto::getName ))
+			.collect(Collectors.toList());
 
 		return transformedTags;
 	}
@@ -116,5 +123,17 @@ public class TagServiceImpl
 		}
 
 		return tagTypeWrapper;
+	}
+
+	public List<TagApiDto> findAllTagsWithOccurrences()
+	{
+		StringBuffer sql = new StringBuffer();
+
+		sql.append("select it.tag_id as id, t.name as name, count(it.image_id) as amount ");
+		sql.append("from   Image_Tag it ");
+		sql.append("join   Tag t on t.id = it.tag_id ");
+		sql.append("group  by it.tag_id;");
+
+		return jdbcTemplate.query(sql.toString(), new BeanPropertyRowMapper<>(TagApiDto.class));
 	}
 }

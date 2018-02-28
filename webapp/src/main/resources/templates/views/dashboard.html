@@ -10,7 +10,7 @@
 
 	<div layout:fragment="content">
 
-		<div class="container-fluid" id="demo" style="height: 40rem;/* background-color: #957bbe;*/"></div>
+		<div class="container-fluid" id="wordCloud" style="height: 40rem;/* background-color: #957bbe;*/"></div>
 
 	</div>
 	
@@ -19,18 +19,48 @@
 		<script defer th:src="@{'/webjars/jqcloud2/'+#{application.dependency.jqcloud}+'/dist/jqcloud.min.js'}"></script>
 		
 		<script type="text/javascript">
-		$(document).ready(function() {
+			$( document ).ready( function() {
+	
+				var words;
+	
+				$.when(
+	
+					$.ajax( {
+						url: '/api/1.0/allTagsWithOccurrences',
+						dataType: 'json',
+						cache: false
+					}).done( function( data ) {
+						words = convertTagsToWords( data );
+					}).fail( function( jqXHR, textStatus, errorThrown ) {
+						alert( jqXHR.responseText );
+					})
+	
+				).then( function() {
+					$('#wordCloud').jQCloud(words);
+				});
 
-			var words = [
-			{text: "Lorem", weight: 13, link: "http://github.com/mistic100/jQCloud"},
-			{text: "Ipsum Test", weight: 10.5, link: "http://www.strangeplanet.fr"},
-			{text: "Ipsum", weight: 100, link: "http://www.strangeplanet.fr"},
-			{text: "Dolor", weight: 9.4, link: "http://piwigo.org"}
-			];
-		
-			$('#demo').jQCloud(words);
+				/**
+				 * tags example: [{"id":1, "name":"scrum", "amount":25},{"id":2, "name":"kanban", "amount":3}]
+				 * 
+				 * var words = [
+				 * 		{text: "Lorem", weight: 13, link: "http://github.com/mistic100/jQCloud"},
+				 * 		{text: "Ipsum", weight: 100, link: "http://www.strangeplanet.fr"},
+				 * 		{text: "Dolor", weight: 9.4, link: "http://piwigo.org"}
+				 * ];
+				 */
+				function convertTagsToWords( tags )
+				{
+					var words = [];
 
-		});
+					for( var index in tags )
+					{
+						words.push( { "text": tags[index].name, "weight": tags[index].amount, "link": "/images/tag/"+tags[index].id } );
+					}
+
+					return words;
+				}
+	
+			});
 		</script>
 	</div>
 

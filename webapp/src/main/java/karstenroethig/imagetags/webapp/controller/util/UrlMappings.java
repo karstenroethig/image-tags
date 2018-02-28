@@ -7,6 +7,9 @@ public class UrlMappings
 	public static final String HOME = "/";
 	public static final String DASHBOARD = "/dashboard";
 
+	public static final String CONTROLLER_API = "/api";
+	public static final String CONTROLLER_API_VERSION_1_0 = "/1.0";
+
 	public static final String CONTROLLER_IMAGES = "/images";
 	public static final String CONTROLLER_TAG = "/tag";
 
