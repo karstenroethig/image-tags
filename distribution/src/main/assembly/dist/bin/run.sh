@@ -39,6 +39,4 @@ echo ""
 eval \"$JAVA\" $JAVA_OPTS \
 	-Djava.io.tmpdir=\""$APP_HOME"/temp/\" \
 	-jar \""$APP_HOME"/lib/${app.name.id}.jar\" \
-	--spring.config.location=\""$APP_HOME"/config/\" \
-	--spring.profiles.active=prod \
-	--logging.file=\""$APP_HOME"/log/${app.name.id}.log\"
+	--spring.config.location=\""$APP_HOME"/config/\"

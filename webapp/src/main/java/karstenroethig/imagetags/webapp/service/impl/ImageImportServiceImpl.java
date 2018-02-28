@@ -6,7 +6,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,8 +16,10 @@ import javax.transaction.Transactional;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
+import karstenroethig.imagetags.webapp.config.properties.ImageDataProperties;
 import karstenroethig.imagetags.webapp.domain.Image;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
+@EnableConfigurationProperties(ImageDataProperties.class)
 public class ImageImportServiceImpl
 {
-	private static final Path IMAGES_IMPORT_DIRECTORY = Paths.get("data/new");
 	private static final String[] IMAGE_FILE_EXTENSIONS = new String[] {"gif", "GIF", "jpg", "JPG", "jpeg", "JPEG", "png", "PNG"};
+
+	@Autowired
+	protected ImageDataProperties imageDataProperties;
 
 	@Autowired
 	protected ImageRepository imageRepository;
@@ -41,7 +45,9 @@ public class ImageImportServiceImpl
 	@PostConstruct
 	public void execute()
 	{
-		if (!Files.exists(IMAGES_IMPORT_DIRECTORY))
+		Path importDirectory = imageDataProperties.getImportDirectory();
+
+		if (!Files.exists(importDirectory))
 		{
 			log.info("import of images skipped (directory 'data/new' does not exist)");
 
@@ -51,7 +57,7 @@ public class ImageImportServiceImpl
 		try
 		{
 			// find all new files for import
-			List<Path> allNewImages = Files.walk(IMAGES_IMPORT_DIRECTORY, FileVisitOption.FOLLOW_LINKS)
+			List<Path> allNewImages = Files.walk(importDirectory, FileVisitOption.FOLLOW_LINKS)
 				.sorted(Comparator.reverseOrder())
 				.filter(path -> isImageFile(path))
 //				.peek(System.out::println)
@@ -61,7 +67,7 @@ public class ImageImportServiceImpl
 			importImages(allNewImages);
 
 			// clean up the import directory
-			cleanupImportDirectory();
+			cleanupImportDirectory(importDirectory);
 		}
 		catch (IOException ex)
 		{
@@ -124,11 +130,11 @@ public class ImageImportServiceImpl
 		return images != null && !images.isEmpty();
 	}
 
-	private void cleanupImportDirectory() throws IOException
+	private void cleanupImportDirectory(Path importDirectory) throws IOException
 	{
-		List<Path> emptyDirectories = Files.walk(IMAGES_IMPORT_DIRECTORY, FileVisitOption.FOLLOW_LINKS)
+		List<Path> emptyDirectories = Files.walk(importDirectory, FileVisitOption.FOLLOW_LINKS)
 			.sorted(Comparator.reverseOrder())
-			.filter(path -> isEmptyDirectory(path) && !path.equals(IMAGES_IMPORT_DIRECTORY))
+			.filter(path -> isEmptyDirectory(path) && !path.equals(importDirectory))
 			.collect(Collectors.toList());
 
 		for (Path emptyDirectory : emptyDirectories)

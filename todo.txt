@@ -2,9 +2,5 @@ todo
 ----
 - Über die Oberfläche könnte man einen File-/Directory-Upload anbieten
 	-> auch Upload eines ZIP-Archivs wäre denkbar
-- [Download]-Button für Images
-- SELECT-Statements für
-	- alle Images ohne Tags
-	- alle Images mit einer Liste von Tags (jede Image muss jeden Tag enthalten)
 
 http://localhost:4080/h2-console

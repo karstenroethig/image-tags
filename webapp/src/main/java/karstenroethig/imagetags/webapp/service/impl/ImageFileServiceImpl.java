@@ -6,7 +6,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.zip.ZipOutputStream;
 
@@ -15,19 +14,25 @@ import javax.transaction.Transactional;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
+
+import karstenroethig.imagetags.webapp.config.properties.ImageDataProperties;
 
 @Service
 @Transactional
+@EnableConfigurationProperties(ImageDataProperties.class)
 public class ImageFileServiceImpl
 {
-	private static final Path IMAGES_ZIP_PATH = Paths.get("data/images.zip");
+	@Autowired
+	protected ImageDataProperties imageDataProperties;
 
 	public void saveImage(Path imageFilePath, Long imageId) throws IOException
 	{
 		createZipFileIfItDoesNotExist();
 
-		try (FileSystem fileSystem = FileSystems.newFileSystem(IMAGES_ZIP_PATH, null))
+		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
 		{
 			String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
 			String filename = buildFilename(imageId, extension);
@@ -41,7 +46,7 @@ public class ImageFileServiceImpl
 	{
 		createZipFileIfItDoesNotExist();
 
-		try (FileSystem fileSystem = FileSystems.newFileSystem(IMAGES_ZIP_PATH, null))
+		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
 		{
 			String filename = buildFilename(imageId, extension);
 			Path path = fileSystem.getPath("/"+filename);
@@ -54,7 +59,7 @@ public class ImageFileServiceImpl
 	{
 		createZipFileIfItDoesNotExist();
 
-		try (FileSystem fileSystem = FileSystems.newFileSystem(IMAGES_ZIP_PATH, null))
+		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
 		{
 			String filename = buildFilename(imageId, extension);
 			Path path = fileSystem.getPath("/"+filename);
@@ -65,14 +70,14 @@ public class ImageFileServiceImpl
 
 	private void createZipFileIfItDoesNotExist() throws IOException
 	{
-		if (Files.exists(IMAGES_ZIP_PATH))
+		if (Files.exists(imageDataProperties.getZipPath()))
 		{
 			return;
 		}
 
 		try (ZipOutputStream out = new ZipOutputStream(
 				Files.newOutputStream(
-						IMAGES_ZIP_PATH,
+						imageDataProperties.getZipPath(),
 						StandardOpenOption.CREATE,
 						StandardOpenOption.TRUNCATE_EXISTING)))
 		{
