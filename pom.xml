@@ -34,7 +34,7 @@
 		<app.name.files>ImageTags</app.name.files>
 		<app.description>TODO Add Description.</app.description>
 
-		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
+		<spring.boot.version>1.5.10.RELEASE</spring.boot.version>
 
 		<webjars-jquery.version>3.3.1</webjars-jquery.version>
 		<webjars-bootstrap.version>4.0.0</webjars-bootstrap.version>
