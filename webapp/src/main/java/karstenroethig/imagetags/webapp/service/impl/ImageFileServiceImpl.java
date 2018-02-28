@@ -30,7 +30,7 @@ public class ImageFileServiceImpl
 		try (FileSystem fileSystem = FileSystems.newFileSystem(IMAGES_ZIP_PATH, null))
 		{
 			String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
-			String filename = createFilename(imageId, extension);
+			String filename = buildFilename(imageId, extension);
 			Path path = fileSystem.getPath("/"+filename);
 
 			Files.copy(imageFilePath, path);
@@ -43,7 +43,7 @@ public class ImageFileServiceImpl
 
 		try (FileSystem fileSystem = FileSystems.newFileSystem(IMAGES_ZIP_PATH, null))
 		{
-			String filename = createFilename(imageId, extension);
+			String filename = buildFilename(imageId, extension);
 			Path path = fileSystem.getPath("/"+filename);
 
 			return readDataFromPath(path);
@@ -56,7 +56,7 @@ public class ImageFileServiceImpl
 
 		try (FileSystem fileSystem = FileSystems.newFileSystem(IMAGES_ZIP_PATH, null))
 		{
-			String filename = createFilename(imageId, extension);
+			String filename = buildFilename(imageId, extension);
 			Path path = fileSystem.getPath("/"+filename);
 
 			Files.deleteIfExists(path);
@@ -80,7 +80,7 @@ public class ImageFileServiceImpl
 		}
 	}
 
-	private String createFilename(Long imageId, String extension)
+	public String buildFilename(Long imageId, String extension)
 	{
 		return StringUtils.leftPad(imageId.toString(), 12, "0") + "." + extension;
 	}

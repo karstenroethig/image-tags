@@ -16,6 +16,7 @@ import karstenroethig.imagetags.webapp.controller.exceptions.NotFoundException;
 import karstenroethig.imagetags.webapp.domain.Image;
 import karstenroethig.imagetags.webapp.domain.Tag;
 import karstenroethig.imagetags.webapp.dto.DtoTransformer;
+import karstenroethig.imagetags.webapp.dto.ImageDataDto;
 import karstenroethig.imagetags.webapp.dto.ImageDto;
 import karstenroethig.imagetags.webapp.dto.ImagesSearchDto;
 import karstenroethig.imagetags.webapp.dto.TagDto;
@@ -61,7 +62,7 @@ public class ImageServiceImpl
 		return transform(imageRepository.findOne(imageId));
 	}
 
-	public byte[] getImageData(Long imageId) throws IOException
+	public ImageDataDto getImageData(Long imageId) throws IOException
 	{
 		Image image = imageRepository.findOne(imageId);
 
@@ -70,7 +71,12 @@ public class ImageServiceImpl
 			throw new NotFoundException(String.valueOf(imageId));
 		}
 
-		return imageFileService.loadImage(image.getId(), image.getExtension());
+		ImageDataDto imageData = new ImageDataDto();
+		imageData.setData(imageFileService.loadImage(image.getId(), image.getExtension()));
+		imageData.setFilename(imageFileService.buildFilename(imageId, image.getExtension()));
+		imageData.setSize(image.getSize());
+
+		return imageData;
 	}
 
 	public ImageDto editImage(ImageDto imageDto)

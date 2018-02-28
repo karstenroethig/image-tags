@@ -27,6 +27,7 @@ import karstenroethig.imagetags.webapp.bean.ImagesSearchBean;
 import karstenroethig.imagetags.webapp.controller.exceptions.NotFoundException;
 import karstenroethig.imagetags.webapp.controller.util.UrlMappings;
 import karstenroethig.imagetags.webapp.controller.util.ViewEnum;
+import karstenroethig.imagetags.webapp.dto.ImageDataDto;
 import karstenroethig.imagetags.webapp.dto.ImageDto;
 import karstenroethig.imagetags.webapp.dto.ImagesSearchDto;
 import karstenroethig.imagetags.webapp.dto.TagDto;
@@ -124,13 +125,14 @@ public class ImagesController
 	)
 	public ResponseEntity<byte[]> show(@PathVariable("id") Long imageId) throws IOException
 	{
+		ImageDataDto imageData = imageService.getImageData(imageId);
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+		headers.setContentDispositionFormData("attachment", imageData.getFilename());
+		headers.setContentLength(imageData.getSize());
 
-		byte[] data = imageService.getImageData(imageId);
-		ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(data, headers, HttpStatus.OK);
-
-		return responseEntity;
+		return new ResponseEntity<>(imageData.getData(), headers, HttpStatus.OK);
 	}
 
 	@RequestMapping(
