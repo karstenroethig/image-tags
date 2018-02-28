@@ -11,7 +11,7 @@
 	<div layout:fragment="content">
 
 		<div class="container-fluid">
-			<div class="container-sidebar col-3" style="background-color: #80bdff; height: 8rem; float: right;">
+			<div class="container-sidebar col-3" style="/*background-color: #80bdff; height: 8rem;*/ float: right;">
 				<div class="card" style="margin-top: 10px;">
 					<h5 class="card-header" th:text="#{images.card.search.title}">Search</h5>
 					<div class="card-body">
@@ -60,7 +60,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="container-body col-9" style="background-color: #957bbe; height: 8rem; padding-top: 10px;">
+			<div class="container-body col-9" style="/*background-color: #957bbe; height: 8rem;*/ padding-top: 10px;">
 				<img th:if="${imagesPage.hasImage()}" th:src="@{/images/show/{id}(id=${image.id})}" class="img-fluid mx-auto d-block">
 				<p class="text-center text-muted" th:if="${imagesPage.hasError()}">
 					<i class="fas fa-exclamation-circle fa-10x"></i><br>
