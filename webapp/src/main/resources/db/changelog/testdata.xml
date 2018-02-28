@@ -11,27 +11,58 @@
 	<!-- =========== -->
 	<changeSet id="1" author="roethig">
 
-		<!-- =========== -->
-		<!-- Table "Tag" -->
-		<!-- =========== -->
 		<loadData
 			tableName="Tag"
 			file="db/data/tags.csv"
 			separator=";">
 		</loadData>
-		
-		<!-- ============= -->
-		<!-- Table "Image" -->
-		<!-- ============= -->
+
 		<insert tableName="Image">
-			<column name="file_extension">png</column>
-			<column name="file_size">94762</column>
-			<column name="hash">37a9f6e6567e216a6850c0fcb48f1242</column>
+			<column name="file_extension" value="png"/>
+			<column name="file_size" value="75315"/>
+			<column name="hash" value="a175f61fca912ec49ce9379f02dbebfb"/>
 		</insert>
+		<insert tableName="Image_Tag">
+			<column name="image_id" valueNumeric="select id from Image where hash='a175f61fca912ec49ce9379f02dbebfb'"/>
+			<column name="tag_id" valueNumeric="select id from Tag where name='software development'"/>
+		</insert>
+		<insert tableName="Image_Tag">
+			<column name="image_id" valueNumeric="select id from Image where hash='a175f61fca912ec49ce9379f02dbebfb'"/>
+			<column name="tag_id" valueNumeric="select id from Tag where name='kanban'"/>
+		</insert>
+
 		<insert tableName="Image">
-			<column name="file_extension">png</column>
-			<column name="file_size">177779</column>
-			<column name="hash">9dee2210276f5cd6509e166d79d7692e</column>
+			<column name="file_extension" value="jpg"/>
+			<column name="file_size" value="74479"/>
+			<column name="hash" value="3773af58a5b072a094c53f628e7160fa"/>
+		</insert>
+
+		<insert tableName="Image">
+			<column name="file_extension" value="png"/>
+			<column name="file_size" value="178917"/>
+			<column name="hash" value="1ef2bdcf054c278cab5f321e99b4dd89"/>
+		</insert>
+		<insert tableName="Image_Tag">
+			<column name="image_id" valueNumeric="select id from Image where hash='1ef2bdcf054c278cab5f321e99b4dd89'"/>
+			<column name="tag_id" valueNumeric="select id from Tag where name='software development'"/>
+		</insert>
+		<insert tableName="Image_Tag">
+			<column name="image_id" valueNumeric="select id from Image where hash='1ef2bdcf054c278cab5f321e99b4dd89'"/>
+			<column name="tag_id" valueNumeric="select id from Tag where name='funny'"/>
+		</insert>
+
+		<insert tableName="Image">
+			<column name="file_extension" value="jpg"/>
+			<column name="file_size" value="53623"/>
+			<column name="hash" value="1fd1c4ba07fa847691d092ca618c549e"/>
+		</insert>
+		<insert tableName="Image_Tag">
+			<column name="image_id" valueNumeric="select id from Image where hash='1fd1c4ba07fa847691d092ca618c549e'"/>
+			<column name="tag_id" valueNumeric="select id from Tag where name='software development'"/>
+		</insert>
+		<insert tableName="Image_Tag">
+			<column name="image_id" valueNumeric="select id from Image where hash='1fd1c4ba07fa847691d092ca618c549e'"/>
+			<column name="tag_id" valueNumeric="select id from Tag where name='scrum'"/>
 		</insert>
 
 	</changeSet>
