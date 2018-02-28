@@ -129,10 +129,10 @@ public class TagServiceImpl
 	{
 		StringBuffer sql = new StringBuffer();
 
-		sql.append("select it.tag_id as id, t.name as name, count(it.image_id) as amount ");
-		sql.append("from   Image_Tag it ");
-		sql.append("join   Tag t on t.id = it.tag_id ");
-		sql.append("group  by it.tag_id;");
+		sql.append("SELECT it.tag_id AS id, t.name AS name, COUNT(it.image_id) AS amount ");
+		sql.append("FROM   Image_Tag it ");
+		sql.append("JOIN   Tag t ON t.id = it.tag_id ");
+		sql.append("GROUP  BY it.tag_id;");
 
 		return jdbcTemplate.query(sql.toString(), new BeanPropertyRowMapper<>(TagApiDto.class));
 	}

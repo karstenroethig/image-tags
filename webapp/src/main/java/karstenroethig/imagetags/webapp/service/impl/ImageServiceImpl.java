@@ -1,15 +1,14 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import karstenroethig.imagetags.webapp.controller.exceptions.NotFoundException;
@@ -31,6 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 public class ImageServiceImpl
 {
 	@Autowired
+	protected JdbcTemplate jdbcTemplate;
+
+	@Autowired
 	protected ImageRepository imageRepository;
 
 	@Autowired
@@ -41,20 +43,54 @@ public class ImageServiceImpl
 
 	public List<Long> findImages(ImagesSearchDto searchParams)
 	{
+		// tags available -> show images matching tags
+		if (searchParams != null
+			&& searchParams.getTags() != null
+			&& !searchParams.getTags().isEmpty())
+		{
+			return findTaggedImages(searchParams.getTags());
+		}
+
 		// no tags -> show untagged images
 		return findUntaggedImages();
-
-		// TODO tag available -> show images matching tags
 	}
 
 	private List<Long> findUntaggedImages()
 	{
-		Iterable<Image> imagesIterator = imageRepository.findAll();
-		Stream<Image> imagesStream = StreamSupport.stream(imagesIterator.spliterator(), false);
+		StringBuffer sql = new StringBuffer();
 
-		return imagesStream
-				.map(image -> image.getId())
-				.collect(Collectors.toList());
+		sql.append("SELECT i.id ");
+		sql.append("FROM   Image i ");
+		sql.append("LEFT   JOIN Image_Tag it ON it.image_id = i.id ");
+		sql.append("WHERE  it.image_id IS NULL;");
+
+		return jdbcTemplate.queryForList(sql.toString(), Long.class);
+	}
+
+	private List<Long> findTaggedImages(List<TagDto> tags)
+	{
+		List<Long> tagIds = new ArrayList<>();
+		StringBuffer sql = new StringBuffer();
+
+		sql.append("SELECT i.id ");
+		sql.append("FROM   Image i ");
+		sql.append("WHERE  1=1 ");
+
+		for (TagDto tag : tags)
+		{
+			tagIds.add(tag.getId());
+
+			sql.append("AND ");
+			sql.append("EXISTS ( ");
+			sql.append("    SELECT it.image_id ");
+			sql.append("    FROM   image_tag it ");
+			sql.append("    WHERE  i.id = it.image_id AND it.tag_id = ? ");
+			sql.append(") ");
+		}
+
+		sql.append(";");
+
+		return jdbcTemplate.queryForList(sql.toString(), tagIds.toArray(), Long.class);
 	}
 
 	public ImageDto findImage(Long imageId)
