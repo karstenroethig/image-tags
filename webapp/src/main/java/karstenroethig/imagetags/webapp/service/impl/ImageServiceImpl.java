@@ -151,6 +151,7 @@ public class ImageServiceImpl
 		ImageDto imageDto = new ImageDto();
 
 		imageDto.setId(image.getId());
+		imageDto.setImportPath(image.getImportPath());
 
 		Set<Tag> tags = image.getTags();
 

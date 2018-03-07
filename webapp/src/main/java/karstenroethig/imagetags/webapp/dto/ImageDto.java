@@ -11,6 +11,7 @@ import lombok.Setter;
 public class ImageDto
 {
 	private Long id;
+	private String importPath;
 	private List<TagDto> tags = new ArrayList<>();
 
 	public void addTag(TagDto tag)

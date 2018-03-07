@@ -59,6 +59,9 @@
 							<a href="" th:text="#{default.button.delete.label}" data-toggle="modal" data-target="#deleteModal" class="btn btn-outline-danger" th:attr="data-id=${image.id}">Delete</a>
 						</form>
 					</div>
+					<div class="card-footer" th:if="${image.importPath != null}">
+						<p class="lead font-italic" th:text="${image.importPath}">[importPath]</p>
+					</div>
 				</div>
 			</div>
 			<div class="container-body col-9" style="/*background-color: #957bbe; height: 8rem;*/ padding-top: 10px;">

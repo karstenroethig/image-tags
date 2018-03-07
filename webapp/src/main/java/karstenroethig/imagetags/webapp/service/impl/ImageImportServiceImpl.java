@@ -124,6 +124,7 @@ public class ImageImportServiceImpl
 
 		image.setExtension(FilenameUtils.getExtension(imagePath.getFileName().toString()));
 		image.setSize(Files.size(imagePath));
+		image.setImportPath(findRelativeImportPath(imagePath));
 
 		try (InputStream inputStream = Files.newInputStream(imagePath))
 		{
@@ -161,6 +162,11 @@ public class ImageImportServiceImpl
 		}
 
 		return FilenameUtils.isExtension(path.getFileName().toString(), IMAGE_FILE_EXTENSIONS);
+	}
+
+	private String findRelativeImportPath(Path filePath)
+	{
+		return imageDataProperties.getImportDirectory().relativize(filePath).toString();
 	}
 
 	private boolean isEmptyDirectory(Path path)

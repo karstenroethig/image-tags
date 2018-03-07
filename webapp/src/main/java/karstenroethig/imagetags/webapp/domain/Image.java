@@ -63,6 +63,13 @@ public class Image
 	)
 	private String hash;
 
+	@Column(
+		name = "import_path",
+		length = 256,
+		nullable = true
+	)
+	private String importPath;
+
 	@ManyToMany(
 		fetch = FetchType.LAZY,
 		cascade = CascadeType.ALL

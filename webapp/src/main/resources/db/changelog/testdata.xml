@@ -21,6 +21,7 @@
 			<column name="file_extension" value="png"/>
 			<column name="file_size" value="75315"/>
 			<column name="hash" value="a175f61fca912ec49ce9379f02dbebfb"/>
+			<column name="import_path" value="abc/123/test.png"/>
 		</insert>
 		<insert tableName="Image_Tag">
 			<column name="image_id" valueNumeric="select id from Image where hash='a175f61fca912ec49ce9379f02dbebfb'"/>

@@ -41,6 +41,9 @@
 			<column name="hash" type="varchar(256)">
 				<constraints nullable="false"/>
 			</column>
+			<column name="import_path" type="varchar(256)">
+				<constraints nullable="true"/>
+			</column>
 		</createTable>
 
 		<!-- ================ -->
