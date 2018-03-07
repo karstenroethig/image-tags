@@ -77,17 +77,25 @@ public class ImageImportServiceImpl
 
 	private void importImages(List<Path> imagePaths) throws IOException
 	{
-		log.info("start import of " + imagePaths.size() + " new images");
+		int totalFileCount = imagePaths.size();
+		int currentFileCount = 0;
+
+		log.info(
+			String.format("start import of %s new images", totalFileCount)
+		);
 
 		for (Path imagePath : imagePaths)
 		{
-			importImage(imagePath);
+			currentFileCount++;
+			importImage(imagePath, currentFileCount, totalFileCount);
 		}
 	}
 
-	private void importImage(Path imagePath) throws IOException
+	private void importImage(Path imagePath, int currentFileCount, int totalFileCount) throws IOException
 	{
-		log.info("importing image file " + imagePath.toString());
+		log.info(
+			String.format("importing image file [%s/%s]: %s", currentFileCount, totalFileCount, imagePath.toString())
+		);
 
 		Image image = createImage(imagePath);
 
@@ -101,7 +109,9 @@ public class ImageImportServiceImpl
 		}
 		else
 		{
-			log.info("image " + imagePath.toString() + " already exists and will be ignored");
+			log.info(
+				String.format("image %s already exists and will be ignored", imagePath.toString())
+			);
 		}
 
 		// delete the source file
