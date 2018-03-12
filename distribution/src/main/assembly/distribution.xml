@@ -48,6 +48,15 @@
 			<filtered>false</filtered>
 		</fileSet>
 
+		<!-- create an empty temp directory -->
+		<fileSet>
+			<directory>.</directory>
+			<outputDirectory>temp</outputDirectory>
+			<excludes>
+				<exclude>*/**</exclude>
+			</excludes>
+		</fileSet>
+
 	</fileSets>
 
 	<files>
