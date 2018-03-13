@@ -8,8 +8,8 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
-import karstenroethig.imagetags.webapp.dto.ImagesPageDto;
-import karstenroethig.imagetags.webapp.dto.ImagesSearchDto;
+import karstenroethig.imagetags.webapp.dto.ImagePageDto;
+import karstenroethig.imagetags.webapp.dto.ImageSearchDto;
 import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +21,7 @@ import lombok.Setter;
 @Scope(value=WebApplicationContext.SCOPE_SESSION, proxyMode=ScopedProxyMode.TARGET_CLASS)
 public class ImagesSearchBean
 {
-	private ImagesSearchDto searchParams;
+	private ImageSearchDto searchParams;
 	private List<Long> searchResultImageIds;
 	private int currentPage;
 	private String errorMessageKey;
@@ -39,14 +39,14 @@ public class ImagesSearchBean
 		errorMessageKey = null;
 	}
 
-	public ImagesPageDto getCurrentImagesPage()
+	public ImagePageDto getCurrentImagePage()
 	{
-		ImagesPageDto imagesPageDto = new ImagesPageDto();
-		imagesPageDto.setCurrentPageNumber(currentPage);
-		imagesPageDto.setMaxPageNumber(searchResultImageIds.size());
-		imagesPageDto.setErrorMessageKey(errorMessageKey);
+		ImagePageDto imagePageDto = new ImagePageDto();
+		imagePageDto.setCurrentPageNumber(currentPage);
+		imagePageDto.setMaxPageNumber(searchResultImageIds.size());
+		imagePageDto.setErrorMessageKey(errorMessageKey);
 
-		return imagesPageDto;
+		return imagePageDto;
 	}
 
 	public Long getImageIdForCurrentPage()

@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum ViewEnum
 {
 	DASHBOARD("dashboard"),
-	IMAGES("images"),
+	IMAGE("image"),
 
 	TAG_CREATE(ControllerEnum.tag, ActionEnum.create),
 	TAG_EDIT(ControllerEnum.tag, ActionEnum.edit),

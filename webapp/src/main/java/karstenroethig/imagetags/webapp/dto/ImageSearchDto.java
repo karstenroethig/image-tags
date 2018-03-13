@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ImagesSearchDto
+public class ImageSearchDto
 {
 	private List<TagDto> tags = new ArrayList<>();
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ImagesPageDto
+public class ImagePageDto
 {
 	private Integer currentPageNumber;
 	private Integer maxPageNumber;

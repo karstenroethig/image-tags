@@ -17,7 +17,7 @@ import karstenroethig.imagetags.webapp.domain.Tag;
 import karstenroethig.imagetags.webapp.dto.DtoTransformer;
 import karstenroethig.imagetags.webapp.dto.ImageDataDto;
 import karstenroethig.imagetags.webapp.dto.ImageDto;
-import karstenroethig.imagetags.webapp.dto.ImagesSearchDto;
+import karstenroethig.imagetags.webapp.dto.ImageSearchDto;
 import karstenroethig.imagetags.webapp.dto.TagDto;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
 import karstenroethig.imagetags.webapp.repository.TagRepository;
@@ -41,7 +41,7 @@ public class ImageServiceImpl
 	@Autowired
 	protected ImageFileServiceImpl imageFileService;
 
-	public List<Long> findImages(ImagesSearchDto searchParams)
+	public List<Long> findImages(ImageSearchDto searchParams)
 	{
 		// tags available -> show images matching tags
 		if (searchParams != null

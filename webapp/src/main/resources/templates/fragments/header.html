@@ -13,8 +13,8 @@
 				<li class="nav-item" th:classappend="${#strings.equals(menu,'dashboard')} ? active">
 					<a class="nav-link" th:href="@{/dashboard}" th:text="#{dashboard.label}">Dashboard</a>
 				</li>
-				<li class="nav-item" th:classappend="${#strings.equals(menu,'images')} ? active">
-					<a class="nav-link" th:href="@{/images}" th:text="#{images.label}">Images</a>
+				<li class="nav-item" th:classappend="${#strings.equals(menu,'image')} ? active">
+					<a class="nav-link" th:href="@{/image}" th:text="#{image.label}">Images</a>
 				</li>
 				<li class="nav-item dropdown" th:classappend="${#strings.equals(menu,'tag')} ? active">
 					<a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
