@@ -35,6 +35,7 @@
 					</tr>
 				</tbody>
 			</table>
+			<a th:href="@{/tag/create}" class="btn btn-outline-primary" th:text="#{tag.add.label}">Add tag</a>
 			
 			<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
 				<div class="modal-dialog" role="document">
@@ -50,7 +51,7 @@
 						</div>
 						<div class="modal-footer">
 							<a href="" th:attr="data-href-template=@{/tag/delete/{id}}" class="btn btn-danger" th:text="#{default.button.delete.label}">Delete</a>
-							<button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{default.button.cancel.label}">Cancel</button>
+							<button type="button" class="btn btn-outline-secondary" data-dismiss="modal" th:text="#{default.button.cancel.label}">Cancel</button>
 						</div>
 					</div>
 				</div>
