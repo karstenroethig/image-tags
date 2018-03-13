@@ -55,7 +55,7 @@
 								</select>
 							</div>
 							<button type="submit" class="btn btn-primary" th:text="#{default.button.save.label}">Save</button>
-							<a th:href="@{/image/show/{id}(id=${image.id})}" th:text="#{default.button.download.label}" class="btn btn-secondary">Download</a>
+							<a th:href="@{/image/show/{id}(id=${image.id})}" th:text="#{default.button.download.label}" class="btn btn-outline-secondary">Download</a>
 							<a href="" th:text="#{default.button.delete.label}" data-toggle="modal" data-target="#deleteModal" class="btn btn-outline-danger" th:attr="data-id=${image.id}">Delete</a>
 						</form>
 					</div>
