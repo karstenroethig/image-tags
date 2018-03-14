@@ -7,6 +7,8 @@ public enum ViewEnum
 	DASHBOARD("dashboard"),
 	IMAGE("image"),
 
+	ADMIN_SERVER_INFO( ControllerEnum.admin, "server-info" ),
+
 	TAG_CREATE(ControllerEnum.tag, ActionEnum.create),
 	TAG_EDIT(ControllerEnum.tag, ActionEnum.edit),
 	TAG_LIST(ControllerEnum.tag, ActionEnum.list);
@@ -17,7 +19,7 @@ public enum ViewEnum
 
 	private enum ControllerEnum
 	{
-		tag;
+		admin, tag;
 	}
 
 	private enum ActionEnum
