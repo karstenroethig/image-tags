@@ -3,7 +3,7 @@
 
 	<groupId>karstenroethig.image-tags</groupId>
 	<artifactId>image-tags-project</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Image Tags :: Project</name>
