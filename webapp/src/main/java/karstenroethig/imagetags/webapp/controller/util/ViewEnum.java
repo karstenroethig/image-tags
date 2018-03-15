@@ -9,6 +9,9 @@ public enum ViewEnum
 
 	ADMIN_SERVER_INFO( ControllerEnum.admin, "server-info" ),
 
+	GALLERY_LIST(ControllerEnum.gallery, ActionEnum.list),
+	GALLERY_SHOW(ControllerEnum.gallery, ActionEnum.show),
+
 	TAG_CREATE(ControllerEnum.tag, ActionEnum.create),
 	TAG_EDIT(ControllerEnum.tag, ActionEnum.edit),
 	TAG_LIST(ControllerEnum.tag, ActionEnum.list);
@@ -19,7 +22,7 @@ public enum ViewEnum
 
 	private enum ControllerEnum
 	{
-		admin, tag;
+		admin, gallery, tag;
 	}
 
 	private enum ActionEnum

@@ -1,0 +1,60 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title th:text="#{gallery.label}"></title>
+	
+	<!-- Select2 -->
+	<link rel="stylesheet" th:href="@{'/webjars/select2/'+#{application.dependency.select2}+'/dist/css/select2.min.css'}"/>
+</head>
+<body th:with="menu='gallery'">
+
+	<div layout:fragment="content">
+
+		<div class="container-fluid">
+			<div class="container-sidebar col-3" style="/*background-color: #80bdff; height: 8rem;*/ float: left;">
+				<div class="card" style="margin-top: 10px;">
+					<h5 class="card-header" th:text="#{gallery.card.search.title}">Search</h5>
+					<div class="card-body">
+						<form th:object="${searchParams}" th:action="@{/gallery/search}" action="#" method="post">
+							<div class="form-group">
+								<select th:field="*{tags}" class="form-control select2-multiple" size="4" multiple="multiple">
+									<optgroup
+										th:each="ty : ${T(karstenroethig.imagetags.webapp.domain.enums.TagTypeEnum).values()}"
+										th:if="${allTags.hasTagsForType(ty)}"
+										th:label="${#messages.msg('tag.type.'+ty.name()+'.label')}" label="[type]">
+										<option th:each="tag : ${allTags.getTagsByType(ty)}" th:value="${{tag}}" th:text="${tag.name}">[name]</option>
+									</optgroup>
+								</select>
+							</div>
+							<button type="submit" class="btn btn-primary" th:text="#{default.button.search.label}">Search</button>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="container-body offset-3 col-9" style="/*background-color: #957bbe; height: 8rem;*/ padding-top: 10px;">
+
+				<p class="text-center text-muted" th:if="${#lists.isEmpty(imageIds)}">
+					<i class="fas fa-exclamation-circle fa-10x"></i><br>
+					<span th:text="#{gallery.search.empty-result}">No images found.</span>
+				</p>
+				<a href="#" th:href="@{/gallery/show/{id}(id=${imageId})}" th:each="imageId : ${imageIds}" target="_blank">
+					<img class="mb-1" th:src="@{/image/show/{id}/thumb(id=${imageId})}">
+				</a>
+
+			</div>
+		</div>
+
+	</div>
+	
+	<div layout:fragment="additionalJs">
+		<!-- Select2 -->
+		<script th:src="@{'/webjars/select2/'+#{application.dependency.select2}+'/dist/js/select2.min.js'}"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('.select2-multiple').select2();
+			});
+		</script>
+	</div>
+
+</body>
+</html>

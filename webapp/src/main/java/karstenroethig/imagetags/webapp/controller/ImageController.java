@@ -136,6 +136,22 @@ public class ImageController
 	}
 
 	@RequestMapping(
+			value = UrlMappings.ACTION_SHOW + "/thumb",
+			method = RequestMethod.GET
+			)
+	public ResponseEntity<byte[]> showThumbnail(@PathVariable("id") Long imageId) throws IOException
+	{
+		ImageDataDto imageData = imageService.getImageThumbnailData(imageId);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+		headers.setContentDispositionFormData("attachment", imageData.getFilename());
+		headers.setContentLength(imageData.getSize());
+
+		return new ResponseEntity<>(imageData.getData(), headers, HttpStatus.OK);
+	}
+
+	@RequestMapping(
 		value = UrlMappings.ACTION_UPDATE,
 		method = RequestMethod.POST
 	)

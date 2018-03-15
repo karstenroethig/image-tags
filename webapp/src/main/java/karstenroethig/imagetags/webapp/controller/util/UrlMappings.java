@@ -11,6 +11,7 @@ public class UrlMappings
 	public static final String CONTROLLER_API_VERSION_1_0 = "/1.0";
 
 	public static final String CONTROLLER_IMAGE = "/image";
+	public static final String CONTROLLER_GALLERY = "/gallery";
 	public static final String CONTROLLER_TAG = "/tag";
 	public static final String CONTROLLER_ADMIN = "/admin";
 

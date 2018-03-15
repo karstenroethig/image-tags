@@ -1,5 +1,9 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystem;
@@ -7,8 +11,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.imageio.ImageIO;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.FilenameUtils;
@@ -19,6 +25,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service;
 
 import karstenroethig.imagetags.webapp.config.properties.ImageDataProperties;
+import net.coobird.thumbnailator.Thumbnails;
 
 @Service
 @Transactional
@@ -34,11 +41,18 @@ public class ImageFileServiceImpl
 
 		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
 		{
+			// create filename
 			String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
 			String filename = buildFilename(imageId, extension);
-			Path path = fileSystem.getPath("/"+filename);
 
+			// save image
+			Path path = fileSystem.getPath("/"+filename);
 			Files.copy(imageFilePath, path);
+
+			// save thumbnail
+			Path pathThumbnail = fileSystem.getPath("/thumbs/"+filename);
+			byte[] imageThumbnailData = createImageThumbnail(imageFilePath);
+			Files.copy(new ByteArrayInputStream(imageThumbnailData), pathThumbnail);
 		}
 	}
 
@@ -55,6 +69,19 @@ public class ImageFileServiceImpl
 		}
 	}
 
+	public byte[] loadImageThumbnail(Long imageId, String extension) throws IOException
+	{
+		createZipFileIfItDoesNotExist();
+
+		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
+		{
+			String filename = buildFilename(imageId, extension);
+			Path path = fileSystem.getPath("/thumbs/"+filename);
+
+			return readDataFromPath(path);
+		}
+	}
+
 	public void deleteImage(Long imageId, String extension) throws IOException
 	{
 		createZipFileIfItDoesNotExist();
@@ -62,9 +89,14 @@ public class ImageFileServiceImpl
 		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
 		{
 			String filename = buildFilename(imageId, extension);
-			Path path = fileSystem.getPath("/"+filename);
 
+			// delete image
+			Path path = fileSystem.getPath("/"+filename);
 			Files.deleteIfExists(path);
+
+			// delete thumbnail
+			Path pathThumbnail = fileSystem.getPath("/thumbs/"+filename);
+			Files.deleteIfExists(pathThumbnail);
 		}
 	}
 
@@ -81,6 +113,7 @@ public class ImageFileServiceImpl
 						StandardOpenOption.CREATE,
 						StandardOpenOption.TRUNCATE_EXISTING)))
 		{
+			out.putNextEntry(new ZipEntry("thumbs/"));
 			out.closeEntry();
 		}
 	}
@@ -96,5 +129,51 @@ public class ImageFileServiceImpl
 		{
 			return IOUtils.toByteArray(inputStream);
 		}
+	}
+
+	private byte[] createImageThumbnail(Path imageFilePath) throws IOException
+	{
+		String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
+		BufferedImage originalImage = ImageIO.read(imageFilePath.toFile());
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Rectangle cropRectangle = calculateCropRectangle(originalImage.getWidth(), originalImage.getHeight());
+
+		if (cropRectangle != null)
+		{
+			BufferedImage croppedImage = originalImage.getSubimage(cropRectangle.x, cropRectangle.y, cropRectangle.width, cropRectangle.height);
+			Thumbnails.of(croppedImage).size(100, 100).outputFormat(extension).toOutputStream(out);
+		}
+		else
+		{
+			Thumbnails.of(originalImage).size(100, 100).outputFormat(extension).toOutputStream(out);
+		}
+
+		return out.toByteArray();
+	}
+
+	private Rectangle calculateCropRectangle(int imageWidth, int imageHeight)
+	{
+		if (imageWidth == imageHeight)
+		{
+			return null;
+		}
+
+		int x = 0;
+		int y = 0;
+		int width = Math.min(imageWidth, imageHeight);
+		int height = width;
+
+		int diff = Math.abs(imageWidth-imageHeight);
+
+		if (imageWidth > imageHeight)
+		{
+			x = diff / 2;
+		}
+		else
+		{
+			y = diff / 2;
+		}
+
+		return new Rectangle(x, y, width, height);
 	}
 }

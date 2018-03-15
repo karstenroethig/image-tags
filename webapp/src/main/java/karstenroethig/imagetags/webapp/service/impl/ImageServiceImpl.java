@@ -115,6 +115,23 @@ public class ImageServiceImpl
 		return imageData;
 	}
 
+	public ImageDataDto getImageThumbnailData(Long imageId) throws IOException
+	{
+		Image image = imageRepository.findOne(imageId);
+
+		if (image == null)
+		{
+			throw new NotFoundException(String.valueOf(imageId));
+		}
+
+		ImageDataDto imageData = new ImageDataDto();
+		imageData.setData(imageFileService.loadImageThumbnail(image.getId(), image.getExtension()));
+		imageData.setFilename("thumb." + imageFileService.buildFilename(imageId, image.getExtension()));
+		imageData.setSize(new Long(imageData.getData().length));
+
+		return imageData;
+	}
+
 	public ImageDto editImage(ImageDto imageDto)
 	{
 		Image image = imageRepository.findOne(imageDto.getId() );

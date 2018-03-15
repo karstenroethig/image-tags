@@ -124,6 +124,12 @@
 			<artifactId>commons-codec</artifactId>
 		</dependency>
 
+		<!-- Thumbnails with Thumbnailator -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+		</dependency>
+
 		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>

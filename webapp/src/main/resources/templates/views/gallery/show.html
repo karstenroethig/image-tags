@@ -1,48 +1,21 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
 <head>
-	<title th:text="#{image.label}"></title>
+	<title th:text="#{gallery.label}"></title>
 	
 	<!-- Select2 -->
 	<link rel="stylesheet" th:href="@{'/webjars/select2/'+#{application.dependency.select2}+'/dist/css/select2.min.css'}"/>
 </head>
-<body th:with="menu='image'">
+<body th:with="menu='gallery'">
 
 	<div layout:fragment="content">
 
 		<div class="container-fluid">
 			<div class="container-sidebar col-3" style="/*background-color: #80bdff; height: 8rem;*/ float: left;">
 				<div class="card" style="margin-top: 10px;">
-					<h5 class="card-header" th:text="#{image.card.search.title}">Search</h5>
+					<h5 class="card-header" th:text="#{gallery.card.image.title}">Image</h5>
 					<div class="card-body">
-						<form th:object="${searchParams}" th:action="@{/image/search}" action="#" method="post">
-							<div class="form-group">
-								<select th:field="*{tags}" class="form-control select2-multiple" size="4" multiple="multiple">
-									<optgroup
-										th:each="ty : ${T(karstenroethig.imagetags.webapp.domain.enums.TagTypeEnum).values()}"
-										th:if="${allTags.hasTagsForType(ty)}"
-										th:label="${#messages.msg('tag.type.'+ty.name()+'.label')}" label="[type]">
-										<option th:each="tag : ${allTags.getTagsByType(ty)}" th:value="${{tag}}" th:text="${tag.name}">[name]</option>
-									</optgroup>
-								</select>
-							</div>
-							<button type="submit" class="btn btn-primary" th:text="#{default.button.search.label}">Search</button>
-						</form>
-						<p class="lead font-italic text-center" style="margin-top: 10px;">
-							<a th:href="@{/image/page/{page}(page=${imagePage.currentPageNumber-1})}" th:if="${imagePage.hasPreviousPage()}"><i class="fas fa-chevron-left fa-lg text-primary"></i></a>
-							<i th:if="${!imagePage.hasPreviousPage()}" class="fas fa-chevron-left fa-lg text-muted"></i>
-							<span th:text="${#numbers.formatInteger(imagePage.currentPageNumber,1,'POINT')}">[currentPageNumber]</span>
-							/
-							<span th:text="${#numbers.formatInteger(imagePage.maxPageNumber,1,'POINT')}">[maxPageNumber]</span>
-							<a th:href="@{/image/page/{page}(page=${imagePage.currentPageNumber+1})}" th:if="${imagePage.hasNextPage()}"><i class="fas fa-chevron-right fa-lg text-primary"></i></a>
-							<i th:if="${!imagePage.hasNextPage()}" class="fas fa-chevron-right fa-lg text-muted"></i>
-						</p>
-					</div>
-				</div>
-				<div class="card" style="margin-top: 10px;" th:if="${imagePage.hasImage()}">
-					<h5 class="card-header" th:text="#{image.card.image.title}">Current Image</h5>
-					<div class="card-body">
-						<form th:object="${image}" th:action="@{/image/update}" action="#" method="post">
+						<form th:object="${image}" th:action="@{/gallery/update}" action="#" method="post">
 							<input type="hidden" th:field="*{id}"/>
 							<div class="form-group">
 								<select th:field="*{tags}" class="form-control select2-multiple" size="4" multiple="multiple">
@@ -65,11 +38,7 @@
 				</div>
 			</div>
 			<div class="container-body offset-3 col-9" style="/*background-color: #957bbe; height: 8rem;*/ padding-top: 10px;">
-				<img th:if="${imagePage.hasImage()}" th:src="@{/image/show/{id}(id=${image.id})}" class="img-fluid mx-auto d-block">
-				<p class="text-center text-muted" th:if="${imagePage.hasError()}">
-					<i class="fas fa-exclamation-circle fa-10x"></i><br>
-					<span th:text="${#messages.msg(imagePage.errorMessageKey)}"></span>
-				</p>
+				<img th:src="@{/image/show/{id}(id=${image.id})}" class="img-fluid mx-auto d-block">
 			</div>
 		</div>
 		
@@ -86,7 +55,7 @@
 						<span th:text="#{image.deletePopup.question}">Do you really want to delete this image?</span>
 					</div>
 					<div class="modal-footer">
-						<a href="" th:attr="data-href-template=@{/image/delete/{id}}" class="btn btn-danger" th:text="#{default.button.delete.label}">Delete</a>
+						<a href="" th:attr="data-href-template=@{/gallery/delete/{id}}" class="btn btn-danger" th:text="#{default.button.delete.label}">Delete</a>
 						<button type="button" class="btn btn-secondary" data-dismiss="modal" th:text="#{default.button.cancel.label}">Cancel</button>
 					</div>
 				</div>

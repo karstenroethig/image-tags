@@ -16,6 +16,9 @@
 				<li class="nav-item" th:classappend="${#strings.equals(menu,'image')} ? active">
 					<a class="nav-link" th:href="@{/image}" th:text="#{image.label}">Images</a>
 				</li>
+				<li class="nav-item" th:classappend="${#strings.equals(menu,'gallery')} ? active">
+					<a class="nav-link" th:href="@{/gallery/list}" th:text="#{gallery.label}">Gallery</a>
+				</li>
 				<li class="nav-item dropdown" th:classappend="${#strings.equals(menu,'tag')} ? active">
 					<a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
 						href="#" th:text="#{tag.label.plural}">Tags</a>
