@@ -13,6 +13,12 @@
 		<div class="container-fluid">
 			<div class="container-sidebar col-3" style="/*background-color: #80bdff; height: 8rem;*/ float: left;">
 				<div class="card" style="margin-top: 10px;">
+					<h5 class="card-header" th:text="#{gallery.card.search.title}">Search</h5>
+					<div class="card-body">
+						<a th:href="@{/gallery/back}" th:text="#{gallery.card.search.button.backToGallery}" class="btn btn-outline-secondary">Back to gallery</a>
+					</div>
+				</div>
+				<div class="card" style="margin-top: 10px;">
 					<h5 class="card-header" th:text="#{gallery.card.image.title}">Image</h5>
 					<div class="card-body">
 						<form th:object="${image}" th:action="@{/gallery/update}" action="#" method="post">

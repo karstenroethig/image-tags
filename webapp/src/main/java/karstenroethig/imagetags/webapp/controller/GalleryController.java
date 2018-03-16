@@ -63,6 +63,19 @@ public class GalleryController
 	}
 
 	@RequestMapping(
+		value = "/back",
+		method = RequestMethod.GET
+	)
+	public String back(Model model)
+	{
+		model.addAttribute("allTags", tagService.getAllTagsByType());
+		model.addAttribute("searchParams", imagesSearchBean.getSearchParams());
+		model.addAttribute("imageIds", imagesSearchBean.getSearchResultImageIds());
+
+		return ViewEnum.GALLERY_LIST.getViewName();
+	}
+
+	@RequestMapping(
 		value = UrlMappings.ACTION_SHOW,
 		method = RequestMethod.GET
 	)
@@ -89,7 +102,9 @@ public class GalleryController
 	{
 		imageService.deleteImage(imageId);
 
-		return executeNewSearch(model, imagesSearchBean.getSearchParams());
+		imagesSearchBean.removeImageFormSearchResult(imageId);
+
+		return UrlMappings.redirect(UrlMappings.CONTROLLER_GALLERY, "/back");
 	}
 
 	@RequestMapping(
