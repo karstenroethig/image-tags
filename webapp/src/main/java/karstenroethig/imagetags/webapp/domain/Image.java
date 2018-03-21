@@ -3,7 +3,6 @@ package karstenroethig.imagetags.webapp.domain;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -71,8 +70,7 @@ public class Image
 	private String importPath;
 
 	@ManyToMany(
-		fetch = FetchType.LAZY,
-		cascade = CascadeType.ALL
+		fetch = FetchType.LAZY
 	)
 	@JoinTable(
 		name = "Image_Tag",
