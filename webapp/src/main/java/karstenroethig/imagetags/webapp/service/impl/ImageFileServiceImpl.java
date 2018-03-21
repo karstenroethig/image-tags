@@ -11,6 +11,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -37,19 +38,21 @@ public class ImageFileServiceImpl
 
 	public void saveImage(Path imageFilePath, Long imageId) throws IOException
 	{
+		String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
+		String filename = buildFilename(imageId, extension);
+
 		createZipFileIfItDoesNotExist();
 
 		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
 		{
-			// create filename
-			String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
-			String filename = buildFilename(imageId, extension);
-
-			// save image
 			Path path = fileSystem.getPath("/"+filename);
 			Files.copy(imageFilePath, path);
+		}
 
-			// save thumbnail
+		createThumbsZipFileIfItDoesNotExist();
+
+		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getThumbsZipPath(), null))
+		{
 			Path pathThumbnail = fileSystem.getPath("/thumbs/"+filename);
 			byte[] imageThumbnailData = createImageThumbnail(imageFilePath);
 			Files.copy(new ByteArrayInputStream(imageThumbnailData), pathThumbnail);
@@ -73,7 +76,7 @@ public class ImageFileServiceImpl
 	{
 		createZipFileIfItDoesNotExist();
 
-		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
+		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getThumbsZipPath(), null))
 		{
 			String filename = buildFilename(imageId, extension);
 			Path path = fileSystem.getPath("/thumbs/"+filename);
@@ -84,23 +87,26 @@ public class ImageFileServiceImpl
 
 	public void deleteImage(Long imageId, String extension) throws IOException
 	{
+		String filename = buildFilename(imageId, extension);
+
 		createZipFileIfItDoesNotExist();
 
 		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
 		{
-			String filename = buildFilename(imageId, extension);
-
-			// delete image
 			Path path = fileSystem.getPath("/"+filename);
 			Files.deleteIfExists(path);
+		}
 
-			// delete thumbnail
+		createThumbsZipFileIfItDoesNotExist();
+
+		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getThumbsZipPath(), null))
+		{
 			Path pathThumbnail = fileSystem.getPath("/thumbs/"+filename);
 			Files.deleteIfExists(pathThumbnail);
 		}
 	}
 
-	private void createZipFileIfItDoesNotExist() throws IOException
+	public void createZipFileIfItDoesNotExist() throws IOException
 	{
 		if (Files.exists(imageDataProperties.getZipPath()))
 		{
@@ -113,6 +119,25 @@ public class ImageFileServiceImpl
 						StandardOpenOption.CREATE,
 						StandardOpenOption.TRUNCATE_EXISTING)))
 		{
+			out.setLevel(Deflater.NO_COMPRESSION);
+			out.closeEntry();
+		}
+	}
+
+	private void createThumbsZipFileIfItDoesNotExist() throws IOException
+	{
+		if (Files.exists(imageDataProperties.getThumbsZipPath()))
+		{
+			return;
+		}
+
+		try (ZipOutputStream out = new ZipOutputStream(
+				Files.newOutputStream(
+						imageDataProperties.getThumbsZipPath(),
+						StandardOpenOption.CREATE,
+						StandardOpenOption.TRUNCATE_EXISTING)))
+		{
+			out.setLevel(Deflater.NO_COMPRESSION);
 			out.putNextEntry(new ZipEntry("thumbs/"));
 			out.closeEntry();
 		}
