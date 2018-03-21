@@ -3,6 +3,8 @@ package karstenroethig.imagetags.webapp.service.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -84,14 +86,19 @@ public class ImageImportServiceImpl
 			String.format("start import of %s new images", totalFileCount)
 		);
 
-		for (Path imagePath : imagePaths)
+		imageFileService.createZipFileIfItDoesNotExist();
+
+		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
 		{
-			currentFileCount++;
-			importImage(imagePath, currentFileCount, totalFileCount);
+			for (Path imagePath : imagePaths)
+			{
+				currentFileCount++;
+				importImage(imagePath, currentFileCount, totalFileCount, fileSystem);
+			}
 		}
 	}
 
-	private void importImage(Path imagePath, int currentFileCount, int totalFileCount) throws IOException
+	private void importImage(Path imagePath, int currentFileCount, int totalFileCount, FileSystem fileSystem) throws IOException
 	{
 		log.info(
 			String.format("importing image file [%s/%s]: %s", currentFileCount, totalFileCount, imagePath.toString())
@@ -105,7 +112,8 @@ public class ImageImportServiceImpl
 			imageRepository.save(image);
 
 			// copy file
-			imageFileService.saveImage(imagePath, image.getId());
+//			imageFileService.saveImage(imagePath, image.getId());
+			saveImage(imagePath, image.getId(), fileSystem);
 		}
 		else
 		{
@@ -186,5 +194,14 @@ public class ImageImportServiceImpl
 		}
 
 		return false;
+	}
+
+	private void saveImage(Path imageFilePath, Long imageId, FileSystem fileSystem) throws IOException
+	{
+		String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
+		String filename = imageFileService.buildFilename(imageId, extension);
+
+		Path path = fileSystem.getPath("/"+filename);
+		Files.copy(imageFilePath, path);
 	}
 }
