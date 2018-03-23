@@ -31,4 +31,4 @@ logging:
 
 imageData:
     importDirectory: data/new
-    zipPath: data/images.zip
+    storageDirectory: data

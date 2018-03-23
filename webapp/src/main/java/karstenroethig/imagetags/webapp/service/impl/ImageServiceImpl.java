@@ -1,12 +1,15 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import karstenroethig.imagetags.webapp.controller.exceptions.NotFoundException;
 import karstenroethig.imagetags.webapp.domain.Image;
 import karstenroethig.imagetags.webapp.domain.Tag;
+import karstenroethig.imagetags.webapp.domain.enums.ImageThumbStatusEnum;
 import karstenroethig.imagetags.webapp.dto.DtoTransformer;
 import karstenroethig.imagetags.webapp.dto.ImageDataDto;
 import karstenroethig.imagetags.webapp.dto.ImageDto;
@@ -39,7 +43,7 @@ public class ImageServiceImpl
 	protected TagRepository tagRepository;
 
 	@Autowired
-	protected ImageFileServiceImpl imageFileService;
+	protected StorageServiceImpl storageService;
 
 	public List<Long> findImages(ImageSearchDto searchParams)
 	{
@@ -98,36 +102,33 @@ public class ImageServiceImpl
 		return transform(imageRepository.findOne(imageId));
 	}
 
-	public ImageDataDto getImageData(Long imageId) throws IOException
+	public ImageDataDto getImageData(Long imageId, boolean thumbnail) throws IOException
 	{
 		Image image = imageRepository.findOne(imageId);
 
 		if (image == null)
-		{
 			throw new NotFoundException(String.valueOf(imageId));
-		}
+
+		String storageKey = image.getStorage() == null ? null : image.getStorage().getKey();
 
 		ImageDataDto imageData = new ImageDataDto();
-		imageData.setData(imageFileService.loadImage(image.getId(), image.getExtension()));
-		imageData.setFilename(imageFileService.buildFilename(imageId, image.getExtension()));
-		imageData.setSize(image.getSize());
 
-		return imageData;
-	}
-
-	public ImageDataDto getImageThumbnailData(Long imageId) throws IOException
-	{
-		Image image = imageRepository.findOne(imageId);
-
-		if (image == null)
+		if (image.getThumbStatusEnum() == ImageThumbStatusEnum.THUMB_100_100)
 		{
-			throw new NotFoundException(String.valueOf(imageId));
+			imageData.setData(storageService.loadImage(image.getId(), image.getExtension(), storageKey, thumbnail));
+		}
+		else
+		{
+			try(InputStream input = ClassLoader.getSystemClassLoader().getResourceAsStream("static/images/thumb_error.png"))
+			{
+				imageData.setData(IOUtils.toByteArray(input));
+			}
 		}
 
-		ImageDataDto imageData = new ImageDataDto();
-		imageData.setData(imageFileService.loadImageThumbnail(image.getId(), image.getExtension()));
-		imageData.setFilename("thumb." + imageFileService.buildFilename(imageId, image.getExtension()));
-		imageData.setSize(new Long(imageData.getData().length));
+		imageData.setFilename(
+			(thumbnail ? "thumb." : StringUtils.EMPTY)
+			+ storageService.buildImageFilename(imageId, image.getExtension()));
+		imageData.setSize(thumbnail ? new Long(imageData.getData().length) : image.getSize());
 
 		return imageData;
 	}
@@ -144,9 +145,7 @@ public class ImageServiceImpl
 	private Image merge(Image image, ImageDto imageDto)
 	{
 		if (image == null || imageDto == null)
-		{
 			return null;
-		}
 
 		image.clearTags();
 
@@ -161,9 +160,7 @@ public class ImageServiceImpl
 	private ImageDto transform(Image image)
 	{
 		if (image == null)
-		{
 			return null;
-		}
 
 		ImageDto imageDto = new ImageDto();
 
@@ -188,16 +185,21 @@ public class ImageServiceImpl
 		Image image = imageRepository.findOne(imageId);
 
 		if (image == null)
-		{
 			throw new NotFoundException(String.valueOf(imageId));
-		}
+
+		String storageKey = image.getStorage() == null ? null : image.getStorage().getKey();
 
 		try {
-			imageFileService.deleteImage(imageId, image.getExtension());
+			storageService.deleteImage(imageId, image.getExtension(), storageKey);
 		}
 		catch (IOException ex)
 		{
 			log.error("unable to delete file with id " + imageId);
+		}
+
+		if (image.getStorage() != null)
+		{
+			storageService.subtractAndSaveFilesize(image.getStorage().getId(), image.getSize());
 		}
 
 		imageRepository.delete(imageId);

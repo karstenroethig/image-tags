@@ -125,7 +125,7 @@ public class ImageController
 	)
 	public ResponseEntity<byte[]> show(@PathVariable("id") Long imageId) throws IOException
 	{
-		ImageDataDto imageData = imageService.getImageData(imageId);
+		ImageDataDto imageData = imageService.getImageData(imageId, false);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
@@ -141,7 +141,7 @@ public class ImageController
 			)
 	public ResponseEntity<byte[]> showThumbnail(@PathVariable("id") Long imageId) throws IOException
 	{
-		ImageDataDto imageData = imageService.getImageThumbnailData(imageId);
+		ImageDataDto imageData = imageService.getImageData(imageId, true);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setCacheControl(CacheControl.noCache().getHeaderValue());

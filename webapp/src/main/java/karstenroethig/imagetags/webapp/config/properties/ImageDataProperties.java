@@ -14,6 +14,5 @@ import lombok.Setter;
 public class ImageDataProperties
 {
 	private Path importDirectory = Paths.get("data/new");
-	private Path zipPath = Paths.get("data/images.zip");
-	private Path thumbsZipPath = Paths.get("data/images_thumbs.zip");
+	private Path storageDirectory = Paths.get("data");
 }

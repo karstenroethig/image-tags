@@ -12,9 +12,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import karstenroethig.imagetags.webapp.domain.enums.ImageThumbStatusEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,6 +46,20 @@ public class Image
 	@Id
 	private Long id;
 
+	@JoinColumn(name = "storage_id")
+	@ManyToOne(optional = true)
+	private Storage storage;
+
+	@ManyToMany(
+		fetch = FetchType.LAZY
+	)
+	@JoinTable(
+		name = "Image_Tag",
+		joinColumns = { @JoinColumn(name = "image_id") },
+		inverseJoinColumns = { @JoinColumn(name = "tag_id") }
+	)
+	private Set<Tag> tags = new HashSet<>();
+
 	@Column(
 		name = "file_extension",
 		length = 50,
@@ -69,15 +86,11 @@ public class Image
 	)
 	private String importPath;
 
-	@ManyToMany(
-		fetch = FetchType.LAZY
+	@Column(
+		name = "thumb_status",
+		nullable = false
 	)
-	@JoinTable(
-		name = "Image_Tag",
-		joinColumns = { @JoinColumn(name = "image_id") },
-		inverseJoinColumns = { @JoinColumn(name = "tag_id") }
-	)
-	private Set<Tag> tags = new HashSet<>();
+	private Integer thumbStatus;
 
 	public void addTag(Tag tag)
 	{
@@ -87,5 +100,23 @@ public class Image
 	public void clearTags()
 	{
 		tags.clear();
+	}
+
+	@Transient
+	public ImageThumbStatusEnum getThumbStatusEnum()
+	{
+		return ImageThumbStatusEnum.getStatusForKey(thumbStatus);
+	}
+
+	public void setThumbStatusEnum(ImageThumbStatusEnum imageThumbStatusEnum)
+	{
+		if (imageThumbStatusEnum != null)
+		{
+			setThumbStatus(imageThumbStatusEnum.getKey());
+		}
+		else
+		{
+			setThumbStatus(ImageThumbStatusEnum.NO_THUMB.getKey());
+		}
 	}
 }

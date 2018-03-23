@@ -17,12 +17,14 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import karstenroethig.imagetags.webapp.config.properties.ImageDataProperties;
 import karstenroethig.imagetags.webapp.domain.Image;
+import karstenroethig.imagetags.webapp.domain.Storage;
+import karstenroethig.imagetags.webapp.domain.enums.ImageThumbStatusEnum;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
-@EnableConfigurationProperties(ImageDataProperties.class)
 public class ImageImportServiceImpl
 {
 	private static final String[] IMAGE_FILE_EXTENSIONS = new String[] {"gif", "GIF", "jpg", "JPG", "jpeg", "JPEG", "png", "PNG"};
@@ -42,7 +43,10 @@ public class ImageImportServiceImpl
 	protected ImageRepository imageRepository;
 
 	@Autowired
-	protected ImageFileServiceImpl imageFileService;
+	protected ImageOperationServiceImpl imageOperationService;
+
+	@Autowired
+	protected StorageServiceImpl storageService;
 
 	@PostConstruct
 	public void execute()
@@ -51,7 +55,7 @@ public class ImageImportServiceImpl
 
 		if (!Files.exists(importDirectory))
 		{
-			log.info("import of images skipped (directory 'data/new' does not exist)");
+			log.info("import of images skipped (directory '" + importDirectory + "' does not exist)");
 
 			return;
 		}
@@ -86,19 +90,50 @@ public class ImageImportServiceImpl
 			String.format("start import of %s new images", totalFileCount)
 		);
 
-		imageFileService.createZipFileIfItDoesNotExist();
+		Storage currentStorage = null;
+		String currentStorageKey = null;
+		FileSystem currentFileSystem = null;
+		FileSystem currentFileSystemThumbs = null;
 
-		try (FileSystem fileSystem = FileSystems.newFileSystem(imageDataProperties.getZipPath(), null))
+		try
 		{
 			for (Path imagePath : imagePaths)
 			{
 				currentFileCount++;
-				importImage(imagePath, currentFileCount, totalFileCount, fileSystem);
+
+				currentStorage = storageService.findOrCreateStorage(currentStorage, Files.size(imagePath));
+
+				if (!currentStorage.getKey().equals(currentStorageKey))
+				{
+					currentStorageKey = currentStorage.getKey();
+
+					IOUtils.closeQuietly(currentFileSystem);
+					storageService.createStorageFileIfItDoesNotExist(currentStorageKey, false);
+					Path storagePath = storageService.createStoragePath(currentStorageKey, false);
+					currentFileSystem = FileSystems.newFileSystem(storagePath, null);
+
+					IOUtils.closeQuietly(currentFileSystemThumbs);
+					storageService.createStorageFileIfItDoesNotExist(currentStorageKey, true);
+					storagePath = storageService.createStoragePath(currentStorageKey, true);
+					currentFileSystemThumbs = FileSystems.newFileSystem(storagePath, null);
+				}
+
+				Image image = importImage(imagePath, currentStorage, currentFileCount, totalFileCount, currentFileSystem, currentFileSystemThumbs);
+
+				if (image != null)
+				{
+					currentStorage = storageService.addAndSaveFilesize(currentStorage.getId(), image.getSize());
+				}
 			}
+		}
+		finally
+		{
+			IOUtils.closeQuietly(currentFileSystem);
+			IOUtils.closeQuietly(currentFileSystemThumbs);
 		}
 	}
 
-	private void importImage(Path imagePath, int currentFileCount, int totalFileCount, FileSystem fileSystem) throws IOException
+	private Image importImage(Path imagePath, Storage storage, int currentFileCount, int totalFileCount, FileSystem fileSystem, FileSystem fileSystemThumbs) throws IOException
 	{
 		log.info(
 			String.format("importing image file [%s/%s]: %s", currentFileCount, totalFileCount, imagePath.toString())
@@ -109,21 +144,34 @@ public class ImageImportServiceImpl
 		if (!doesImageExistInDatabase(image.getHash()))
 		{
 			// save new image in database
+			image.setStorage(storage);
 			imageRepository.save(image);
 
 			// copy file
-//			imageFileService.saveImage(imagePath, image.getId());
-			saveImage(imagePath, image.getId(), fileSystem);
+			storageService.saveImage(imagePath, image.getId(), fileSystem, false);
+
+			// create thumbnail and copy it to the storage
+			try {
+				byte[] thumbData = imageOperationService.createImageThumbnail(imagePath);
+				storageService.saveImage(thumbData, image.getId(), image.getExtension(), fileSystemThumbs, true);
+				image.setThumbStatusEnum(ImageThumbStatusEnum.THUMB_100_100);
+			}
+			catch (Exception ex)
+			{
+				log.info(String.format("image %s already exists and will be ignored", imagePath.toString()), ex);
+				image.setThumbStatusEnum(ImageThumbStatusEnum.GENERATION_ERROR);
+			}
 		}
 		else
 		{
-			log.info(
-				String.format("image %s already exists and will be ignored", imagePath.toString())
-			);
+			log.info(String.format("image %s already exists and will be ignored", imagePath.toString()));
+			image = null;
 		}
 
 		// delete the source file
 		Files.delete(imagePath);
+
+		return image;
 	}
 
 	private Image createImage(Path imagePath) throws IOException
@@ -132,6 +180,7 @@ public class ImageImportServiceImpl
 
 		image.setExtension(FilenameUtils.getExtension(imagePath.getFileName().toString()));
 		image.setSize(Files.size(imagePath));
+		image.setThumbStatusEnum(ImageThumbStatusEnum.NO_THUMB);
 		image.setImportPath(findRelativeImportPath(imagePath));
 
 		try (InputStream inputStream = Files.newInputStream(imagePath))
@@ -194,14 +243,5 @@ public class ImageImportServiceImpl
 		}
 
 		return false;
-	}
-
-	private void saveImage(Path imageFilePath, Long imageId, FileSystem fileSystem) throws IOException
-	{
-		String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
-		String filename = imageFileService.buildFilename(imageId, extension);
-
-		Path path = fileSystem.getPath("/"+filename);
-		Files.copy(imageFilePath, path);
 	}
 }

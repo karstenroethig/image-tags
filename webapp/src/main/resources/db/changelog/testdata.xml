@@ -9,7 +9,7 @@
 	<!-- =========== -->
 	<!-- insert data -->
 	<!-- =========== -->
-	<changeSet id="1" author="roethig">
+	<changeSet id="test" author="roethig">
 
 		<loadData
 			tableName="Tag"
@@ -22,6 +22,7 @@
 			<column name="file_size" value="75315"/>
 			<column name="hash" value="a175f61fca912ec49ce9379f02dbebfb"/>
 			<column name="import_path" value="abc/123/test.png"/>
+			<column name="thumb_status" value="1"/>
 		</insert>
 		<insert tableName="Image_Tag">
 			<column name="image_id" valueNumeric="select id from Image where hash='a175f61fca912ec49ce9379f02dbebfb'"/>
@@ -36,12 +37,14 @@
 			<column name="file_extension" value="jpg"/>
 			<column name="file_size" value="74479"/>
 			<column name="hash" value="3773af58a5b072a094c53f628e7160fa"/>
+			<column name="thumb_status" value="1"/>
 		</insert>
 
 		<insert tableName="Image">
 			<column name="file_extension" value="png"/>
 			<column name="file_size" value="178917"/>
 			<column name="hash" value="1ef2bdcf054c278cab5f321e99b4dd89"/>
+			<column name="thumb_status" value="-1"/>
 		</insert>
 		<insert tableName="Image_Tag">
 			<column name="image_id" valueNumeric="select id from Image where hash='1ef2bdcf054c278cab5f321e99b4dd89'"/>
@@ -56,6 +59,7 @@
 			<column name="file_extension" value="jpg"/>
 			<column name="file_size" value="53623"/>
 			<column name="hash" value="1fd1c4ba07fa847691d092ca618c549e"/>
+			<column name="thumb_status" value="1"/>
 		</insert>
 		<insert tableName="Image_Tag">
 			<column name="image_id" valueNumeric="select id from Image where hash='1fd1c4ba07fa847691d092ca618c549e'"/>

@@ -6,7 +6,7 @@
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-	<changeSet id="1" author="roethig">
+	<changeSet id="1.0" author="roethig">
 
 		<!-- =========== -->
 		<!-- Table "Tag" -->
@@ -23,7 +23,7 @@
 			</column>
 		</createTable>
 
-		<addUniqueConstraint tableName="Tag" columnNames="name" constraintName="unique_tag_name"/>
+		<addUniqueConstraint tableName="Tag" columnNames="name" constraintName="unique___tag___name"/>
 
 		<!-- ============= -->
 		<!-- Table "Image" -->
@@ -50,13 +50,29 @@
 		<!-- Table "ImageTag" -->
 		<!-- ================ -->
 		<createTable tableName="Image_Tag">
-			<column name="image_id" type="${type.id}">
-				<constraints primaryKey="true" nullable="false"/>
+			<column name="image_id" type="${type.idRef}">
+				<constraints nullable="false"/>
 			</column>
-			<column name="tag_id" type="${type.id}">
-				<constraints primaryKey="true" nullable="false"/>
+			<column name="tag_id" type="${type.idRef}">
+				<constraints nullable="false"/>
 			</column>
 		</createTable>
+
+		<addPrimaryKey tableName="Image_Tag" columnNames="image_id,tag_id" constraintName="primarykey___image_tag___image_id__tag_id"/>
+
+		<addForeignKeyConstraint
+			baseTableName="Image_Tag"
+			baseColumnNames="image_id"
+			referencedTableName="Image"
+			referencedColumnNames="id"
+			constraintName="foreignkey___image_tag__image_id___image__id"/>
+
+		<addForeignKeyConstraint
+			baseTableName="Image_Tag"
+			baseColumnNames="tag_id"
+			referencedTableName="Tag"
+			referencedColumnNames="id"
+			constraintName="foreignkey___image_tag__tag_id___tag__id"/>
 
 	</changeSet>
 
