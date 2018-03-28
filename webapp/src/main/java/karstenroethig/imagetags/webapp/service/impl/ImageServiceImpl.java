@@ -113,13 +113,13 @@ public class ImageServiceImpl
 
 		ImageDataDto imageData = new ImageDataDto();
 
-		if (image.getThumbStatusEnum() == ImageThumbStatusEnum.THUMB_100_100)
+		if (!thumbnail || image.getThumbStatusEnum() == ImageThumbStatusEnum.THUMB_100_100)
 		{
 			imageData.setData(storageService.loadImage(image.getId(), image.getExtension(), storageKey, thumbnail));
 		}
 		else
 		{
-			try(InputStream input = ClassLoader.getSystemClassLoader().getResourceAsStream("static/images/thumb_error.png"))
+			try(InputStream input = ImageServiceImpl.class.getResourceAsStream("thumb_error.png"))
 			{
 				imageData.setData(IOUtils.toByteArray(input));
 			}

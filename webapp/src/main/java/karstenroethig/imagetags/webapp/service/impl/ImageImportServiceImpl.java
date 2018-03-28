@@ -135,9 +135,7 @@ public class ImageImportServiceImpl
 
 	private Image importImage(Path imagePath, Storage storage, int currentFileCount, int totalFileCount, FileSystem fileSystem, FileSystem fileSystemThumbs) throws IOException
 	{
-		log.info(
-			String.format("importing image file [%s/%s]: %s", currentFileCount, totalFileCount, imagePath.toString())
-		);
+		log.info(String.format("importing image file [%s/%s]: %s", currentFileCount, totalFileCount, imagePath.toString()));
 
 		Image image = createImage(imagePath);
 
@@ -158,9 +156,10 @@ public class ImageImportServiceImpl
 			}
 			catch (Exception ex)
 			{
-				log.info(String.format("image %s already exists and will be ignored", imagePath.toString()), ex);
+				log.warn(String.format("failed to generate thumbnail of image %s", imagePath.toString()), ex);
 				image.setThumbStatusEnum(ImageThumbStatusEnum.GENERATION_ERROR);
 			}
+			imageRepository.save(image);
 		}
 		else
 		{
