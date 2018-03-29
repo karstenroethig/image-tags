@@ -6,6 +6,7 @@ public enum ViewEnum
 {
 	DASHBOARD("dashboard"),
 	IMAGE("image"),
+	STATISTIC("statistic"),
 
 	ADMIN_SERVER_INFO( ControllerEnum.admin, "server-info" ),
 

@@ -97,6 +97,26 @@ public class ImageServiceImpl
 		return jdbcTemplate.queryForList(sql.toString(), tagIds.toArray(), Long.class);
 	}
 
+	public Long findTotalImages()
+	{
+		StringBuffer sql = new StringBuffer();
+
+		sql.append("SELECT COUNT(id) ");
+		sql.append("FROM   Image;");
+
+		return jdbcTemplate.queryForObject(sql.toString(), Long.class);
+	}
+
+	public Long findTotalFilesize()
+	{
+		StringBuffer sql = new StringBuffer();
+
+		sql.append("SELECT SUM(file_size) ");
+		sql.append("FROM   Image;");
+
+		return jdbcTemplate.queryForObject(sql.toString(), Long.class);
+	}
+
 	public ImageDto findImage(Long imageId)
 	{
 		return transform(imageRepository.findOne(imageId));
