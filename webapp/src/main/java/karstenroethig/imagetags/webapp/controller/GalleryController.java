@@ -1,6 +1,7 @@
 package karstenroethig.imagetags.webapp.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -49,7 +50,17 @@ public class GalleryController
 	)
 	public String list(Model model)
 	{
-		return executeNewSearch(model, new ImageSearchDto());
+		List<Long> foundImagesIds = new ArrayList<>();
+
+		imagesSearchBean.clear();
+		imagesSearchBean.setSearchParams(new ImageSearchDto());
+		imagesSearchBean.setSearchResultImageIds(foundImagesIds);
+
+		model.addAttribute("allTags", tagService.getAllTagsByType());
+		model.addAttribute("searchParams", imagesSearchBean.getSearchParams());
+		model.addAttribute("imageIds", foundImagesIds);
+
+		return ViewEnum.GALLERY_LIST.getViewName();
 	}
 
 	@RequestMapping(
