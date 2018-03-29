@@ -4,3 +4,33 @@ todo
 	-> auch Upload eines ZIP-Archivs wäre denkbar
 
 http://localhost:4080/h2-console
+
+
+
+sql statements
+--------------
+-- find all categories and persons for tags
+select import_path from Image where import_path is not null order by import_path;
+
+
+-- select total file size
+select sum(file_size) from image;
+
+
+-- find biggest and smallest image file
+select top 3 * from image order by file_size desc;
+select top 3 * from image order by file_size asc;
+
+
+-- count error thumbs
+select thumb_status, count(id) from image group by thumb_status;
+
+
+-- add tags to images of tags
+select * from tag where name = 'software development'; -- 1
+select * from tag where name = 'kanban'; -- 3
+
+--insert into image_tag
+select i.id as image_id, 3 as tag_id from Image i where
+exists ( select it.image_id from image_tag it where i.id = it.image_id and it.tag_id = 1)
+and not exists ( select it.image_id from image_tag it where i.id = it.image_id and it.tag_id = 3);
