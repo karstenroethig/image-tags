@@ -59,6 +59,15 @@
 							<a href="" th:text="#{default.button.delete.label}" data-toggle="modal" data-target="#deleteModal" class="btn btn-outline-danger" th:attr="data-id=${image.id}">Delete</a>
 						</form>
 					</div>
+					<div class="card-footer">
+						<p class="lead font-italic">
+							<span th:text="#{image.card.image.filessize.label}">File size</span>: <span th:text="${image.sizeFormatted}">[sizeFormatted]</span>
+						</p>
+						<p class="lead font-italic">
+							<span th:text="#{image.card.image.resolution.label}">Resolution</span>:
+							<span th:text="${image.resolutionWidth}">[resolutionWidth]</span> x <span th:text="${image.resolutionHeight}">[resolutionHeight]</span>
+						</p>
+					</div>
 					<div class="card-footer" th:if="${image.importPath != null}">
 						<p class="lead font-italic" th:text="${image.importPath}">[importPath]</p>
 					</div>

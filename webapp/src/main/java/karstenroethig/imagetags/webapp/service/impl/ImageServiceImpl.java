@@ -25,6 +25,7 @@ import karstenroethig.imagetags.webapp.dto.ImageSearchDto;
 import karstenroethig.imagetags.webapp.dto.TagDto;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
 import karstenroethig.imagetags.webapp.repository.TagRepository;
+import karstenroethig.imagetags.webapp.util.FilesizeUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -185,6 +186,9 @@ public class ImageServiceImpl
 		ImageDto imageDto = new ImageDto();
 
 		imageDto.setId(image.getId());
+		imageDto.setSizeFormatted(FilesizeUtils.formatFilesize(image.getSize()));
+		imageDto.setResolutionWidth(0);
+		imageDto.setResolutionHeight(0);
 		imageDto.setImportPath(image.getImportPath());
 
 		Set<Tag> tags = image.getTags();
