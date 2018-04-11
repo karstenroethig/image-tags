@@ -1,5 +1,6 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
+import java.awt.Point;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
@@ -35,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ImageImportServiceImpl
 {
 	private static final String[] IMAGE_FILE_EXTENSIONS = new String[] {"gif", "GIF", "jpg", "JPG", "jpeg", "JPEG", "png", "PNG"};
+	private static final Point RESOLUTION_DEFAULT = new Point(0, 0);
 
 	@Autowired
 	protected ImageDataProperties imageDataProperties;
@@ -185,6 +187,19 @@ public class ImageImportServiceImpl
 		try (InputStream inputStream = Files.newInputStream(imagePath))
 		{
 			image.setHash(DigestUtils.md5Hex(inputStream));
+		}
+
+		try
+		{
+			Point resolution = imageOperationService.resolveImageResolution(imagePath);
+			image.setResolutionWidth(resolution.x);
+			image.setResolutionHeight(resolution.y);
+		}
+		catch (Exception ex)
+		{
+			log.warn(String.format("error on resolving resolution of image %s", imagePath.toString()), ex);
+			image.setResolutionWidth(RESOLUTION_DEFAULT.x);
+			image.setResolutionHeight(RESOLUTION_DEFAULT.y);
 		}
 
 		return image;

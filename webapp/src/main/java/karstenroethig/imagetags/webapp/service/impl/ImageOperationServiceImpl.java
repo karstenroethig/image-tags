@@ -1,5 +1,6 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -38,6 +39,16 @@ public class ImageOperationServiceImpl
 		}
 
 		return out.toByteArray();
+	}
+
+	public Point resolveImageResolution(Path imageFilePath) throws IOException
+	{
+		BufferedImage originalImage = ImageIO.read(imageFilePath.toFile());
+
+		int width = originalImage.getWidth();
+		int height = originalImage.getHeight();
+
+		return new Point(width, height);
 	}
 
 	private Rectangle calculateCropRectangle(int imageWidth, int imageHeight)

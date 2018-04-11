@@ -187,8 +187,8 @@ public class ImageServiceImpl
 
 		imageDto.setId(image.getId());
 		imageDto.setSizeFormatted(FilesizeUtils.formatFilesize(image.getSize()));
-		imageDto.setResolutionWidth(0);
-		imageDto.setResolutionHeight(0);
+		imageDto.setResolutionWidth(image.getResolutionWidth());
+		imageDto.setResolutionHeight(image.getResolutionHeight());
 		imageDto.setImportPath(image.getImportPath());
 
 		Set<Tag> tags = image.getTags();

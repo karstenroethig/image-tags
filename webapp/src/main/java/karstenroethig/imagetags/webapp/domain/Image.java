@@ -92,6 +92,18 @@ public class Image
 	)
 	private Integer thumbStatus;
 
+	@Column(
+		name = "resolution_width",
+		nullable = false
+	)
+	private Integer resolutionWidth;
+
+	@Column(
+		name = "resolution_height",
+		nullable = false
+	)
+	private Integer resolutionHeight;
+
 	public void addTag(Tag tag)
 	{
 		tags.add(tag);
