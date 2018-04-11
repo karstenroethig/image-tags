@@ -18,6 +18,6 @@
 
 	<include file="db/changelog/1.0.xml"/>
 	<include file="db/changelog/1.1.xml"/>
-	<include file="db/changelog/testdata.xml"/>
+	<!--include file="db/changelog/testdata.xml"/-->
 
 </databaseChangeLog>
