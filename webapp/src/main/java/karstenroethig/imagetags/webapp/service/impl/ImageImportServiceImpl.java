@@ -88,9 +88,7 @@ public class ImageImportServiceImpl
 		int totalFileCount = imagePaths.size();
 		int currentFileCount = 0;
 
-		log.info(
-			String.format("start import of %s new images", totalFileCount)
-		);
+		log.info(String.format("start import of %s new images", totalFileCount));
 
 		Storage currentStorage = null;
 		String currentStorageKey = null;

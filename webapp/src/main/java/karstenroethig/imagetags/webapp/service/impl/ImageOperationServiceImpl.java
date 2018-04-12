@@ -3,6 +3,7 @@ package karstenroethig.imagetags.webapp.service.impl;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,6 +26,20 @@ public class ImageOperationServiceImpl
 	{
 		String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
 		BufferedImage originalImage = ImageIO.read(imageFilePath.toFile());
+
+		return createImageThumbnail(originalImage, extension);
+	}
+
+	public byte[] createImageThumbnail(byte[] imageData, String extension) throws IOException
+	{
+		ByteArrayInputStream input = new ByteArrayInputStream(imageData);
+		BufferedImage image = ImageIO.read(input);
+
+		return createImageThumbnail(image, extension);
+	}
+
+	private byte[] createImageThumbnail(BufferedImage originalImage, String extension) throws IOException
+	{
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Rectangle cropRectangle = calculateCropRectangle(originalImage.getWidth(), originalImage.getHeight());
 
@@ -43,10 +58,23 @@ public class ImageOperationServiceImpl
 
 	public Point resolveImageResolution(Path imageFilePath) throws IOException
 	{
-		BufferedImage originalImage = ImageIO.read(imageFilePath.toFile());
+		BufferedImage image = ImageIO.read(imageFilePath.toFile());
 
-		int width = originalImage.getWidth();
-		int height = originalImage.getHeight();
+		return resolveImageResolution(image);
+	}
+
+	public Point resolveImageResolution(byte[] imageData) throws IOException
+	{
+		ByteArrayInputStream input = new ByteArrayInputStream(imageData);
+		BufferedImage image = ImageIO.read(input);
+
+		return resolveImageResolution(image);
+	}
+
+	private Point resolveImageResolution(BufferedImage image) throws IOException
+	{
+		int width = image.getWidth();
+		int height = image.getHeight();
 
 		return new Point(width, height);
 	}

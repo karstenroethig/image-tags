@@ -59,7 +59,7 @@
 			<column name="file_extension" value="jpg"/>
 			<column name="file_size" value="53623"/>
 			<column name="hash" value="1fd1c4ba07fa847691d092ca618c549e"/>
-			<column name="thumb_status" value="1"/>
+			<column name="thumb_status" value="0"/>
 		</insert>
 		<insert tableName="Image_Tag">
 			<column name="image_id" valueNumeric="select id from Image where hash='1fd1c4ba07fa847691d092ca618c549e'"/>
