@@ -115,7 +115,9 @@ public class ImageServiceImpl
 		sql.append("SELECT SUM(file_size) ");
 		sql.append("FROM   Image;");
 
-		return jdbcTemplate.queryForObject(sql.toString(), Long.class);
+		Long totalFilesize = jdbcTemplate.queryForObject(sql.toString(), Long.class);
+
+		return totalFilesize != null ? totalFilesize : 0l;
 	}
 
 	public ImageDto findImage(Long imageId)
