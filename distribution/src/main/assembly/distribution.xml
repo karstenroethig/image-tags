@@ -32,6 +32,7 @@
 			<directory>${basedir}/src/main/assembly/dist/</directory>
 			<excludes>
 				<exclude>**/bin/run.conf</exclude>
+				<exclude>**/bin/run.conf.bat</exclude>
 				<exclude>**/config/application.yml</exclude>
 			</excludes>
 			<outputDirectory></outputDirectory>
@@ -66,6 +67,12 @@
 			<source>${basedir}/src/main/assembly/dist/bin/run.conf</source>
 			<outputDirectory>bin</outputDirectory>
 			<destName>run.conf.example</destName>
+			<filtered>false</filtered>
+		</file>
+		<file>
+			<source>${basedir}/src/main/assembly/dist/bin/run.conf.bat</source>
+			<outputDirectory>bin</outputDirectory>
+			<destName>run.conf.bat.example</destName>
 			<filtered>false</filtered>
 		</file>
 		<file>
