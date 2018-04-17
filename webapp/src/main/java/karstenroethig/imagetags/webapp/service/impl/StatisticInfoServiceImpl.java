@@ -14,6 +14,9 @@ public class StatisticInfoServiceImpl
 	@Autowired
 	private ImageServiceImpl imageService;
 
+	@Autowired
+	private TagServiceImpl tagService;
+
 	public StatisticInfoDto getStatistic()
 	{
 		/*
@@ -34,12 +37,25 @@ public class StatisticInfoServiceImpl
 		String totalFilesizeFormated = FilesizeUtils.formatFilesize(totalFilesize);
 
 		/*
+		 * total tags
+		 */
+		Long totalTags = tagService.findTotalTags();
+
+		/*
+		 * unused tags
+		 */
+		List<Long> unusedTagIds = tagService.findUnusedTags();
+		Long unusedTags = new Long(unusedTagIds.size());
+
+		/*
 		 * create statistic object
 		 */
 		StatisticInfoDto stats = new StatisticInfoDto();
 		stats.setTotalImages(totalImages);
 		stats.setUntaggedImages(untaggedImages);
 		stats.setTotalFilesizeFormated(totalFilesizeFormated);
+		stats.setTotalTags(totalTags);
+		stats.setUnusedTags(unusedTags);
 
 		return stats;
 	}

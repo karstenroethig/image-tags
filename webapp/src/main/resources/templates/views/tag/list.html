@@ -16,17 +16,24 @@
 					<tr>
 						<th th:text="#{tag.name.label}">Name</th>
 						<th th:text="#{tag.type.label}">Type</th>
+						<th class="text-right">Usage</th>
 						<th th:text="#{default.table.operations.label}">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr th:if="${#lists.isEmpty(allTags)}">
-						<td colspan="3" align="center" th:text="#{default.table.empty.text}">Data can not be found.</td>
+						<td colspan="4" align="center" th:text="#{default.table.empty.text}">Data can not be found.</td>
 					</tr>
 					<tr th:each="tag : ${allTags}">
 						<td th:text="${tag.name}">[name]</td>
 						<td>
 							<span class="badge badge-secondary" th:classappend="${'tag-type-'+tag.type.name().toLowerCase()}" th:text="${#messages.msg('tag.type.'+tag.type.name()+'.label')}">[type]</span>
+						</td>
+						<td class="text-right ajaxFetchUsage" th:attr="data-id=${tag.id}">
+							<i class="fa fa-question" title="Ermittlung startet automatisch nach 5 Sekunden"></i>
+<!-- 							<i class="fa fa-spinner fa-spin"></i> -->
+<!-- 							<i class="fa fa-exclamation-circle" style="color: red;" title="Fehlermeldung"></i> -->
+<!-- 							1.245 -->
 						</td>
 						<td>
 							<a th:href="@{/tag/edit/{id}(id=${tag.id})}" th:text="#{default.button.edit.label}">Edit</a> |
@@ -59,6 +66,10 @@
 		
 		</div>
 		
+	</div>
+	
+	<div layout:fragment="additionalJs">
+		<script th:src="@{/js/tag-list.js}"></script>
 	</div>
 
 </body>

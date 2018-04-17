@@ -10,4 +10,7 @@ public class StatisticInfoDto
 	private Long totalImages;
 	private Long untaggedImages;
 	private String totalFilesizeFormated;
+
+	private Long totalTags;
+	private Long unusedTags;
 }

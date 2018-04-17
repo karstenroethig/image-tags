@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import karstenroethig.imagetags.webapp.controller.util.UrlMappings;
 import karstenroethig.imagetags.webapp.dto.api.TagApiDto;
+import karstenroethig.imagetags.webapp.dto.api.TagUsageApiDto;
 import karstenroethig.imagetags.webapp.service.impl.TagServiceImpl;
 
 @RestController
@@ -31,5 +33,17 @@ public class ApiController
 		Collection<TagApiDto> tags = tagService.findAllTagsWithOccurrences();
 
 		return new ResponseEntity<>(tags, HttpStatus.OK);
+	}
+
+	@RequestMapping(
+		value = "/tag/{id}/usage",
+		method = RequestMethod.GET,
+		produces = MediaType.APPLICATION_JSON_VALUE
+	)
+	public ResponseEntity<TagUsageApiDto> fetchTagUsage(@PathVariable("id") Long tagId)
+	{
+		TagUsageApiDto tagUsage = tagService.findTagUsage(tagId);
+
+		return new ResponseEntity<>(tagUsage, HttpStatus.OK);
 	}
 }

@@ -19,6 +19,7 @@ import karstenroethig.imagetags.webapp.dto.DtoTransformer;
 import karstenroethig.imagetags.webapp.dto.TagDto;
 import karstenroethig.imagetags.webapp.dto.TagTypeWrapper;
 import karstenroethig.imagetags.webapp.dto.api.TagApiDto;
+import karstenroethig.imagetags.webapp.dto.api.TagUsageApiDto;
 import karstenroethig.imagetags.webapp.repository.TagRepository;
 import karstenroethig.imagetags.webapp.service.exceptions.TagAlreadyExistsException;
 
@@ -125,6 +126,28 @@ public class TagServiceImpl
 		return tagTypeWrapper;
 	}
 
+	public Long findTotalTags()
+	{
+		StringBuffer sql = new StringBuffer();
+
+		sql.append("SELECT COUNT(id) ");
+		sql.append("FROM   Tag;");
+
+		return jdbcTemplate.queryForObject(sql.toString(), Long.class);
+	}
+
+	public List<Long> findUnusedTags()
+	{
+		StringBuffer sql = new StringBuffer();
+
+		sql.append("SELECT    t.id ");
+		sql.append("FROM      Tag t ");
+		sql.append("LEFT JOIN Image_Tag it ON it.tag_id = t.id ");
+		sql.append("WHERE     it.tag_id IS NULL;");
+
+		return jdbcTemplate.queryForList(sql.toString(), Long.class);
+	}
+
 	public List<TagApiDto> findAllTagsWithOccurrences()
 	{
 		StringBuffer sql = new StringBuffer();
@@ -135,5 +158,29 @@ public class TagServiceImpl
 		sql.append("GROUP  BY it.tag_id;");
 
 		return jdbcTemplate.query(sql.toString(), new BeanPropertyRowMapper<>(TagApiDto.class));
+	}
+
+	public TagUsageApiDto findTagUsage(Long tagId)
+	{
+		StringBuffer sql = new StringBuffer();
+
+		sql.append("SELECT it.tag_id AS id, COUNT(it.image_id) AS usage ");
+		sql.append("FROM   Image_Tag it ");
+		sql.append("JOIN   Tag t ON t.id = it.tag_id ");
+		sql.append("WHERE  it.tag_id = ? ");
+		sql.append("GROUP  BY it.tag_id;");
+
+		List<TagUsageApiDto> tagsUsage = jdbcTemplate.query(sql.toString(), new Long[]{tagId}, new BeanPropertyRowMapper<>(TagUsageApiDto.class));
+
+		if (tagsUsage == null || tagsUsage.isEmpty())
+		{
+			TagUsageApiDto tagUsage = new TagUsageApiDto();
+			tagUsage.setId(tagId);
+			tagUsage.setUsage(0);
+
+			return tagUsage;
+		}
+
+		return tagsUsage.get(0);
 	}
 }
