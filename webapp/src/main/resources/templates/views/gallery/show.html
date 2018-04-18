@@ -40,11 +40,11 @@
 					</div>
 					<div class="card-footer">
 						<p class="lead font-italic">
-							<span th:text="#{gallery.card.image.filessize.label}">File size</span>: <span th:text="${image.sizeFormatted}">[sizeFormatted]</span>
+							<span th:text="#{gallery.card.image.filesize.label}">File size</span>: <span th:text="${image.sizeFormatted}">[sizeFormatted]</span>
 						</p>
 						<p class="lead font-italic">
 							<span th:text="#{gallery.card.image.resolution.label}">Resolution</span>:
-							<span th:text="${gallery.resolutionWidth}">[resolutionWidth]</span> x <span th:text="${image.resolutionHeight}">[resolutionHeight]</span>
+							<span th:text="${image.resolutionWidth}">[resolutionWidth]</span> x <span th:text="${image.resolutionHeight}">[resolutionHeight]</span>
 						</p>
 					</div>
 					<div class="card-footer" th:if="${image.importPath != null}">
