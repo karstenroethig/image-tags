@@ -9,7 +9,13 @@ Requirements
 
 * Java SDK 1.8+
 * Maven 3.5.x ([http://maven.apache.org](http://maven.apache.org))
-* Lombok ([https://projectlombok.org/](https://projectlombok.org/)) (only if you use an IDE like Eclipse)
+* Optional: Lombok ([https://projectlombok.org/](https://projectlombok.org/)) (only if you use an IDE like Eclipse)
+
+
+IDE Support
+-----------
+
+To use these projects in an IDE you will need the [project Lombok](https://projectlombok.org/) agent. Full instructions can be found in the Lombok website. The sign that you need to do this is a lot of compiler errors to do with missing methods and fields.
 
 
 Build the installation package
