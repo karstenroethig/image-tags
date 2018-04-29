@@ -17,6 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
+import karstenroethig.imagetags.webapp.domain.enums.ImageResolutionStatusEnum;
 import karstenroethig.imagetags.webapp.domain.enums.ImageThumbStatusEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -104,6 +105,12 @@ public class Image
 	)
 	private Integer resolutionHeight;
 
+	@Column(
+		name = "resolution_status",
+		nullable = false
+	)
+	private Integer resolutionStatus;
+
 	public void addTag(Tag tag)
 	{
 		tags.add(tag);
@@ -129,6 +136,24 @@ public class Image
 		else
 		{
 			setThumbStatus(ImageThumbStatusEnum.NO_THUMB.getKey());
+		}
+	}
+
+	@Transient
+	public ImageResolutionStatusEnum getResolutionStatusEnum()
+	{
+		return ImageResolutionStatusEnum.getStatusForKey(resolutionStatus);
+	}
+
+	public void setResolutionStatusEnum(ImageResolutionStatusEnum imageResolutionStatusEnum)
+	{
+		if (imageResolutionStatusEnum != null)
+		{
+			setResolutionStatus(imageResolutionStatusEnum.getKey());
+		}
+		else
+		{
+			setResolutionStatus(ImageResolutionStatusEnum.NO_RESOLUTION.getKey());
 		}
 	}
 }

@@ -63,7 +63,7 @@
 						<p class="lead font-italic">
 							<span th:text="#{image.card.image.filessize.label}">File size</span>: <span th:text="${image.sizeFormatted}">[sizeFormatted]</span>
 						</p>
-						<p class="lead font-italic">
+						<p class="lead font-italic" th:if="${image.resolutionWidth &gt; 0}">
 							<span th:text="#{image.card.image.resolution.label}">Resolution</span>:
 							<span th:text="${image.resolutionWidth}">[resolutionWidth]</span> x <span th:text="${image.resolutionHeight}">[resolutionHeight]</span>
 						</p>

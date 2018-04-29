@@ -12,5 +12,5 @@ public interface ImageRepository extends CrudRepository<Image,Long>
 
 	List<Image> findByThumbStatus(Integer thumbStatus);
 
-	List<Image> findByResolutionWidthOrResolutionHeight(Integer resolutionWidth, Integer resolutionHeight);
+	List<Image> findByResolutionStatus(Integer resolutionStatus);
 }

@@ -1,7 +1,6 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
 import java.awt.Point;
-import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import karstenroethig.imagetags.webapp.domain.Image;
+import karstenroethig.imagetags.webapp.domain.enums.ImageResolutionStatusEnum;
 import karstenroethig.imagetags.webapp.domain.enums.ImageThumbStatusEnum;
 import karstenroethig.imagetags.webapp.dto.ImageDataDto;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
@@ -138,11 +138,11 @@ public class UpgradeServiceImpl implements DisposableBean
 
 		/*
 		 * ================================================================================
-		 * resolve image resolution for all images with resolution 0 x 0
+		 * resolve image resolution for all images with resolution_status "NO_RESOLUTION"
 		 * ================================================================================
 		 */
 
-		List<Image> imagesWithoutResolution = imageRepository.findByResolutionWidthOrResolutionHeight(0, 0);
+		List<Image> imagesWithoutResolution = imageRepository.findByResolutionStatus(ImageResolutionStatusEnum.NO_RESOLUTION.getKey());
 
 		int totalImageCount = imagesWithoutResolution.size();
 		int currentImageCount = 0;
@@ -162,13 +162,15 @@ public class UpgradeServiceImpl implements DisposableBean
 
 				image.setResolutionWidth(resolution.x);
 				image.setResolutionHeight(resolution.y);
-
-				imageRepository.save(image);
+				image.setResolutionStatusEnum(ImageResolutionStatusEnum.GENERATION_SUCCESS);
 			}
-			catch (IOException ex)
+			catch (Exception ex)
 			{
 				log.error(String.format(step + " :: error on resolving resolution of image: %s", image.getId()), ex);
+				image.setResolutionStatusEnum(ImageResolutionStatusEnum.GENERATION_ERROR);
 			}
+
+			imageRepository.save(image);
 		}
 
 

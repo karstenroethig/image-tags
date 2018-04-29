@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import karstenroethig.imagetags.webapp.config.properties.ImageDataProperties;
 import karstenroethig.imagetags.webapp.domain.Image;
 import karstenroethig.imagetags.webapp.domain.Storage;
+import karstenroethig.imagetags.webapp.domain.enums.ImageResolutionStatusEnum;
 import karstenroethig.imagetags.webapp.domain.enums.ImageThumbStatusEnum;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -192,12 +193,14 @@ public class ImageImportServiceImpl
 			Point resolution = imageOperationService.resolveImageResolution(imagePath);
 			image.setResolutionWidth(resolution.x);
 			image.setResolutionHeight(resolution.y);
+			image.setResolutionStatusEnum(ImageResolutionStatusEnum.GENERATION_SUCCESS);
 		}
 		catch (Exception ex)
 		{
 			log.warn(String.format("error on resolving resolution of image %s", imagePath.toString()), ex);
 			image.setResolutionWidth(RESOLUTION_DEFAULT.x);
 			image.setResolutionHeight(RESOLUTION_DEFAULT.y);
+			image.setResolutionStatusEnum(ImageResolutionStatusEnum.GENERATION_ERROR);
 		}
 
 		return image;
