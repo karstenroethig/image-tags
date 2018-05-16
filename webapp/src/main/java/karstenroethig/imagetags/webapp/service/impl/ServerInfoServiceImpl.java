@@ -38,12 +38,18 @@ public class ServerInfoServiceImpl implements ApplicationContextAware
 		 */
 		SystemInfoDto systemInfo = new SystemInfoDto();
 
-		String version = messageSource.getMessage(MessageKeyEnum.APPLICATION_VERSION.getKey(), null, LocaleContextHolder.getLocale());
+		Locale currentLocale = LocaleContextHolder.getLocale();
+
+		String version = messageSource.getMessage(MessageKeyEnum.APPLICATION_VERSION.getKey(), null, currentLocale);
+		String revision = messageSource.getMessage(MessageKeyEnum.APPLICATION_REVISION.getKey(), null, currentLocale);
+		String buildDate = messageSource.getMessage(MessageKeyEnum.APPLICATION_BUILD_DATE.getKey(), null, currentLocale);
 
 		long serverStartupTime = applicationContext.getStartupDate();
 		long uptimeMilis = System.currentTimeMillis() - serverStartupTime;
 
 		systemInfo.setVersion(version);
+		systemInfo.setRevision(revision);
+		systemInfo.setBuildDate(buildDate);
 		systemInfo.setServerTime(new Date().toString());
 		systemInfo.setUptime(formatUptime(uptimeMilis));
 		systemInfo.setJavaVersion(System.getProperty("java.version"));

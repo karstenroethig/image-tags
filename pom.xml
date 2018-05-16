@@ -14,6 +14,7 @@
 	</organization>
 
 	<scm>
+		<connection>scm:git:git://github.com/karstenroethig/image-tags.git</connection>
 		<url>https://github.com/karstenroethig/image-tags</url>
 	</scm>
 
@@ -155,11 +156,22 @@
 					<version>1.4</version>
 					<configuration>
 						<revisionOnScmFailure>ERR</revisionOnScmFailure>
-						<timestampFormat>{0,date,dd.MM.yyyy HH:mm:ss}</timestampFormat>
+						<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
 						<doCheck>false</doCheck>
-						<doUpdate>true</doUpdate>
-						<skip>true</skip>
+						<doUpdate>false</doUpdate>
+<!-- 						<shortRevisionLength>7</shortRevisionLength> -->
+<!-- 						<providerImplementations> -->
+<!-- 							<git>jgit</git> -->
+<!-- 						</providerImplementations> -->
+						<!--skip>true</skip-->
 					</configuration>
+<!-- 					<dependencies> -->
+<!-- 						<dependency> -->
+<!-- 							<groupId>org.apache.maven.scm</groupId> -->
+<!-- 							<artifactId>maven-scm-provider-jgit</artifactId> -->
+<!-- 							<version>1.9.5</version> -->
+<!-- 						</dependency> -->
+<!-- 					</dependencies> -->
 				</plugin>
 
 				<plugin>

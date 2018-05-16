@@ -8,8 +8,12 @@ import lombok.Setter;
 public class SystemInfoDto
 {
 	private String version;
+	private String revision;
+	private String buildDate;
+
 	private String serverTime;
 	private String uptime;
+
 	private String javaVersion;
 	private String javaVendor;
 	private String javaVm;

@@ -16,7 +16,7 @@
 			<table class="table table-bordered">
 				<tr>
 					<td width="20%" th:text="#{utility.serverInfo.systemInfo.version.label}">Server Version</td>
-					<td th:text="${serverInfo.systemInfo.version}"></td>
+					<td th:text="${#messages.msg('utility.serverInfo.systemInfo.version.text', serverInfo.systemInfo.version, serverInfo.systemInfo.revision, serverInfo.systemInfo.buildDate)}"></td>
 				</tr>
 				<tr>
 					<td th:text="#{utility.serverInfo.systemInfo.serverTime.label}">Server Time</td>

@@ -4,7 +4,9 @@ import lombok.Getter;
 
 public enum MessageKeyEnum
 {
-	APPLICATION_VERSION( "application.version" ),
+	APPLICATION_VERSION("application.version"),
+	APPLICATION_REVISION("application.revision"),
+	APPLICATION_BUILD_DATE("application.buildDate"),
 
 	/* ********************
 	 * Images.
