@@ -21,14 +21,14 @@ spring:
     url: jdbc:h2:mem:image-tags-db
     username: ImageTagsUser
     password: ImageTagsUser
-    poolName: SpringBootHikariCP
-    maximumPoolSize: 5
-    minimumIdle: 3
-    maxLifetime: 2000000
-    connectionTimeout: 30000
-    idleTimeout: 30000
-    pool-prepared-statements: true
-    max-open-prepared-statements: 250
+    # Connection Pooling (see https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby)
+    hikari:
+      connectionTimeout: 30000
+      idleTimeout: 30000
+      maxLifetime: 2000000
+      minimumIdle: 3
+      maximumPoolSize: 5
+      poolName: SpringBootHikariCP
 
   resources:
     chain:

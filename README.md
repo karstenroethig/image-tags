@@ -25,7 +25,7 @@ Build the installation package
 
 	`set PATH=C:\Program Files\Java\jdk1.8.0_121\bin;%PATH%`
 
-    `set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_121`
+	`set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_121`
 
 2. Install Maven and create Maven environment variables
 
@@ -46,6 +46,7 @@ Run
 1. Create a installation directory
 
 	`cd [PATH_TO_APPS]`
+	
 	`mkdir image-tags`
 
 2. Extract the installation package `ImageTags_V[VERSION].zip`
@@ -59,6 +60,7 @@ Run
 6. Navigate to the installation directory and start the application
 
 	`cd [PATH_TO_APPS]/image-tags`
+	
 	`bin/run`
 
 7. Browse to [http://localhost:4080/](http://localhost:4080/)
