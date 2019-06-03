@@ -183,19 +183,6 @@
 
 		<plugins>
 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>create</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<!-- Mit dem spring-boot-maven-plugin wird das Spring Boot Uber-Jar erzeugt. -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
