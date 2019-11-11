@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import lombok.Getter;
 import lombok.Setter;
 
-@ConfigurationProperties(prefix = "imageData", ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = "image-data", ignoreUnknownFields = false)
 @Getter
 @Setter
 public class ImageDataProperties

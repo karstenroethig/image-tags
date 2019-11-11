@@ -35,9 +35,7 @@ public class TagServiceImpl
 
 	public TagDto newTag()
 	{
-		TagDto tagDto = new TagDto();
-
-		return tagDto;
+		return new TagDto();
 	}
 
 	public TagDto saveTag(TagDto tagDto) throws TagAlreadyExistsException
@@ -59,7 +57,7 @@ public class TagServiceImpl
 
 	public Boolean deleteTag(Long tagId)
 	{
-		Tag temp = tagRepository.findOne(tagId);
+		Tag temp = tagRepository.findById(tagId).orElse(null);
 
 		if (temp != null)
 		{
@@ -83,7 +81,7 @@ public class TagServiceImpl
 			throw new TagAlreadyExistsException();
 		}
 
-		Tag tag = tagRepository.findOne(tagDto.getId());
+		Tag tag = tagRepository.findById(tagDto.getId()).orElse(null);
 
 		tag = DtoTransformer.merge(tag, tagDto);
 
@@ -92,7 +90,7 @@ public class TagServiceImpl
 
 	public TagDto findTag(Long tagId)
 	{
-		return DtoTransformer.transform(tagRepository.findOne(tagId));
+		return DtoTransformer.transform(tagRepository.findById(tagId).orElse(null));
 	}
 
 	public List<TagDto> getAllTags()
@@ -128,7 +126,7 @@ public class TagServiceImpl
 
 	public Long findTotalTags()
 	{
-		StringBuffer sql = new StringBuffer();
+		StringBuilder sql = new StringBuilder();
 
 		sql.append("SELECT COUNT(id) ");
 		sql.append("FROM   Tag;");
@@ -138,7 +136,7 @@ public class TagServiceImpl
 
 	public List<Long> findUnusedTags()
 	{
-		StringBuffer sql = new StringBuffer();
+		StringBuilder sql = new StringBuilder();
 
 		sql.append("SELECT    t.id ");
 		sql.append("FROM      Tag t ");
@@ -150,7 +148,7 @@ public class TagServiceImpl
 
 	public List<TagApiDto> findAllTagsWithOccurrences()
 	{
-		StringBuffer sql = new StringBuffer();
+		StringBuilder sql = new StringBuilder();
 
 		sql.append("SELECT it.tag_id AS id, t.name AS name, COUNT(it.image_id) AS amount ");
 		sql.append("FROM   Image_Tag it ");
@@ -162,7 +160,7 @@ public class TagServiceImpl
 
 	public TagUsageApiDto findTagUsage(Long tagId)
 	{
-		StringBuffer sql = new StringBuffer();
+		StringBuilder sql = new StringBuilder();
 
 		sql.append("SELECT it.tag_id AS id, COUNT(it.image_id) AS usage ");
 		sql.append("FROM   Image_Tag it ");
@@ -172,7 +170,7 @@ public class TagServiceImpl
 
 		List<TagUsageApiDto> tagsUsage = jdbcTemplate.query(sql.toString(), new Long[]{tagId}, new BeanPropertyRowMapper<>(TagUsageApiDto.class));
 
-		if (tagsUsage == null || tagsUsage.isEmpty())
+		if (tagsUsage.isEmpty())
 		{
 			TagUsageApiDto tagUsage = new TagUsageApiDto();
 			tagUsage.setId(tagId);

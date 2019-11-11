@@ -1,6 +1,8 @@
 #
 # Spring Boot configuration
-#  - options: https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-docs/src/main/asciidoc/appendix-application-properties.adoc
+#  - options:
+#      - https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html
+#      - https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-docs/src/main/asciidoc/appendix-application-properties.adoc
 #
 
 server:
@@ -12,6 +14,7 @@ spring:
     databasePlatform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: none
+    open-in-view: false
 
   h2:
     console:
@@ -39,8 +42,5 @@ spring:
           enabled: true
           paths: /css/**, /images/**, /js/**
 
-  thymeleaf:
-    mode: LEGACYHTML5
-
-liquibase:
-  change-log: classpath:/db/changelog/master.xml
+  liquibase:
+    change-log: classpath:/db/changelog/master.xml

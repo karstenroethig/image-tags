@@ -1,21 +1,21 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout">
 <head>
 	<title th:text="#{tag.label.plural}+' - '+#{tag.edit.label}"></title>
 </head>
 <body th:with="menu='tag'">
 
-	<div layout:fragment="content">
+	<div th:fragment="content">
 
 		<div class="container">
-		
+
 			<h1 style="padding-top: 10px;">
 				<span th:text="#{tag.edit.label}">Edit tags</span>:
 				<span th:text="${tag.name}">[name]</span>
 			</h1>
-		
+
 			<div th:replace="fragments/messages"></div>
-		
+
 			<form style="padding-top: 10px;" th:object="${tag}" th:action="@{/tag/update}" action="#" method="post">
 				<input type="hidden" th:field="*{id}"/>
 				<div class="form-group row">
@@ -53,7 +53,7 @@
 					</div>
 				</div>
 			</form>
-		
+
 		</div>
 
 	</div>

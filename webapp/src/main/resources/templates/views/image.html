@@ -1,14 +1,14 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout">
 <head>
 	<title th:text="#{image.label}"></title>
-	
+
 	<!-- Select2 -->
 	<link rel="stylesheet" th:href="@{'/webjars/select2/'+#{application.dependency.select2}+'/dist/css/select2.min.css'}"/>
 </head>
 <body th:with="menu='image'">
 
-	<div layout:fragment="content">
+	<div th:fragment="content">
 
 		<div class="container-fluid">
 			<div class="container-sidebar col-3" style="/*background-color: #80bdff; height: 8rem;*/ float: left;">
@@ -81,7 +81,7 @@
 				</p>
 			</div>
 		</div>
-		
+
 		<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
 			<div class="modal-dialog" role="document">
 				<div class="modal-content">
@@ -103,8 +103,8 @@
 		</div>
 
 	</div>
-	
-	<div layout:fragment="additionalJs">
+
+	<div th:fragment="additionalJs">
 		<!-- Select2 -->
 		<script th:src="@{'/webjars/select2/'+#{application.dependency.select2}+'/dist/js/select2.min.js'}"></script>
 		<script type="text/javascript">

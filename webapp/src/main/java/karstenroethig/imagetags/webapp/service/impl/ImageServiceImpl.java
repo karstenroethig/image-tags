@@ -62,7 +62,7 @@ public class ImageServiceImpl
 
 	private List<Long> findUntaggedImages()
 	{
-		StringBuffer sql = new StringBuffer();
+		StringBuilder sql = new StringBuilder();
 
 		sql.append("SELECT i.id ");
 		sql.append("FROM   Image i ");
@@ -75,7 +75,7 @@ public class ImageServiceImpl
 	private List<Long> findTaggedImages(List<TagDto> tags)
 	{
 		List<Long> tagIds = new ArrayList<>();
-		StringBuffer sql = new StringBuffer();
+		StringBuilder sql = new StringBuilder();
 
 		sql.append("SELECT i.id ");
 		sql.append("FROM   Image i ");
@@ -100,7 +100,7 @@ public class ImageServiceImpl
 
 	public Long findTotalImages()
 	{
-		StringBuffer sql = new StringBuffer();
+		StringBuilder sql = new StringBuilder();
 
 		sql.append("SELECT COUNT(id) ");
 		sql.append("FROM   Image;");
@@ -110,7 +110,7 @@ public class ImageServiceImpl
 
 	public Long findTotalFilesize()
 	{
-		StringBuffer sql = new StringBuffer();
+		StringBuilder sql = new StringBuilder();
 
 		sql.append("SELECT SUM(file_size) ");
 		sql.append("FROM   Image;");
@@ -122,12 +122,12 @@ public class ImageServiceImpl
 
 	public ImageDto findImage(Long imageId)
 	{
-		return transform(imageRepository.findOne(imageId));
+		return transform(imageRepository.findById(imageId).orElse(null));
 	}
 
 	public ImageDataDto getImageData(Long imageId, boolean thumbnail) throws IOException
 	{
-		Image image = imageRepository.findOne(imageId);
+		Image image = imageRepository.findById(imageId).orElse(null);
 
 		if (image == null)
 			throw new NotFoundException(String.valueOf(imageId));
@@ -151,14 +151,14 @@ public class ImageServiceImpl
 		imageData.setFilename(
 			(thumbnail ? "thumb." : StringUtils.EMPTY)
 			+ storageService.buildImageFilename(imageId, image.getExtension()));
-		imageData.setSize(thumbnail ? new Long(imageData.getData().length) : image.getSize());
+		imageData.setSize(thumbnail ? Long.valueOf(imageData.getData().length) : image.getSize());
 
 		return imageData;
 	}
 
 	public ImageDto editImage(ImageDto imageDto)
 	{
-		Image image = imageRepository.findOne(imageDto.getId() );
+		Image image = imageRepository.findById(imageDto.getId()).orElse(null);
 
 		image = merge(image, imageDto);
 
@@ -174,7 +174,7 @@ public class ImageServiceImpl
 
 		for (TagDto tagDto : imageDto.getTags())
 		{
-			image.addTag(tagRepository.findOne(tagDto.getId()));
+			image.addTag(tagRepository.findById(tagDto.getId()).orElse(null));
 		}
 
 		return image;
@@ -208,7 +208,7 @@ public class ImageServiceImpl
 
 	public void deleteImage(Long imageId)
 	{
-		Image image = imageRepository.findOne(imageId);
+		Image image = imageRepository.findById(imageId).orElse(null);
 
 		if (image == null)
 			throw new NotFoundException(String.valueOf(imageId));
@@ -228,6 +228,6 @@ public class ImageServiceImpl
 			storageService.subtractAndSaveFilesize(image.getStorage().getId(), image.getSize());
 		}
 
-		imageRepository.delete(imageId);
+		imageRepository.deleteById(imageId);
 	}
 }

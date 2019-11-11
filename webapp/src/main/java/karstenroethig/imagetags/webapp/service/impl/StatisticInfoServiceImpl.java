@@ -28,7 +28,7 @@ public class StatisticInfoServiceImpl
 		 * untagged images
 		 */
 		List<Long> untaggedImageIds = imageService.findImages(null);
-		Long untaggedImages = new Long(untaggedImageIds.size());
+		Long untaggedImages = Long.valueOf(untaggedImageIds.size());
 
 		/*
 		 * filesize
@@ -45,7 +45,7 @@ public class StatisticInfoServiceImpl
 		 * unused tags
 		 */
 		List<Long> unusedTagIds = tagService.findUnusedTags();
-		Long unusedTags = new Long(unusedTagIds.size());
+		Long unusedTags = Long.valueOf(unusedTagIds.size());
 
 		/*
 		 * create statistic object

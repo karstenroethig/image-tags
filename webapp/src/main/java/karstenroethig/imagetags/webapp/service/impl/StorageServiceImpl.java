@@ -118,7 +118,7 @@ public class StorageServiceImpl
 
 	public Storage addAndSaveFilesize(Long storageId, long delta)
 	{
-		Storage storage = storageRepository.findOne(storageId);
+		Storage storage = storageRepository.findById(storageId).orElse(null);
 
 		if (storage == null)
 			return null;
@@ -129,7 +129,7 @@ public class StorageServiceImpl
 
 	public void subtractAndSaveFilesize(Long storageId, long delta)
 	{
-		Storage storage = storageRepository.findOne(storageId);
+		Storage storage = storageRepository.findById(storageId).orElse(null);
 
 		if (storage == null)
 			return;
@@ -173,7 +173,7 @@ public class StorageServiceImpl
 
 	public String buildStorageFilename(String storageKey, boolean thumbnail)
 	{
-		StringBuffer filename = new StringBuffer();
+		StringBuilder filename = new StringBuilder();
 
 		filename.append("images");
 

@@ -1,15 +1,15 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout">
 <head>
 	<title th:text="#{statistic.label}"></title>
 </head>
 <body th:with="menu='statistic'">
 
-	<div layout:fragment="content">
+	<div th:fragment="content">
 
 		<div class="container-fluid mt-3">
 			<div class="row">
-	
+
 				<div class="col-sm-3">
 					<div class="card">
 						<h5 class="card-header" th:text="#{statistic.card.images.label}">Images</h5>
@@ -20,7 +20,7 @@
 						</ul>
 					</div>
 				</div>
-	
+
 				<div class="col-sm-3">
 					<div class="card">
 						<h5 class="card-header" th:text="#{statistic.card.tags.label}">Tags</h5>
@@ -30,7 +30,7 @@
 						</ul>
 					</div>
 				</div>
-	
+
 			</div>
 		</div>
 
