@@ -1,9 +1,16 @@
-<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							null,
+							'statistic'
+							)}">
 <head>
-	<title th:text="#{statistic.label}"></title>
+	<title th:text="#{application.title-pattern(#{application.name}, #{statistic.label})}">Statistic</title>
 </head>
-<body th:with="menu='statistic'">
+<body>
 
 	<div th:fragment="content">
 

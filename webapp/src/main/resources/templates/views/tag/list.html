@@ -1,9 +1,16 @@
-<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout">
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							~{:: #additionalJs},
+							'tag'
+							)}">
 <head>
-	<title th:text="#{tag.label.plural}"></title>
+	<title th:text="#{application.title-pattern(#{application.name}, #{tag.label.plural})}"></title>
 </head>
-<body th:with="menu='tag'">
+<body>
 
 	<div th:fragment="content">
 
@@ -68,9 +75,9 @@
 
 	</div>
 
-	<div th:fragment="additionalJs">
+	<th:block id="additionalJs">
 		<script th:src="@{/js/tag-list.js}"></script>
-	</div>
+	</th:block>
 
 </body>
 </html>

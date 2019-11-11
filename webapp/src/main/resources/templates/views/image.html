@@ -1,12 +1,16 @@
-<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout">
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout :: layout-fragment(
+							~{::title},
+							~{::content},
+							~{:: #additionalStyles},
+							~{:: #additionalJs},
+							'image'
+							)}">
 <head>
-	<title th:text="#{image.label}"></title>
-
-	<!-- Select2 -->
-	<link rel="stylesheet" th:href="@{'/webjars/select2/'+#{application.dependency.select2}+'/dist/css/select2.min.css'}"/>
+	<title th:text="#{application.title-pattern(#{application.name}, #{image.label})}">Image</title>
 </head>
-<body th:with="menu='image'">
+<body>
 
 	<div th:fragment="content">
 
@@ -102,16 +106,6 @@
 			</div>
 		</div>
 
-	</div>
-
-	<div th:fragment="additionalJs">
-		<!-- Select2 -->
-		<script th:src="@{'/webjars/select2/'+#{application.dependency.select2}+'/dist/js/select2.min.js'}"></script>
-		<script type="text/javascript">
-			$(document).ready(function() {
-				$('.select2-multiple').select2();
-			});
-		</script>
 	</div>
 
 </body>

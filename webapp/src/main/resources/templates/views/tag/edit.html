@@ -1,9 +1,16 @@
-<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout">
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							null,
+							'tag'
+							)}">
 <head>
-	<title th:text="#{tag.label.plural}+' - '+#{tag.edit.label}"></title>
+	<title th:text="#{application.title-pattern(#{application.name}, #{tag.label.plural}+' - '+#{tag.edit.label})}"></title>
 </head>
-<body th:with="menu='tag'">
+<body>
 
 	<div th:fragment="content">
 
@@ -14,7 +21,7 @@
 				<span th:text="${tag.name}">[name]</span>
 			</h1>
 
-			<div th:replace="fragments/messages"></div>
+			<div th:replace="~{fragments/messages :: messages-fragment(${messages})}"></div>
 
 			<form style="padding-top: 10px;" th:object="${tag}" th:action="@{/tag/update}" action="#" method="post">
 				<input type="hidden" th:field="*{id}"/>

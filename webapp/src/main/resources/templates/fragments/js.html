@@ -1,13 +1,28 @@
-<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+</head>
+<body>
 
-<!-- JQuery -->
-<script th:src="@{'/webjars/jquery/'+#{application.dependency.jquery}+'/jquery.min.js'}"></script>
+	<th:block th:fragment="js-fragment">
 
-<!-- Popper.js -->
-<script th:src="@{'/webjars/popper.js/'+#{application.dependency.popper}+'/dist/umd/popper.min.js'}"></script>
+		<!-- JQuery -->
+		<script th:src="@{'/webjars/jquery/'+#{application.dependency.jquery}+'/jquery.min.js'}"></script>
 
-<!-- Bootstrap -->
-<script th:src="@{'/webjars/bootstrap/'+#{application.dependency.bootstrap}+'/js/bootstrap.min.js'}"></script>
+		<!-- Popper.js -->
+		<script th:src="@{'/webjars/popper.js/'+#{application.dependency.popper}+'/dist/umd/popper.min.js'}"></script>
 
-<!-- App JavaScript -->
-<script th:src="@{/js/app.js}"></script>
+		<!-- Bootstrap -->
+		<script th:src="@{'/webjars/bootstrap/'+#{application.dependency.bootstrap}+'/js/bootstrap.min.js'}"></script>
+
+		<!-- Select2 -->
+		<script th:src="@{'/webjars/select2/'+#{application.dependency.select2}+'/dist/js/select2.min.js'}"></script>
+
+		<!-- App JavaScript -->
+		<script th:src="@{/js/app.js}"></script>
+
+	</th:block>
+
+</body>
+</html>

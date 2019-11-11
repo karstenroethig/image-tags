@@ -1,26 +1,29 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-	<head>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:fragment="layout-fragment (title, content, additionalStyles, additionalJs, menu)">
+<head>
 
-		<title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE" th:text="#{application.name}"></title>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title th:replace="${title}"></title>
 
-		<link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+	<link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
 
-		<link th:replace="~{fragments/style}"/>
+	<link th:replace="~{fragments/style :: style-fragment}"/>
 
-	</head>
+	<th:block th:replace="${additionalStyles} ?: ~{}"></th:block>
 
-	<body>
+</head>
+<body>
 
-		<div th:replace="~{fragments/header}"></div>
+	<div th:replace="~{fragments/header :: header-fragment(${menu})}"></div>
 
-		<div th:replace="~{::content}"></div>
+	<div th:replace="${content}"></div>
 
-		<div th:replace="~{fragments/js}"></div>
-		<div th:replace="~{::additionalJs} ?: ~{}"></div>
+	<div th:replace="~{fragments/js :: js-fragment}"></div>
 
-	</body>
+	<th:blcok th:replace="${additionalJs} ?: ~{}"></th:block>
+
+</body>
 </html>

@@ -1,9 +1,16 @@
-<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout">
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							null,
+							'admin'
+							)}">
 <head>
-	<title th:text="#{utility.serverInfo.label}">Server Info</title>
+	<title th:text="#{application.title-pattern(#{application.name}, #{utility.serverInfo.label})}">Server Info</title>
 </head>
-<body th:with="menu='admin',submenu='server-info'">
+<body>
 
 	<div th:fragment="content">
 
@@ -11,7 +18,7 @@
 
 			<h1 style="padding-top: 10px;" th:text="#{utility.serverInfo.label}">Server Info</h1>
 
-			<div th:replace="fragments/messages"></div>
+			<div th:replace="~{fragments/messages :: messages-fragment(${messages})}"></div>
 
 			<table class="table table-bordered">
 				<tr>

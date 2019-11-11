@@ -1,12 +1,21 @@
-<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout">
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout :: layout-fragment(
+							~{::title},
+							~{::content},
+							~{:: #additionalStyles},
+							~{:: #additionalJs},
+							'dashboard'
+							)}">
 <head>
-	<title th:text="#{dashboard.label}"></title>
+	<title th:text="#{application.title-pattern(#{application.name}, #{dashboard.label})}">Dashboard</title>
 
-	<!-- jQCloud -->
-	<link rel="stylesheet" th:href="@{'/webjars/jqcloud2/'+#{application.dependency.jqcloud}+'/dist/jqcloud.min.css'}"/>
+	<th:block id="additionalStyles">
+		<!-- jQCloud -->
+		<link rel="stylesheet" th:href="@{'/webjars/jqcloud2/'+#{application.dependency.jqcloud}+'/dist/jqcloud.min.css'}"/>
+	</th:block>
 </head>
-<body th:with="menu='dashboard'">
+<body>
 
 	<div th:fragment="content">
 
@@ -14,55 +23,12 @@
 
 	</div>
 
-	<div th:fragment="additionalJs">
+	<th:block id="additionalJs">
 		<!-- jQCloud -->
 		<script defer th:src="@{'/webjars/jqcloud2/'+#{application.dependency.jqcloud}+'/dist/jqcloud.min.js'}"></script>
-		
-		<script type="text/javascript">
-			$( document ).ready( function() {
 
-				var words;
-
-				$.when(
-
-					$.ajax( {
-						url: '/api/1.0/allTagsWithOccurrences',
-						dataType: 'json',
-						cache: false
-					}).done( function( data ) {
-						words = convertTagsToWords( data );
-					}).fail( function( jqXHR, textStatus, errorThrown ) {
-						alert( jqXHR.responseText );
-					})
-
-				).then( function() {
-					$('#wordCloud').jQCloud(words);
-				});
-
-				/**
-				 * tags example: [{"id":1, "name":"scrum", "amount":25},{"id":2, "name":"kanban", "amount":3}]
-				 * 
-				 * var words = [
-				 * 		{text: "Lorem", weight: 13, link: "http://github.com/mistic100/jQCloud"},
-				 * 		{text: "Ipsum", weight: 100, link: "http://www.strangeplanet.fr"},
-				 * 		{text: "Dolor", weight: 9.4, link: "http://piwigo.org"}
-				 * ];
-				 */
-				function convertTagsToWords( tags )
-				{
-					var words = [];
-
-					for( var index in tags )
-					{
-						words.push( { "text": tags[index].name, "weight": tags[index].amount, "link": "/image/tag/"+tags[index].id } );
-					}
-
-					return words;
-				}
-
-			});
-		</script>
-	</div>
+		<script th:src="@{/js/dashboard.js}"></script>
+	</th:block>
 
 </body>
 </html>
