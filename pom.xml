@@ -58,6 +58,13 @@
 				<scope>import</scope>
 			</dependency>
 
+			<!-- JDBC-Treiber for H2 -->
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>1.4.196</version>
+			</dependency>
+
 			<!-- WebJARs -->
 			<dependency>
 				<groupId>org.webjars</groupId>
