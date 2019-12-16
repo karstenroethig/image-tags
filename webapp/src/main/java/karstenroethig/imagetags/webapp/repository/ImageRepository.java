@@ -13,4 +13,6 @@ public interface ImageRepository extends CrudRepository<Image,Long>
 	List<Image> findByThumbStatus(Integer thumbStatus);
 
 	List<Image> findByResolutionStatus(Integer resolutionStatus);
+
+	List<Image> findByCreatedDateNull();
 }

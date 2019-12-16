@@ -1,5 +1,6 @@
 package karstenroethig.imagetags.webapp.domain;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,6 +17,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.Type;
 
 import karstenroethig.imagetags.webapp.domain.enums.ImageResolutionStatusEnum;
 import karstenroethig.imagetags.webapp.domain.enums.ImageThumbStatusEnum;
@@ -110,6 +113,15 @@ public class Image
 		nullable = false
 	)
 	private Integer resolutionStatus;
+
+	@Column(
+		name = "created_date",
+		nullable = true
+	)
+	@Type(
+		type = "org.hibernate.type.LocalDateTimeType"
+	)
+	private LocalDateTime createdDate;
 
 	public void addTag(Tag tag)
 	{

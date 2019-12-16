@@ -67,7 +67,8 @@ public class ImageServiceImpl
 		sql.append("SELECT i.id ");
 		sql.append("FROM   Image i ");
 		sql.append("LEFT   JOIN Image_Tag it ON it.image_id = i.id ");
-		sql.append("WHERE  it.image_id IS NULL;");
+		sql.append("WHERE  it.image_id IS NULL ");
+		sql.append("ORDER  BY i.created_date DESC;");
 
 		return jdbcTemplate.queryForList(sql.toString(), Long.class);
 	}
@@ -93,7 +94,7 @@ public class ImageServiceImpl
 			sql.append(") ");
 		}
 
-		sql.append(";");
+		sql.append("ORDER  BY i.created_date DESC;");
 
 		return jdbcTemplate.queryForList(sql.toString(), tagIds.toArray(), Long.class);
 	}

@@ -9,6 +9,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -182,6 +183,7 @@ public class ImageImportServiceImpl
 		image.setSize(Files.size(imagePath));
 		image.setThumbStatusEnum(ImageThumbStatusEnum.NO_THUMB);
 		image.setImportPath(findRelativeImportPath(imagePath));
+		image.setCreatedDate(LocalDateTime.now());
 
 		try (InputStream inputStream = Files.newInputStream(imagePath))
 		{

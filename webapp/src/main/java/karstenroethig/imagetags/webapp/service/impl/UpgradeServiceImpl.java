@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,6 +60,7 @@ public class UpgradeServiceImpl implements DisposableBean
 				{
 					upgradeForVersion1_1();
 					upgradeForVersion1_2();
+					upgradeForVersion1_5();
 				}
 				catch (Exception ex)
 				{
@@ -172,7 +175,38 @@ public class UpgradeServiceImpl implements DisposableBean
 
 			imageRepository.save(image);
 		}
+	}
 
+	private void upgradeForVersion1_5()
+	{
+		String step = "upgrades for version 1.5";
+		log.info(step + " :: starting");
 
+		/*
+		 * ================================================================================
+		 * set a creation date for each image that does not yet have one
+		 * ================================================================================
+		 */
+
+		List<Image> imagesWithoutCreationDate = imageRepository.findByCreatedDateNull();
+
+		int totalImageCount = imagesWithoutCreationDate.size();
+		int currentImageCount = 0;
+
+		log.info(String.format(step + " :: start creation date upgrade of %s images", totalImageCount));
+
+		for (Image image : imagesWithoutCreationDate)
+		{
+			currentImageCount++;
+
+			log.info(String.format(step + " :: calculating creation date of image file [%s/%s]: %s", currentImageCount, totalImageCount, image.getId()));
+
+			LocalDateTime startTime = LocalDateTime.of(2019, Month.JANUARY, 1, 0, 0);
+			LocalDateTime createdDate = startTime.plusSeconds(image.getId());
+
+			image.setCreatedDate(createdDate);
+
+			imageRepository.save(image);
+		}
 	}
 }
