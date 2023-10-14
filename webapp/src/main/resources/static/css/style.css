@@ -1,15 +1,3 @@
 .required {
 	color: #F00;
 }
-
-.tag-type-category {
-	background-color: #80bdff;
-}
-
-.tag-type-person {
-	background-color: #957bbe;
-}
-
-.tag-type-album {
-	background-color: #563d7c;
-}

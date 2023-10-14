@@ -53,5 +53,4 @@ echo.
 "%JAVA%" %JAVA_OPTS% ^
 	-Djava.io.tmpdir=%APP_HOME%\temp\ ^
 	-jar %APP_HOME%\lib\${app.name.id}.jar ^
-	--spring.config.additional-location=%APP_HOME%\config\ ^
-	--logging.file=%APP_HOME%\log\${app.name.id}.log
+	--spring.config.additional-location=%APP_HOME%\config\

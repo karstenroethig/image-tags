@@ -1,30 +1,37 @@
 #
 # Spring Boot configuration
-#  - options:
-#      - https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html
-#      - https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-docs/src/main/asciidoc/appendix-application-properties.adoc
+#  - options: https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 #
+
+info:
+  application:
+    name: '@app.name.pretty@'
+    version: '@project.version@'
+    revision: '@buildNumber@'
+    buildDate: '@timestamp@'
+    vendor: '@organization.name@'
 
 server:
   address: 127.0.0.1
-  port: 4080
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+    include-message: always
 
 spring:
 
   jpa:
     databasePlatform: org.hibernate.dialect.H2Dialect
+    # Open Session In View (see https://www.baeldung.com/spring-open-session-in-view)
+    open-in-view: true
     hibernate:
       ddl-auto: none
-    open-in-view: false
-
-  h2:
-    console:
-      enabled: true
 
   datasource:
-    url: jdbc:h2:mem:image-tags-db
-    username: ImageTagsUser
-    password: ImageTagsUser
+    url: jdbc:h2:mem:image-tags-db;MODE=MariaDB;DATABASE_TO_LOWER=TRUE;NON_KEYWORDS=USER
+    username: image-tags_user
+    password: image-tags_password
     # Connection Pooling (see https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby)
     hikari:
       connectionTimeout: 30000
@@ -34,14 +41,67 @@ spring:
       maximumPoolSize: 5
       poolName: SpringBootHikariCP
 
-  resources:
-    chain:
-      cache: true
-      html-application-cache: true
-      strategy:
-        content:
-          enabled: true
-          paths: /css/**, /images/**, /js/**
-
   liquibase:
     change-log: classpath:/db/changelog/master.xml
+
+  web:
+    resources:
+      chain:
+        strategy:
+          content:
+            enabled: true
+            paths: /css/**, /images/**, /js/**
+
+  jackson:
+    default-property-inclusion: NON_NULL
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  main:
+    allow-circular-references: true
+
+logging:
+  level:
+    ROOT: WARN
+    '[org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer]': INFO
+    '[karstenroethig.imagetags.webapp.Application]': INFO
+    '[karstenroethig.imagetags.webapp]': WARN
+  file:
+    name: log/image-tags.log
+
+
+---
+
+spring:
+
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    show-sql: false
+
+  h2:
+    console:
+      enabled: false # accessible via http://localhost:8080/h2-console
+
+  liquibase:
+    change-log: classpath:/db/changelog/master-dev.xml
+
+  thymeleaf:
+    # Reload templates without restarting the container
+    cache: false
+
+server:
+  # Server only listens to localhost
+  address: 127.0.0.1
+
+logging:
+  level:
+    ROOT: INFO
+    '[karstenroethig.imagetags.webapp]': DEBUG
+  file:
+    name: target/log/image-tags.log

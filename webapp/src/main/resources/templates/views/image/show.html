@@ -1,0 +1,112 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							~{:: #additionalJs},
+							'technology'
+							)}">
+<head>
+	<title th:text="#{application.title-pattern(#{application.name}, #{technology.label.plural}+' - '+#{technology.show.label})}"></title>
+</head>
+<body>
+
+	<div th:fragment="content">
+
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a th:href="@{/dashboard}" th:text="#{dashboard.label}">Dashboard</a></li>
+			<li class="breadcrumb-item"><a th:href="@{/technology/list}" th:text="#{technology.label.plural}">Technologies</a></li>
+			<li class="breadcrumb-item active">
+				<span th:text="#{technology.show.label}">Show technology</span>:
+				<span th:text="${technology.title}">[title]</span>
+			</li>
+		</ol>
+
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h1 class="h2">
+				<span th:text="#{technology.show.label}">Show technology</span>:
+				<span th:text="${technology.title}">[title]</span>
+			</h1>
+			<div class="btn-toolbar mb-2 mb-md-0">
+				<div class="btn-group me-2">
+					<button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<em class="fa fa-ellipsis-v"></em>
+					</button>
+					<div class="dropdown-menu dropdown-menu-end">
+						<a th:href="@{/technology/duplicate/{id}(id=${technology.id})}" class="dropdown-item" th:text="#{common.button.duplicate.label}">Create a copy</a>
+						<span th:if="${permissions.allowRequestVerification(technology, currentUser)}">
+							<hr class="dropdown-divider">
+							<a th:href="@{/technology/request-verification/{id}(id=${technology.id})}" class="dropdown-item" th:text="#{common.verified.requestVerification.label}">Request verification</a>
+						</span>
+						<span th:if="${permissions.allowVerify(technology, currentUser)}">
+							<hr class="dropdown-divider">
+							<a th:href="@{/technology/verify/{id}(id=${technology.id})}" class="dropdown-item" th:text="#{common.verified.verify.label}">Verify</a>
+						</span>
+					</div>
+				</div>
+				<div th:if="${permissions.allowUpdate(technology, currentUser)}" class="btn-group me-2">
+					<a th:href="@{/technology/edit/{id}(id=${technology.id})}" class="btn btn-sm btn-outline-secondary" th:text="#{common.button.edit.label}">Edit</a>
+				</div>
+				<div th:if="${permissions.allowDelete(technology, currentUser)}" class="btn-group me-2">
+					<a href="" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" th:attr="data-id=${technology.id}" th:text="#{common.button.delete.label}">Delete</a>
+				</div>
+				<div class="btn-group me-2">
+					<a th:href="@{/matching/create/technology/{id}(id=${technology.id})}" class="btn btn-sm btn-primary">Matching</a>
+				</div>
+			</div>
+		</div>
+
+		<div th:replace="~{fragments/messages :: messages-fragment(${messages})}"></div>
+
+		<div class="row" th:if="${technology.title!=null}">
+			<label class="col-sm-4 text-end" th:text="#{technology.title.label}">Title</label>
+			<div class="col-sm-8" th:text="${technology.title}">[title]</div>
+		</div>
+
+		<div class="row mt-3" th:if="${technology.description!=null}">
+			<label class="col-sm-4 text-end" th:text="#{technology.description.label}">Description</label>
+			<div class="col-sm-8" th:utext="${technology.description}">[description]</div>
+		</div>
+
+		<div class="row mt-3" th:if="${technology.verified!=null}">
+			<label class="col-sm-4 text-end" th:text="#{common.verified.label}">Verified</label>
+			<div class="col-sm-8" th:text="${#messages.msg('common.verified.'+technology.verified.name()+'.label')}">[verified]</div>
+		</div>
+
+		<div class="row mt-3" th:if="${technology.createdUser!=null}">
+			<label class="col-sm-4 text-end" th:text="#{common.user.created.label}">Creator</label>
+			<div class="col-sm-8">
+				<span th:replace="~{fragments/user :: userLink-fragment(user=${technology.createdUser})}"></span>
+			</div>
+		</div>
+
+		<div class="d-flex mt-3 mb-2 justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 border-bottom">
+			<h2 class="h5" th:text="#{feature.label.plural}">Features</h2>
+		</div>
+		<div th:replace="~{fragments/feature :: feature-show-fragment(technology=${technology})}"></div>
+
+		<div class="accordion mt-3 mb-3" id="accordionAdditionalData">
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="accordionAdditionalDataChangeHistory">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" th:text="#{changeHistory.label}">Change History</button>
+				</h2>
+				<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="accordionAdditionalDataChangeHistory" data-bs-parent="#accordionAdditionalData">
+					<div class="accordion-body">
+						<div th:replace="~{fragments/change-history :: change-history-fragment(changeItems=${changes})}"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div th:replace="~{fragments/dialogs :: deleteDialog-fragment(id='deleteModal', controller='technology', title=#{technology.deletePopup.title}, question=#{technology.deletePopup.question})}"></div>
+
+	</div>
+
+	<th:block id="additionalJs">
+		<script th:src="@{/js/technology-show.js}"></script>
+	</th:block>
+
+</body>
+</html>

@@ -1,34 +1,76 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
 	th:replace="~{layout :: layout-fragment(
 							~{::title},
 							~{::content},
-							~{:: #additionalStyles},
-							~{:: #additionalJs},
+							null,
+							null,
 							'dashboard'
 							)}">
 <head>
 	<title th:text="#{application.title-pattern(#{application.name}, #{dashboard.label})}">Dashboard</title>
-
-	<th:block id="additionalStyles">
-		<!-- jQCloud -->
-		<link rel="stylesheet" th:href="@{'/webjars/jqcloud2/'+#{application.dependency.jqcloud}+'/dist/jqcloud.min.css'}"/>
-	</th:block>
 </head>
 <body>
 
 	<div th:fragment="content">
 
-		<div class="container-fluid" id="wordCloud" style="height: 40rem;/* background-color: #957bbe;*/"></div>
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item active" th:text="#{dashboard.label}">Dashboard</li>
+		</ol>
+
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h1 class="h2" th:text="#{dashboard.label}">Dashboard</h1>
+		</div>
+
+		<div th:replace="~{fragments/messages :: messages-fragment(${messages})}"></div>
+
+		<div class="row">
+
+			<div class="col-lg-6">
+
+				<div class="card mb-3">
+					<h3 class="card-header" th:text="#{dashboard.card.welcome.title}">Welcome</h3>
+					<div class="card-body">
+						<p class="card-text" th:text="#{dashboard.card.welcome.text}">[text]</p>
+						<p class="card-text" th:utext="#{dashboard.card.welcome.ticketSystem.text(${ticketSystemUrl})}">[ticketSystem.text]</p>
+						<p class="card-text" th:utext="#{dashboard.card.welcome.specification.text(${specificationUrl})}">[specification.text]</p>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="col-lg-6">
+
+				<div class="card mb-3" th:if="${showAdminCard}" sec:authorize="hasRole('ADMIN')">
+					<h3 class="card-header" th:text="#{admin.label}">Administration</h3>
+					<div class="card-body">
+						<div class="alert alert-danger" th:if="${numberOfNewRegisteredUsers gt 0}">
+							<a th:href="@{/user-admin/search/new-registered}" class="alert-link" th:text="#{dashboard.card.administration.newRegisteredUsersHint.link(${numberOfNewRegisteredUsers})}">[numberOfNewRegisteredUsers] user(s)</a>
+							<span th:text="#{dashboard.card.administration.newRegisteredUsersHint.text}"> have registered and are waiting to be activated.</span>
+						</div>
+						<div class="alert alert-warning" th:if="${hasNoIndustries}">
+							<a th:href="@{/industry/create}" class="alert-link" th:text="#{dashboard.card.administration.missingIndustriesHint.link}">Add industries</a>
+							<span th:text="#{dashboard.card.administration.missingIndustriesHint.text}"> so that use-cases can be provided with all the necessary data.</span>
+						</div>
+						<div class="alert alert-warning" th:if="${numberOfTechnologiesWaitingForVerification gt 0}">
+							<a th:href="@{/technology/search/verified-requested}" class="alert-link" th:text="#{dashboard.card.administration.technologiesWaitingForVerificationHint.link(${numberOfTechnologiesWaitingForVerification})}">[numberOfTechnologiesWaitingForVerification] technologies</a>
+							<span th:text="#{dashboard.card.administration.technologiesWaitingForVerificationHint.text}"> waiting to be verified.</span>
+						</div>
+						<div class="alert alert-warning" th:if="${numberOfUseCasesWaitingForVerification gt 0}">
+							<a th:href="@{/use-case/search/verified-requested}" class="alert-link" th:text="#{dashboard.card.administration.useCasesWaitingForVerificationHint.link(${numberOfUseCasesWaitingForVerification})}">[numberOfUseCasesWaitingForVerification] use case(s)</a>
+							<span th:text="#{dashboard.card.administration.useCasesWaitingForVerificationHint.text}"> waiting to be verified.</span>
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+
+		</div>
 
 	</div>
-
-	<th:block id="additionalJs">
-		<!-- jQCloud -->
-		<script defer th:src="@{'/webjars/jqcloud2/'+#{application.dependency.jqcloud}+'/dist/jqcloud.min.js'}"></script>
-
-		<script th:src="@{/js/dashboard.js}"></script>
-	</th:block>
 
 </body>
 </html>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<!-- =========== -->
+	<!-- insert data -->
+	<!-- =========== -->
+	<changeSet id="test" author="roethig">
+
+		<insert tableName="tag">
+			<column name="name" value="software development"/>
+			<column name="type" value="1"/>
+		</insert>
+		<insert tableName="tag">
+			<column name="name" value="scrum"/>
+			<column name="type" value="1"/>
+		</insert>
+		<insert tableName="tag">
+			<column name="name" value="kanban"/>
+			<column name="type" value="1"/>
+		</insert>
+		<insert tableName="tag">
+			<column name="name" value="funny"/>
+			<column name="type" value="1"/>
+		</insert>
+		<insert tableName="tag">
+			<column name="name" value="Dave Grohl"/>
+			<column name="type" value="2"/>
+		</insert>
+		<insert tableName="tag">
+			<column name="name" value="Zach Braff"/>
+			<column name="type" value="2"/>
+		</insert>
+
+		<insert tableName="storage">
+			<column name="storage_key" value="6b9070cc-2c07-4f64-ac44-6b713bf91dcd"/>
+			<column name="file_size"   value="203417"/>
+		</insert>
+
+		<insert tableName="image">
+			<column name="file_extension"    value="png"/>
+			<column name="file_size"         value="75315"/>
+			<column name="hash"              value="a175f61fca912ec49ce9379f02dbebfb"/>
+			<column name="import_path"       value="abc/123/test.png"/>
+			<column name="thumb_status"      value="THUMB_100_100"/>
+			<column name="storage_id"        valueNumeric="select id from storage where storage_key = '6b9070cc-2c07-4f64-ac44-6b713bf91dcd'"/>
+			<column name="resolution_width"  value="0"/>
+			<column name="resolution_height" value="0"/>
+			<column name="resolution_status" value="NO_RESOLUTION"/>
+			<column name="created_date"      value="now()"/>
+		</insert>
+		<insert tableName="image_tag">
+			<column name="image_id" valueNumeric="select id from image where hash='a175f61fca912ec49ce9379f02dbebfb'"/>
+			<column name="tag_id"   valueNumeric="select id from tag where name='software development'"/>
+		</insert>
+		<insert tableName="image_tag">
+			<column name="image_id" valueNumeric="select id from image where hash='a175f61fca912ec49ce9379f02dbebfb'"/>
+			<column name="tag_id"   valueNumeric="select id from tag where name='kanban'"/>
+		</insert>
+
+		<insert tableName="image">
+			<column name="file_extension"    value="jpg"/>
+			<column name="file_size"         value="74479"/>
+			<column name="hash"              value="3773af58a5b072a094c53f628e7160fa"/>
+			<column name="thumb_status"      value="THUMB_100_100"/>
+			<column name="storage_id"        valueNumeric="select id from storage where storage_key = '6b9070cc-2c07-4f64-ac44-6b713bf91dcd'"/>
+			<column name="resolution_width"  value="0"/>
+			<column name="resolution_height" value="0"/>
+			<column name="resolution_status" value="NO_RESOLUTION"/>
+			<column name="created_date"      value="now()"/>
+		</insert>
+
+		<insert tableName="image">
+			<column name="file_extension"    value="png"/>
+			<column name="file_size"         value="178917"/>
+			<column name="hash"              value="1ef2bdcf054c278cab5f321e99b4dd89"/>
+			<column name="thumb_status"      value="GENERATION_ERROR"/>
+			<column name="storage_id"        valueNumeric="select id from storage where storage_key = '6b9070cc-2c07-4f64-ac44-6b713bf91dcd'"/>
+			<column name="resolution_width"  value="0"/>
+			<column name="resolution_height" value="0"/>
+			<column name="resolution_status" value="NO_RESOLUTION"/>
+			<column name="created_date"      value="now()"/>
+		</insert>
+		<insert tableName="image_tag">
+			<column name="image_id" valueNumeric="select id from image where hash='1ef2bdcf054c278cab5f321e99b4dd89'"/>
+			<column name="tag_id"   valueNumeric="select id from tag where name='software development'"/>
+		</insert>
+		<insert tableName="Image_Tag">
+			<column name="image_id" valueNumeric="select id from image where hash='1ef2bdcf054c278cab5f321e99b4dd89'"/>
+			<column name="tag_id"   valueNumeric="select id from tag where name='funny'"/>
+		</insert>
+
+		<insert tableName="image">
+			<column name="file_extension"    value="jpg"/>
+			<column name="file_size"         value="53623"/>
+			<column name="hash"              value="1fd1c4ba07fa847691d092ca618c549e"/>
+			<column name="thumb_status"      value="THUMB_100_100"/>
+			<column name="storage_id"        valueNumeric="select id from storage where storage_key = '6b9070cc-2c07-4f64-ac44-6b713bf91dcd'"/>
+			<column name="resolution_width"  value="0"/>
+			<column name="resolution_height" value="0"/>
+			<column name="resolution_status" value="NO_RESOLUTION"/>
+			<column name="created_date"      value="now()"/>
+		</insert>
+		<insert tableName="image_tag">
+			<column name="image_id" valueNumeric="select id from image where hash='1fd1c4ba07fa847691d092ca618c549e'"/>
+			<column name="tag_id"   valueNumeric="select id from tag where name='software development'"/>
+		</insert>
+		<insert tableName="image_tag">
+			<column name="image_id" valueNumeric="select id from image where hash='1fd1c4ba07fa847691d092ca618c549e'"/>
+			<column name="tag_id"   valueNumeric="select id from tag where name='scrum'"/>
+		</insert>
+
+	</changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout-admin :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							null,
+							'industry'
+							)}">
+<head>
+	<title th:text="#{application.title-pattern(#{application.name}, #{industry.label.plural}+' - '+#{industry.show.label})}"></title>
+</head>
+<body>
+
+	<div th:fragment="content">
+
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a th:href="@{/admin}" th:text="#{admin.label}">Administration</a></li>
+			<li class="breadcrumb-item"><a th:href="@{/industry/list}" th:text="#{industry.label.plural}">Industries</a></li>
+			<li class="breadcrumb-item active">
+				<span th:text="#{industry.show.label}">Show industry</span>:
+				<span th:text="${industry.name}">[name]</span>
+			</li>
+		</ol>
+
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h1 class="h2">
+				<span th:text="#{industry.show.label}">Show industry</span>:
+				<span th:text="${industry.name}">[name]</span>
+				<span th:if="${industry.archived}" class="badge bg-secondary" th:text="#{common.archived.label}">Archived</span>
+			</h1>
+			<div class="btn-toolbar mb-2 mb-md-0">
+				<div class="btn-group me-2">
+					<a th:href="@{/industry/edit/{id}(id=${industry.id})}" class="btn btn-sm btn-outline-secondary" th:text="#{common.button.edit.label}">Edit</a>
+				</div>
+				<div class="btn-group me-2">
+					<a href="" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" th:attr="data-id=${industry.id}" th:text="#{common.button.delete.label}">Delete</a>
+				</div>
+			</div>
+		</div>
+
+		<div th:replace="~{fragments/messages :: messages-fragment(${messages})}"></div>
+
+		<div class="row">
+			<label class="col-sm-2 text-end" th:text="#{industry.name.label}">Name</label>
+			<div class="col-sm-10" th:text="${industry.name}">[name]</div>
+		</div>
+
+		<div class="row mt-3">
+			<label class="col-sm-2 text-end" th:text="#{industry.description.label}">Description</label>
+			<div class="col-sm-10" th:utext="${industry.description}">[description]</div>
+		</div>
+
+		<div class="accordion mt-3 mb-3" id="accordionAdditionalData">
+			<div class="accordion-item">
+				<h2 class="accordion-header" id="accordionAdditionalDataChangeHistory">
+					<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" th:text="#{changeHistory.label}">Change History</button>
+				</h2>
+				<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="accordionAdditionalDataChangeHistory" data-bs-parent="#accordionAdditionalData">
+					<div class="accordion-body">
+						<div th:replace="~{fragments/change-history :: change-history-fragment(changeItems=${changes})}"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div th:replace="~{fragments/dialogs :: deleteDialog-fragment(id='deleteModal', controller='industry', title=#{industry.deletePopup.title}, question=#{industry.deletePopup.question})}"></div>
+
+	</div>
+
+</body>
+</html>

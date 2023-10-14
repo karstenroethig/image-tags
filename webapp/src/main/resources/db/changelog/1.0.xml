@@ -6,29 +6,46 @@
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 	                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-	<changeSet id="1.0" author="roethig">
+	<changeSet id="2.0" author="roethig">
 
 		<!-- =========== -->
-		<!-- Table "Tag" -->
+		<!-- Table "tag" -->
 		<!-- =========== -->
-		<createTable tableName="Tag">
+		<createTable tableName="tag">
 			<column name="id" type="${type.id}" autoIncrement="true">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
-			<column name="name" type="varchar(255)">
+			<column name="name" type="varchar(191)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="type" type="int">
+			<column name="type" type="varchar(191)">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
 
-		<addUniqueConstraint tableName="Tag" columnNames="name" constraintName="unique___tag___name"/>
+		<addUniqueConstraint tableName="tag" columnNames="name" constraintName="u_tag__name"/>
+
+		<!-- =============== -->
+		<!-- Table "storage" -->
+		<!-- =============== -->
+		<createTable tableName="storage">
+			<column name="id" type="${type.id}" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="storage_key" type="varchar(100)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="file_size" type="int">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
+		<addUniqueConstraint tableName="storage" columnNames="storage_key" constraintName="u_storage__key"/>
 
 		<!-- ============= -->
-		<!-- Table "Image" -->
+		<!-- Table "image" -->
 		<!-- ============= -->
-		<createTable tableName="Image">
+		<createTable tableName="image">
 			<column name="id" type="${type.id}" autoIncrement="true">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
@@ -44,12 +61,37 @@
 			<column name="import_path" type="varchar(256)">
 				<constraints nullable="true"/>
 			</column>
+			<column name="thumb_status" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="storage_id" type="${type.idRef}">
+				<constraints nullable="false"/>
+			</column>
+			<column name="resolution_width" type="int">
+				<constraints nullable="false"/>
+			</column>
+			<column name="resolution_height" type="int">
+				<constraints nullable="false"/>
+			</column>
+			<column name="resolution_status" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_date" type="datetime">
+				<constraints nullable="false"/>
+			</column>
 		</createTable>
 
-		<!-- ================ -->
-		<!-- Table "ImageTag" -->
-		<!-- ================ -->
-		<createTable tableName="Image_Tag">
+		<addForeignKeyConstraint
+			baseTableName="image"
+			baseColumnNames="storage_id"
+			referencedTableName="storage"
+			referencedColumnNames="id"
+			constraintName="fk_image__storage_id__storage"/>
+
+		<!-- ================= -->
+		<!-- Table "image_tag" -->
+		<!-- ================= -->
+		<createTable tableName="image_tag">
 			<column name="image_id" type="${type.idRef}">
 				<constraints nullable="false"/>
 			</column>
@@ -58,21 +100,21 @@
 			</column>
 		</createTable>
 
-		<addPrimaryKey tableName="Image_Tag" columnNames="image_id,tag_id" constraintName="primarykey___image_tag___image_id__tag_id"/>
+		<addPrimaryKey tableName="image_tag" columnNames="image_id,tag_id" constraintName="pk_image_tag__image_id__tag_id"/>
 
 		<addForeignKeyConstraint
-			baseTableName="Image_Tag"
+			baseTableName="image_tag"
 			baseColumnNames="image_id"
-			referencedTableName="Image"
+			referencedTableName="image"
 			referencedColumnNames="id"
-			constraintName="foreignkey___image_tag__image_id___image__id"/>
+			constraintName="fk_image_tag__image_id__image"/>
 
 		<addForeignKeyConstraint
-			baseTableName="Image_Tag"
+			baseTableName="image_tag"
 			baseColumnNames="tag_id"
-			referencedTableName="Tag"
+			referencedTableName="tag"
 			referencedColumnNames="id"
-			constraintName="foreignkey___image_tag__tag_id___tag__id"/>
+			constraintName="fk_image_tag__tag_id__tag"/>
 
 	</changeSet>
 

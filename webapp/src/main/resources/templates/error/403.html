@@ -1,0 +1,27 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout-error :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							null,
+							'error'
+							)}">
+<head>
+	<title th:text="#{application.title-pattern(#{application.name}, #{error.403.title})}">Forbidden</title>
+</head>
+<body>
+
+	<div th:fragment="content">
+
+		<h4 class="card-title mt-1 mb-3 text-center">
+			<span th:text="#{error.403.title}">Forbidden</span> <span class="text-muted">(403)</span>
+		</h4>
+
+		<p th:text="#{error.403.text}">The action performed is not allowed. You do not have the required authorization or the action is not allowed in it's context.</p>
+
+	</div>
+
+</body>
+</html>

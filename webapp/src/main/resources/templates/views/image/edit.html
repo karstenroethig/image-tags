@@ -1,0 +1,99 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							~{:: #additionalJs},
+							'technology'
+							)}">
+<head>
+	<title th:text="#{application.title-pattern(#{application.name}, #{technology.label.plural}+' - '+#{technology.edit.label})}"></title>
+</head>
+<body>
+
+	<div th:fragment="content">
+
+		<ol class="breadcrumb">
+			<li class="breadcrumb-item"><a th:href="@{/dashboard}" th:text="#{dashboard.label}">Dashboard</a></li>
+			<li class="breadcrumb-item"><a th:href="@{/technology/list}" th:text="#{technology.label.plural}">Technologies</a></li>
+			<li class="breadcrumb-item active">
+				<span th:text="#{technology.edit.label}">Edit technology</span>:
+				<span th:text="${technology.title}">[title]</span>
+			</li>
+		</ol>
+
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h1 class="h2">
+				<span th:text="#{technology.edit.label}">Edit technology</span>:
+				<span th:text="${technology.title}">[title]</span>
+			</h1>
+		</div>
+
+		<div th:replace="~{fragments/messages :: messages-fragment(${messages})}"></div>
+
+		<form th:object="${technology}" th:action="@{/technology/update}" action="#" method="post" autocomplete="off">
+			<input type="hidden" th:field="*{id}"/>
+
+			<div class="row">
+				<label class="col-sm-4 col-form-label text-end">
+					<span class="required">*</span> <span th:text="#{technology.title.label}">Title</span>
+				</label>
+				<div class="col-sm-8">
+					<input type="text" th:field="*{title}" class="form-control" th:classappend="${#fields.hasErrors('title')} ? is-invalid">
+					<div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:each="err : ${#fields.errors('title')}" th:text="${err}">validation error</div>
+				</div>
+			</div>
+
+			<div class="row mt-3">
+				<label class="col-sm-4 col-form-label text-end">
+					<span th:text="#{technology.description.label}">Description</span>
+				</label>
+				<div class="col-sm-8">
+					<textarea class="form-control summernote" th:field="*{description}" rows="5" th:classappend="${#fields.hasErrors('description')} ? is-invalid"></textarea>
+					<div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:each="err : ${#fields.errors('description')}" th:text="${err}">validation error</div>
+				</div>
+			</div>
+
+			<div id="field_verified" class="row mt-3">
+				<label class="col-sm-4 col-form-label text-end">
+					<span th:text="#{common.verified.label}">Verified</span>
+				</label>
+				<div class="col-sm-8">
+					<select th:field="*{verified}" class="form-control" th:classappend="${#fields.hasErrors('verified')} ? is-invalid">
+						<option th:each="ver : ${allVerifieds}" th:value="${ver}" th:text="${#messages.msg('common.verified.'+ver.name()+'.label')}" th:if="${currentUser.hasAuthority('ROLE_ADMIN') or !ver.onlyAdminEdit}"></option>
+					</select>
+					<div class="invalid-feedback" th:if="${#fields.hasErrors('verified')}" th:each="err : ${#fields.errors('verified')}" th:text="${err}">validation error</div>
+				</div>
+			</div>
+
+			<div th:replace="~{fragments/feature :: feature-edit-fragment}"></div>
+
+			<div th:replace="~{fragments/change-history :: change-history-comment-fragment}"></div>
+
+			<div class="row mt-3">
+				<div class="offset-sm-4 col-sm-8">
+					<span class="required">*</span> <span th:text="#{common.form.required}">required</span>
+				</div>
+			</div>
+
+			<div class="row mt-2 mb-2">
+				<div class="offset-sm-4 col-sm-8">
+					<input type="submit" class="btn btn-primary" th:value="#{common.button.save.label}" value="Save">
+					<a th:href="@{/technology/show/{id}(id=${technology.id})}" class="btn btn-outline-secondary" th:text="#{common.button.cancel.label}">Cancel</a>
+				</div>
+			</div>
+
+		</form>
+
+		<div th:replace="~{fragments/feature :: feature-edit-modal-fragment}"></div>
+
+	</div>
+
+	<th:block id="additionalJs">
+		<script th:src="@{/js/technology-create.js}"></script>
+	</th:block>
+
+</body>
+</html>

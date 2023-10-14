@@ -2,184 +2,164 @@ package karstenroethig.imagetags.webapp.controller;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import karstenroethig.imagetags.webapp.controller.exceptions.NotFoundException;
+import karstenroethig.imagetags.webapp.controller.util.AttributeNames;
 import karstenroethig.imagetags.webapp.controller.util.UrlMappings;
 import karstenroethig.imagetags.webapp.controller.util.ViewEnum;
-import karstenroethig.imagetags.webapp.dto.TagDto;
-import karstenroethig.imagetags.webapp.service.exceptions.TagAlreadyExistsException;
+import karstenroethig.imagetags.webapp.model.domain.Tag_;
+import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import karstenroethig.imagetags.webapp.service.impl.TagServiceImpl;
 import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
 import karstenroethig.imagetags.webapp.util.Messages;
+import karstenroethig.imagetags.webapp.util.validation.ValidationResult;
 
 @ComponentScan
 @Controller
-@RequestMapping( UrlMappings.CONTROLLER_TAG )
-public class TagController
+@RequestMapping(UrlMappings.CONTROLLER_TAG)
+public class TagController extends AbstractController
 {
-	@Autowired
-	TagServiceImpl tagService;
+	@Autowired private TagServiceImpl tagService;
 
-	@RequestMapping(
-		value = UrlMappings.ACTION_LIST,
-		method = RequestMethod.GET
-	)
-	public String list( Model model )
+	@GetMapping(value = UrlMappings.ACTION_LIST)
+	public String list(Model model, @PageableDefault(size = 20, sort = Tag_.NAME) Pageable pageable)
 	{
-		model.addAttribute( "allTags", tagService.getAllTags() );
+		Page<TagDto> resultsPage = tagService.findAll(pageable);
+		addPagingAttributes(model, resultsPage);
 
 		return ViewEnum.TAG_LIST.getViewName();
 	}
 
-	@RequestMapping(
-		value = UrlMappings.ACTION_CREATE,
-		method = RequestMethod.GET
-	)
-	public String create( Model model )
+	@GetMapping(value = UrlMappings.ACTION_SHOW)
+	public String show(@PathVariable("id") Long id, Model model)
 	{
-		model.addAttribute( "tag", tagService.newTag() );
+		TagDto tag = tagService.find(id);
+		if (tag == null)
+			throw new NotFoundException(String.valueOf(id));
 
+		model.addAttribute(AttributeNames.TAG, tag);
+		return ViewEnum.TAG_SHOW.getViewName();
+	}
+
+	@GetMapping(value = UrlMappings.ACTION_CREATE)
+	public String create(Model model)
+	{
+		model.addAttribute(AttributeNames.TAG, tagService.create());
 		return ViewEnum.TAG_CREATE.getViewName();
 	}
 
-	@RequestMapping(
-		value = UrlMappings.ACTION_EDIT,
-		method = RequestMethod.GET
-	)
-	public String edit( @PathVariable( "id" ) Long tagId, Model model )
+	@GetMapping(value = UrlMappings.ACTION_EDIT)
+	public String edit(@PathVariable("id") Long id, Model model)
 	{
-		TagDto tag = tagService.findTag( tagId );
+		TagDto tag = tagService.find(id);
+		if (tag == null)
+			throw new NotFoundException(String.valueOf(id));
 
-		if ( tag == null )
-		{
-			throw new NotFoundException( String.valueOf( tagId ) );
-		}
-
-		model.addAttribute( "tag", tag );
-
+		model.addAttribute(AttributeNames.TAG, tag);
 		return ViewEnum.TAG_EDIT.getViewName();
 	}
 
-	@RequestMapping(
-		value = UrlMappings.ACTION_DELETE,
-		method = RequestMethod.GET
-	)
-	public String delete( @PathVariable( "id" ) Long tagId, final RedirectAttributes redirectAttributes, Model model )
+	@GetMapping(value = UrlMappings.ACTION_DELETE)
+	public String delete(@PathVariable("id") Long id, final RedirectAttributes redirectAttributes, Model model)
 	{
-		TagDto tag = tagService.findTag( tagId );
+		TagDto tag = tagService.find(id);
+		if (tag == null)
+			throw new NotFoundException(String.valueOf(id));
 
-		if ( tag == null )
+		ValidationResult validationResult = tagService.validateDelete(tag);
+		if (validationResult.hasErrors())
 		{
-			throw new NotFoundException( String.valueOf( tagId ) );
+			addValidationMessagesToRedirectAttributes(MessageKeyEnum.TAG_DELETE_INVALID, validationResult.getErrors(), redirectAttributes);
 		}
-
-		if ( tagService.deleteTag( tagId ) )
+		else if (tagService.delete(id))
 		{
-			redirectAttributes.addFlashAttribute( Messages.ATTRIBUTE_NAME,
-				Messages.createWithSuccess( MessageKeyEnum.TAG_DELETE_SUCCESS, tag.getName() ) );
+			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
+					Messages.createWithSuccess(MessageKeyEnum.TAG_DELETE_SUCCESS, tag.getName()));
 		}
 		else
 		{
-			redirectAttributes.addFlashAttribute( Messages.ATTRIBUTE_NAME,
-				Messages.createWithError( MessageKeyEnum.TAG_DELETE_ERROR, tag.getName() ) );
+			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
+					Messages.createWithError(MessageKeyEnum.TAG_DELETE_ERROR, tag.getName()));
 		}
 
-		return UrlMappings.redirect( UrlMappings.CONTROLLER_TAG, UrlMappings.ACTION_LIST );
+		return UrlMappings.redirect(UrlMappings.CONTROLLER_TAG, UrlMappings.ACTION_LIST);
 	}
 
-	@RequestMapping(
-		value = UrlMappings.ACTION_SAVE,
-		method = RequestMethod.POST
-	)
-	public String save( @ModelAttribute( "tag" ) @Valid TagDto tag, BindingResult bindingResult,
-		final RedirectAttributes redirectAttributes, Model model )
+	@PostMapping(value = UrlMappings.ACTION_SAVE)
+	public String save(@ModelAttribute(AttributeNames.TAG) @Valid TagDto tag, BindingResult bindingResult,
+		final RedirectAttributes redirectAttributes, Model model)
 	{
-		if ( bindingResult.hasErrors() )
+		if (!validate(tag, bindingResult))
 		{
-			model.addAttribute( Messages.ATTRIBUTE_NAME, Messages.createWithError( MessageKeyEnum.TAG_SAVE_INVALID ) );
-
+			model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.TAG_SAVE_INVALID));
 			return ViewEnum.TAG_CREATE.getViewName();
 		}
 
-		try
+		TagDto savedTag = tagService.save(tag);
+		if (savedTag != null)
 		{
-			if ( tagService.saveTag( tag ) != null )
-			{
-				redirectAttributes.addFlashAttribute( Messages.ATTRIBUTE_NAME,
-					Messages.createWithSuccess( MessageKeyEnum.TAG_SAVE_SUCCESS, tag.getName() ) );
-
-				return UrlMappings.redirect( UrlMappings.CONTROLLER_TAG, UrlMappings.ACTION_LIST );
-			}
-		}
-		catch ( TagAlreadyExistsException ex )
-		{
-			bindingResult.rejectValue( "name", "tag.error.exists" );
-
-			model.addAttribute( Messages.ATTRIBUTE_NAME, Messages.createWithError( MessageKeyEnum.TAG_SAVE_INVALID ) );
-
-			return ViewEnum.TAG_CREATE.getViewName();
+			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
+					Messages.createWithSuccess(MessageKeyEnum.TAG_SAVE_SUCCESS, tag.getName()));
+			return UrlMappings.redirectWithId(UrlMappings.CONTROLLER_TAG, UrlMappings.ACTION_SHOW, savedTag.getId());
 		}
 
-		model.addAttribute( Messages.ATTRIBUTE_NAME, Messages.createWithError( MessageKeyEnum.TAG_SAVE_ERROR ) );
-
+		model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.TAG_SAVE_ERROR));
 		return ViewEnum.TAG_CREATE.getViewName();
 	}
 
-	@RequestMapping(
-		value = UrlMappings.ACTION_UPDATE,
-		method = RequestMethod.POST
-	)
-	public String update( @ModelAttribute( "tag" ) @Valid TagDto tag, BindingResult bindingResult,
-		final RedirectAttributes redirectAttributes, Model model )
+	@PostMapping(value = UrlMappings.ACTION_UPDATE)
+	public String update(@ModelAttribute(AttributeNames.TAG) @Valid TagDto tag, BindingResult bindingResult,
+		final RedirectAttributes redirectAttributes, Model model)
 	{
-		if ( bindingResult.hasErrors() )
+		if (!validate(tag, bindingResult))
 		{
-			model.addAttribute( Messages.ATTRIBUTE_NAME, Messages.createWithError( MessageKeyEnum.TAG_UPDATE_INVALID ) );
-
+			model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.TAG_UPDATE_INVALID));
 			return ViewEnum.TAG_EDIT.getViewName();
 		}
 
-		try
+		TagDto updatedTag = tagService.update(tag);
+		if (updatedTag != null)
 		{
-			if ( tagService.editTag( tag ) != null )
-			{
-				redirectAttributes.addFlashAttribute( Messages.ATTRIBUTE_NAME,
-					Messages.createWithSuccess( MessageKeyEnum.TAG_UPDATE_SUCCESS, tag.getName() ) );
-
-				return UrlMappings.redirect( UrlMappings.CONTROLLER_TAG, UrlMappings.ACTION_LIST );
-			}
-		}
-		catch ( TagAlreadyExistsException ex )
-		{
-			bindingResult.rejectValue( "name", "tag.error.exists" );
-
-			model.addAttribute( Messages.ATTRIBUTE_NAME, Messages.createWithError( MessageKeyEnum.TAG_UPDATE_INVALID ) );
-
-			return ViewEnum.TAG_EDIT.getViewName();
+			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
+					Messages.createWithSuccess(MessageKeyEnum.TAG_UPDATE_SUCCESS, tag.getName()));
+			return UrlMappings.redirectWithId(UrlMappings.CONTROLLER_TAG, UrlMappings.ACTION_SHOW, updatedTag.getId());
 		}
 
-		model.addAttribute( Messages.ATTRIBUTE_NAME, Messages.createWithError( MessageKeyEnum.TAG_UPDATE_ERROR ) );
-
+		model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.TAG_UPDATE_ERROR));
 		return ViewEnum.TAG_EDIT.getViewName();
 	}
 
-	@ExceptionHandler( NotFoundException.class )
-	void handleNotFoundException( HttpServletResponse response, NotFoundException ex ) throws IOException {
-		response.sendError( HttpStatus.NOT_FOUND.value(), String.format( "Tag %s does not exist.", ex.getMessage() ) );
+	private boolean validate(TagDto tag, BindingResult bindingResult)
+	{
+		ValidationResult validationResult = tagService.validate(tag);
+		if (validationResult.hasErrors())
+			addValidationMessagesToBindingResult(validationResult.getErrors(), bindingResult);
+
+		return !bindingResult.hasErrors() && !validationResult.hasErrors();
+	}
+
+	@Override
+	@ExceptionHandler(NotFoundException.class)
+	void handleNotFoundException(HttpServletResponse response, NotFoundException ex) throws IOException
+	{
+		response.sendError(HttpStatus.NOT_FOUND.value(), String.format("Tag %s does not exist.", ex.getMessage()));
 	}
 }

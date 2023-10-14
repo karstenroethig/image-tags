@@ -13,6 +13,8 @@ public class FilesizeUtils
 	private static final NumberFormat MB_FORMAT = new DecimalFormat("#,###.#");
 	private static final NumberFormat LITTLE_SIZE_FORMAT = new DecimalFormat("#,###");
 
+	private FilesizeUtils() {}
+
 	public static String formatFilesize(long bytes)
 	{
 		if (bytes > GB)

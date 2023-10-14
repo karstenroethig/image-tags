@@ -1,20 +1,16 @@
 package karstenroethig.imagetags.webapp.controller.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class UrlMappings
 {
 	private static final String REDIRECT_PREFIX = "redirect:";
 
 	public static final String HOME = "/";
 	public static final String DASHBOARD = "/dashboard";
-	public static final String STATISTIC = "/statistic";
 
-	public static final String CONTROLLER_API = "/api";
-	public static final String CONTROLLER_API_VERSION_1_0 = "/1.0";
-
-	public static final String CONTROLLER_IMAGE = "/image";
-	public static final String CONTROLLER_GALLERY = "/gallery";
 	public static final String CONTROLLER_TAG = "/tag";
-	public static final String CONTROLLER_ADMIN = "/admin";
+	public static final String CONTROLLER_IMAGE = "/image";
 
 	public static final String ACTION_LIST = "/list";
 	public static final String ACTION_SHOW = "/show/{id}";
@@ -23,13 +19,24 @@ public class UrlMappings
 	public static final String ACTION_DELETE = "/delete/{id}";
 	public static final String ACTION_SAVE = "/save";
 	public static final String ACTION_UPDATE = "/update";
+	public static final String ACTION_SEARCH = "/search";
 
-	private UrlMappings()
+	private UrlMappings() {}
+
+	public static String redirect(String controllerPath, String actionPath)
 	{
+		return redirect(controllerPath + actionPath);
 	}
 
-	public static String redirect( String controllerPath, String actionPath )
+	public static String redirectWithId(String controllerPath, String actionPath, Long id)
 	{
-		return REDIRECT_PREFIX + controllerPath + actionPath;
+		String idString = id == null ? StringUtils.EMPTY : id.toString();
+		String path = StringUtils.replace(controllerPath + actionPath, "{id}", idString);
+		return redirect(path);
+	}
+
+	public static String redirect(String path)
+	{
+		return REDIRECT_PREFIX + path;
 	}
 }
