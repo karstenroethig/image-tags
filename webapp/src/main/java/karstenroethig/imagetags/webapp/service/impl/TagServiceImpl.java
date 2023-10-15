@@ -1,5 +1,6 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,6 +131,13 @@ public class TagServiceImpl
 	public long count()
 	{
 		return tagRepository.count();
+	}
+
+	public List<TagDto> findAll()
+	{
+		Page<Tag> page = tagRepository.findAll(Pageable.unpaged());
+		Page<TagDto> pageDto = page.map(this::transform);
+		return pageDto.getContent();
 	}
 
 	public Page<TagDto> findAll(Pageable pageable)

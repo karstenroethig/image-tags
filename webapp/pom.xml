@@ -94,6 +94,10 @@
 			<groupId>org.webjars</groupId>
 			<artifactId>font-awesome</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>selectize.js</artifactId>
+		</dependency>
 
 		<!-- Commons -->
 		<dependency>

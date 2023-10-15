@@ -20,6 +20,7 @@ public class AttributeNames
 
 	// Search
 	public static final String SEARCH_PARAMS = "searchParams";
+	public static final String IMAGE_SEARCH_PARAMS = "imageSearchParams";
 
 	public static final String TAG = "tag";
 	public static final String IMAGE = "image";

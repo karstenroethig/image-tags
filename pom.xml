@@ -75,6 +75,12 @@
 				<artifactId>font-awesome</artifactId>
 				<version>6.4.2</version>
 			</dependency>
+			<dependency>
+				<!-- https://selectize.dev/ -->
+				<groupId>org.webjars</groupId>
+				<artifactId>selectize.js</artifactId>
+				<version>0.15.2</version>
+			</dependency>
 
 			<!-- Commons -->
 			<dependency>

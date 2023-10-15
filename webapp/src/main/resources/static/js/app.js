@@ -4,6 +4,10 @@ $( document ).ready( function() {
 	$('[data-bs-toggle="popover"]').popover();
 	$('[data-bs-toggle="tooltip"]').tooltip();
 
+	$('.search-tags-input').selectize({
+		persist: false
+	});
+
 	// delete modals: transfer the id to the modal form
 	$( '.deleteModal' ).on( 'show.bs.modal', function( event ) {
 		var button = $( event.relatedTarget ); // Button that triggered the modal

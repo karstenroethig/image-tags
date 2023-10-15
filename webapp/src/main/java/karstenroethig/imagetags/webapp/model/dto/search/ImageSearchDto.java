@@ -1,7 +1,8 @@
 package karstenroethig.imagetags.webapp.model.dto.search;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
 
+import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,10 +14,10 @@ import lombok.ToString;
 @ToString
 public class ImageSearchDto
 {
-	private String text;
+	private List<TagDto> tags;
 
 	public boolean hasParams()
 	{
-		return StringUtils.isNotBlank(text);
+		return tags != null && !tags.isEmpty();
 	}
 }

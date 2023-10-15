@@ -10,9 +10,13 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.SetJoin;
+import jakarta.persistence.criteria.Subquery;
 import karstenroethig.imagetags.webapp.model.domain.AbstractEntityId_;
 import karstenroethig.imagetags.webapp.model.domain.Image;
 import karstenroethig.imagetags.webapp.model.domain.Image_;
+import karstenroethig.imagetags.webapp.model.domain.Tag;
+import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 
 public class ImageSpecifications
@@ -46,19 +50,26 @@ public class ImageSpecifications
 			{
 				List<Predicate> restrictions = new ArrayList<>();
 
-				addRestrictionsForText(root, cb, restrictions, imageSearchDto.getText());
+				addRestrictionsForTags(root, query, cb, restrictions, imageSearchDto.getTags());
 
 				return cb.and(restrictions.toArray(new Predicate[] {}));
 			};
 	}
 
-	private static void addRestrictionsForText(Root<Image> root, CriteriaBuilder cb, List<Predicate> restrictions, String text)
+	private static void addRestrictionsForTags(Root<Image> root, CriteriaQuery<?> query, CriteriaBuilder cb, List<Predicate> restrictions, List<TagDto> tags)
 	{
-		if (StringUtils.isBlank(text))
+		if (tags == null || tags.isEmpty())
 			return;
 
-		restrictions.add(cb.or(
-				cb.like(cb.lower(root.get(Image_.title)), "%" + StringUtils.lowerCase(text) + "%"),
-				cb.like(cb.lower(root.get(Image_.description)), "%" + StringUtils.lowerCase(text) + "%")));
+		for (TagDto tag : tags)
+		{
+			Subquery<Long> sub = query.subquery(Long.class);
+			Root<Tag> subRoot = sub.from(Tag.class);
+			SetJoin<Image, Tag> subTags = root.join(Image_.tags);
+			sub.select(subRoot.get(AbstractEntityId_.id));
+			sub.where(cb.equal(subTags.get(AbstractEntityId_.id), tag.getId()));
+
+			restrictions.add(cb.exists(sub));
+		}
 	}
 }
