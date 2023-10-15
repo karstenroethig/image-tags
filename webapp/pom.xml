@@ -98,6 +98,11 @@
 			<groupId>org.webjars</groupId>
 			<artifactId>selectize.js</artifactId>
 		</dependency>
+		<dependency>
+			<!-- https://select2.org/ -->
+			<groupId>org.webjars</groupId>
+			<artifactId>select2</artifactId>
+		</dependency>
 
 		<!-- Commons -->
 		<dependency>

@@ -7,7 +7,11 @@ $( document ).ready( function() {
 	$('.search-tags-input').selectize({
 		persist: false
 	});
-
+/*
+	$('.search-tags-input').select2({
+		placeholder: 'Search'
+	});
+*/
 	// delete modals: transfer the id to the modal form
 	$( '.deleteModal' ).on( 'show.bs.modal', function( event ) {
 		var button = $( event.relatedTarget ); // Button that triggered the modal

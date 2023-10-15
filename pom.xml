@@ -81,6 +81,12 @@
 				<artifactId>selectize.js</artifactId>
 				<version>0.15.2</version>
 			</dependency>
+			<dependency>
+				<!-- https://select2.org/ -->
+				<groupId>org.webjars</groupId>
+				<artifactId>select2</artifactId>
+				<version>4.0.13</version>
+			</dependency>
 
 			<!-- Commons -->
 			<dependency>
