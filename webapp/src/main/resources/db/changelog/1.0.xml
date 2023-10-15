@@ -76,7 +76,7 @@
 			<column name="resolution_status" type="varchar(191)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="created_date" type="datetime">
+			<column name="created_datetime" type="datetime">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>

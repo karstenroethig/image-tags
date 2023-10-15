@@ -1,7 +1,11 @@
 package karstenroethig.imagetags.webapp.model.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+import karstenroethig.imagetags.webapp.model.enums.ImageResolutionStatusEnum;
+import karstenroethig.imagetags.webapp.model.enums.ImageThumbStatusEnum;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +19,19 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class ImageDto extends AbstractDtoId
 {
-	@NotNull
-	@Size(min = 1, max = 191)
-	private String title;
+	private String extension;
+	private Long size;
+	private String hash;
+	private String importPath;
+	private ImageThumbStatusEnum thumbStatus;
+	private Integer resolutionWidth;
+	private Integer resolutionHeight;
+	private ImageResolutionStatusEnum resolutionStatus;
+	private LocalDateTime createdDatetime;
+	private Set<TagDto> tags = new HashSet<>();
 
-	private String description;
+	public void addTag(TagDto tag)
+	{
+		tags.add(tag);
+	}
 }

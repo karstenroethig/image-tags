@@ -51,7 +51,7 @@
 			<column name="resolution_width"  value="0"/>
 			<column name="resolution_height" value="0"/>
 			<column name="resolution_status" value="NO_RESOLUTION"/>
-			<column name="created_date"      value="now()"/>
+			<column name="created_datetime"  value="now()"/>
 		</insert>
 		<insert tableName="image_tag">
 			<column name="image_id" valueNumeric="select id from image where hash='a175f61fca912ec49ce9379f02dbebfb'"/>
@@ -71,7 +71,7 @@
 			<column name="resolution_width"  value="0"/>
 			<column name="resolution_height" value="0"/>
 			<column name="resolution_status" value="NO_RESOLUTION"/>
-			<column name="created_date"      value="now()"/>
+			<column name="created_datetime"  value="now()"/>
 		</insert>
 
 		<insert tableName="image">
@@ -83,7 +83,7 @@
 			<column name="resolution_width"  value="0"/>
 			<column name="resolution_height" value="0"/>
 			<column name="resolution_status" value="NO_RESOLUTION"/>
-			<column name="created_date"      value="now()"/>
+			<column name="created_datetime"  value="now()"/>
 		</insert>
 		<insert tableName="image_tag">
 			<column name="image_id" valueNumeric="select id from image where hash='1ef2bdcf054c278cab5f321e99b4dd89'"/>
@@ -103,7 +103,7 @@
 			<column name="resolution_width"  value="0"/>
 			<column name="resolution_height" value="0"/>
 			<column name="resolution_status" value="NO_RESOLUTION"/>
-			<column name="created_date"      value="now()"/>
+			<column name="created_datetime"  value="now()"/>
 		</insert>
 		<insert tableName="image_tag">
 			<column name="image_id" valueNumeric="select id from image where hash='1fd1c4ba07fa847691d092ca618c549e'"/>

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -46,7 +47,7 @@ public class ImageController extends AbstractController
 	@Autowired private ImageSearchBean imageSearchBean;
 
 	@GetMapping(value = UrlMappings.ACTION_LIST)
-	public String list(Model model, @PageableDefault(size = 20, sort = Image_.TITLE) Pageable pageable)
+	public String list(Model model, @PageableDefault(size = 20, sort = Image_.CREATED_DATETIME, direction = Direction.DESC) Pageable pageable)
 	{
 		Page<ImageDto> resultsPage = imageService.findBySearchParams(imageSearchBean.getImageSearchDto(), pageable);
 		addPagingAttributes(model, resultsPage);
@@ -61,7 +62,7 @@ public class ImageController extends AbstractController
 	public String search(@ModelAttribute(AttributeNames.IMAGE_SEARCH_PARAMS) ImageSearchDto imageSearchDto, Model model)
 	{
 		imageSearchBean.setImageSearchDto(imageSearchDto);
-		return UrlMappings.redirect(UrlMappings.DASHBOARD);
+		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST);
 	}
 
 	@GetMapping(value = UrlMappings.ACTION_SHOW)
@@ -84,10 +85,10 @@ public class ImageController extends AbstractController
 
 		if (imageService.delete(id))
 			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
-					Messages.createWithSuccess(MessageKeyEnum.IMAGE_DELETE_SUCCESS, image.getTitle()));
+					Messages.createWithSuccess(MessageKeyEnum.IMAGE_DELETE_SUCCESS));
 		else
 			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
-				Messages.createWithError(MessageKeyEnum.IMAGE_DELETE_ERROR, image.getTitle()));
+				Messages.createWithError(MessageKeyEnum.IMAGE_DELETE_ERROR));
 
 		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST);
 	}
@@ -107,7 +108,7 @@ public class ImageController extends AbstractController
 		if (updatedImage != null)
 		{
 			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
-					Messages.createWithSuccess(MessageKeyEnum.IMAGE_UPDATE_SUCCESS, image.getTitle()));
+					Messages.createWithSuccess(MessageKeyEnum.IMAGE_UPDATE_SUCCESS));
 			return UrlMappings.redirectWithId(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_SHOW, updatedImage.getId());
 		}
 

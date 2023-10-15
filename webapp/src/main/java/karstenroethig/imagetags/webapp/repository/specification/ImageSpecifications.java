@@ -29,7 +29,7 @@ public class ImageSpecifications
 					cb.equal(root.get(AbstractEntityId_.id), id);
 	}
 
-	public static Specification<Image> matchesUniqueProperties(Long id, String title)
+	public static Specification<Image> matchesUniqueProperties(Long id, String hash)
 	{
 		return (Root<Image> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->
 			{
@@ -38,7 +38,7 @@ public class ImageSpecifications
 				if (id != null)
 					restrictions.add(cb.notEqual(root.get(AbstractEntityId_.id), id));
 
-				restrictions.add(cb.equal(cb.lower(root.get(Image_.title)), StringUtils.lowerCase(title)));
+				restrictions.add(cb.equal(cb.lower(root.get(Image_.hash)), StringUtils.lowerCase(hash)));
 
 				return cb.and(restrictions.toArray(new Predicate[] {}));
 			};
