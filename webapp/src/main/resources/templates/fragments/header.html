@@ -37,7 +37,7 @@
 					<select th:field="*{tags}" class="form-control search-tags-input" style="width: 400px;" size="1" multiple="multiple">
 						<option th:each="tag : ${allTags}" th:value="${{tag}}" th:text="${tag.name}">[name]</option>
 					</select>
-					<button class="btn btn-outline-success ms-2" type="submit">Search</button>
+					<button class="btn btn-outline-primary ms-2" type="submit">Search</button>
 				</form>
 			</div>
 		</div>

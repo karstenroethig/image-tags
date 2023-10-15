@@ -58,10 +58,10 @@ public class ImageController extends AbstractController
 	}
 
 	@PostMapping(value = UrlMappings.ACTION_SEARCH)
-	public String search(@ModelAttribute(AttributeNames.SEARCH_PARAMS) ImageSearchDto imageSearchDto, Model model)
+	public String search(@ModelAttribute(AttributeNames.IMAGE_SEARCH_PARAMS) ImageSearchDto imageSearchDto, Model model)
 	{
 		imageSearchBean.setImageSearchDto(imageSearchDto);
-		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST);
+		return UrlMappings.redirect(UrlMappings.DASHBOARD);
 	}
 
 	@GetMapping(value = UrlMappings.ACTION_SHOW)

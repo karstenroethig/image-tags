@@ -99,7 +99,7 @@ public class TagServiceImpl
 		}
 
 		ImageSearchDto imageSearch = new ImageSearchDto();
-		// TODO: imageSearch.setTag(tag);
+		imageSearch.setTags(List.of(tag));
 		long totalImagesUsedBy = imageService.countBySearchParams(imageSearch);
 		if (totalImagesUsedBy > 0)
 			result.addError(MessageKeyEnum.TAG_DELETE_INVALID_STILL_IN_USE_BY_IMAGES, totalImagesUsedBy);

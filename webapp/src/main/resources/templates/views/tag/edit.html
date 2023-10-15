@@ -15,14 +15,6 @@
 
 	<div th:fragment="content">
 
-		<ol class="breadcrumb">
-			<li class="breadcrumb-item"><a th:href="@{/tag/list}" th:text="#{tag.label.plural}">Tags</a></li>
-			<li class="breadcrumb-item active">
-				<span th:text="#{tag.edit.label}">Edit tag</span>:
-				<span th:text="${tag.name}">[name]</span>
-			</li>
-		</ol>
-
 		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h1 class="h2">
 				<span th:text="#{tag.edit.label}">Edit tag</span>:
