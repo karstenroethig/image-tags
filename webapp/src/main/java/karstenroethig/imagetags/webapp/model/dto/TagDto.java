@@ -2,6 +2,7 @@ package karstenroethig.imagetags.webapp.model.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import karstenroethig.imagetags.webapp.model.enums.TagTypeEnum;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,6 @@ public class TagDto extends AbstractDtoId
 	@Size(min = 1, max = 191)
 	private String name;
 
-	private String description;
-
-	private Boolean archived;
+	@NotNull
+	private TagTypeEnum type;
 }

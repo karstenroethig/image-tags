@@ -40,23 +40,12 @@ public class TagController extends AbstractController
 	@Autowired private TagServiceImpl tagService;
 
 	@GetMapping(value = UrlMappings.ACTION_LIST)
-	public String list(Model model, @PageableDefault(size = 20, sort = Tag_.NAME) Pageable pageable)
+	public String list(Model model, @PageableDefault(size = 20, sort = { Tag_.TYPE, Tag_.NAME } ) Pageable pageable)
 	{
 		Page<TagDto> resultsPage = tagService.findAll(pageable);
 		addPagingAttributes(model, resultsPage);
 
 		return ViewEnum.TAG_LIST.getViewName();
-	}
-
-	@GetMapping(value = UrlMappings.ACTION_SHOW)
-	public String show(@PathVariable("id") Long id, Model model)
-	{
-		TagDto tag = tagService.find(id);
-		if (tag == null)
-			throw new NotFoundException(String.valueOf(id));
-
-		model.addAttribute(AttributeNames.TAG, tag);
-		return ViewEnum.TAG_SHOW.getViewName();
 	}
 
 	@GetMapping(value = UrlMappings.ACTION_CREATE)
@@ -118,7 +107,7 @@ public class TagController extends AbstractController
 		{
 			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
 					Messages.createWithSuccess(MessageKeyEnum.TAG_SAVE_SUCCESS, tag.getName()));
-			return UrlMappings.redirectWithId(UrlMappings.CONTROLLER_TAG, UrlMappings.ACTION_SHOW, savedTag.getId());
+			return UrlMappings.redirect(UrlMappings.CONTROLLER_TAG, UrlMappings.ACTION_LIST);
 		}
 
 		model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.TAG_SAVE_ERROR));
@@ -140,7 +129,7 @@ public class TagController extends AbstractController
 		{
 			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
 					Messages.createWithSuccess(MessageKeyEnum.TAG_UPDATE_SUCCESS, tag.getName()));
-			return UrlMappings.redirectWithId(UrlMappings.CONTROLLER_TAG, UrlMappings.ACTION_SHOW, updatedTag.getId());
+			return UrlMappings.redirect(UrlMappings.CONTROLLER_TAG, UrlMappings.ACTION_LIST);
 		}
 
 		model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.TAG_UPDATE_ERROR));

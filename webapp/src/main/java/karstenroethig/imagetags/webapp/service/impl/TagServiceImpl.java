@@ -26,10 +26,7 @@ public class TagServiceImpl
 
 	public TagDto create()
 	{
-		TagDto tag = new TagDto();
-		tag.setArchived(false);
-
-		return tag;
+		return new TagDto();
 	}
 
 	public ValidationResult validate(TagDto tag)
@@ -74,8 +71,7 @@ public class TagServiceImpl
 		Tag tag = new Tag();
 		merge(tag, tagDto);
 
-		Tag savedTag = tagRepository.save(tag);
-		return transform(savedTag);
+		return transform(tagRepository.save(tag));
 	}
 
 	public TagDto update(TagDto tagDto)
@@ -88,8 +84,7 @@ public class TagServiceImpl
 
 		merge(tag, tagDto);
 
-		Tag updatedTag = tagRepository.save(tag);
-		return transform(updatedTag);
+		return transform(tagRepository.save(tag));
 	}
 
 	public ValidationResult validateDelete(TagDto tag)
@@ -154,8 +149,7 @@ public class TagServiceImpl
 			return null;
 
 		tag.setName(tagDto.getName());
-		tag.setDescription(tagDto.getDescription());
-		tag.setArchived(tagDto.getArchived());
+		tag.setType(tagDto.getType());
 
 		return tag;
 	}
@@ -169,8 +163,7 @@ public class TagServiceImpl
 
 		tagDto.setId(tag.getId());
 		tagDto.setName(tag.getName());
-		tagDto.setDescription(tag.getDescription());
-		tagDto.setArchived(tag.isArchived());
+		tagDto.setType(tag.getType());
 
 		return tagDto;
 	}

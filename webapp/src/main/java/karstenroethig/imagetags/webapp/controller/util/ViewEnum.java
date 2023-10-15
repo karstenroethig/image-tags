@@ -11,7 +11,6 @@ public enum ViewEnum
 	SERVER_INFO("/server-info" ),
 
 	TAG_LIST(ControllerEnum.TAG, ActionEnum.LIST),
-	TAG_SHOW(ControllerEnum.TAG, ActionEnum.SHOW),
 	TAG_CREATE(ControllerEnum.TAG, ActionEnum.CREATE),
 	TAG_EDIT(ControllerEnum.TAG, ActionEnum.EDIT),
 
