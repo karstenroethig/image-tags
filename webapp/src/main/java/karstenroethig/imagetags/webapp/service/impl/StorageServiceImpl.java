@@ -32,16 +32,17 @@ public class StorageServiceImpl
 
 	@Autowired private StorageRepository storageRepository;
 
-	public Resource loadAsResource(ImageDto image) throws IOException
+	public Resource loadAsResource(ImageDto image, boolean thumb) throws IOException
 	{
 		Storage storage = storageRepository.findById(image.getStorage().getId()).orElse(null);
 		if (storage == null)
 			return null;
 
-		Path storageArchivePath = createAndGetStorageArchiveIfItDoesNotExist(storage.getKey());
+		Path storageArchivePath = createAndGetStorageArchiveIfItDoesNotExist(storage.getKey(), thumb);
 		try (FileSystem storageFileSystem = FileSystems.newFileSystem(storageArchivePath))
 		{
-			Path pathToFileInArchive = storageFileSystem.getPath(ROOT_PATH_DELIMITER + image.getStorageKey());
+			String thumbsPath = thumb ? "/thumbs" : StringUtils.EMPTY;
+			Path pathToFileInArchive = storageFileSystem.getPath(thumbsPath + ROOT_PATH_DELIMITER + image.getStorageKey());
 			return new ByteArrayResource(Files.readAllBytes(pathToFileInArchive));
 		}
 	}
@@ -59,9 +60,9 @@ public class StorageServiceImpl
 		return storageDto;
 	}
 
-	private Path createAndGetStorageArchiveIfItDoesNotExist(String storageKey) throws IOException
+	private Path createAndGetStorageArchiveIfItDoesNotExist(String storageKey, boolean thumbs) throws IOException
 	{
-		Path storageArchivePath = resolvePathToStorageArchive(storageKey);
+		Path storageArchivePath = resolvePathToStorageArchive(storageKey, thumbs);
 
 		if (!Files.exists(storageArchivePath))
 		{
@@ -79,10 +80,10 @@ public class StorageServiceImpl
 		return storageArchivePath;
 	}
 
-	private Path resolvePathToStorageArchive(String storageKey) throws IOException
+	private Path resolvePathToStorageArchive(String storageKey, boolean thumbs) throws IOException
 	{
 		Path storageDirectory = createAndGetStorageDirectory();
-		String storageArchiveFilename = buildStorageFilename(storageKey);
+		String storageArchiveFilename = buildStorageFilename(storageKey, thumbs);
 		Path storageArchivePath = storageDirectory.resolve(storageArchiveFilename);
 
 		return storageArchivePath;
@@ -99,11 +100,14 @@ public class StorageServiceImpl
 		return storageDirectory;
 	}
 
-	private String buildStorageFilename(String storageKey)
+	private String buildStorageFilename(String storageKey, boolean thumbs)
 	{
 		StringBuilder filename = new StringBuilder();
 
 		filename.append("images");
+
+		if (thumbs)
+			filename.append("_thumbs");
 
 		if (StringUtils.isNotBlank(storageKey))
 		{

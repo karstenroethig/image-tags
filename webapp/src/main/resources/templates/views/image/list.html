@@ -25,27 +25,11 @@
 			</div>
 		</div>
 
-		<table class="table table-bordered">
-			<thead>
-				<tr>
-					<th scope="col" class="clickable" data-sort-prop="hash" th:text="#{image.hash.label}">Hash</th>
-					<th scope="col" th:text="#{common.table.operations.label}">Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:if="${#lists.isEmpty(page.content)}">
-					<td colspan="2" class="text-center" th:text="#{common.table.empty.text}">Data can not be found.</td>
-				</tr>
-				<tr th:each="image : ${page.content}">
-					<td>
-						<span th:text="${image.hash}">[hash]</span>
-					</td>
-					<td>
-						<a th:href="@{/image/show/{id}(id=${image.id})}" class="btn btn-outline-secondary btn-sm" th:text="#{common.button.show.label}">Show</a>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+		<div class="mb-2">
+			<a th:each="image : ${page.content}" th:href="@{/image/show/{id}(id=${image.id})}" style="text-decoration: none;">
+				<img th:src="@{/image/content/{id}?thumb=true(id=${image.id})}" class="img-thumbnail mb-1">
+			</a>
+		</div>
 
 		<div th:replace="~{fragments/paging :: paging-fragment(controller='image', page=${page}, currentItems=${currentItems}, sortProperty=${sortProperty}, sortDesc=${sortDesc})}"></div>
 

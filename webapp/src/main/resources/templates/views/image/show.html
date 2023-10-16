@@ -15,25 +15,12 @@
 
 	<div th:fragment="content">
 
-		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">
-				<span th:text="#{image.show.label}">Show image</span>:
-				<span th:text="${image.hash}">[hash]</span>
-			</h1>
-			<div class="btn-toolbar mb-2 mb-md-0">
-				<div class="btn-group me-2">
-					<a href="" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" th:attr="data-id=${image.id}" th:text="#{common.button.delete.label}">Delete</a>
-				</div>
-			</div>
-		</div>
-
 		<div th:replace="~{fragments/messages :: messages-fragment(${messages})}"></div>
 
-		<div class="row">
+		<div class="row mt-2">
 			<div class="col-9">
 				<div class="text-center">
-					<img src="https://cdnb.artstation.com/p/assets/images/images/007/173/947/large/denis-istomin-your-eyes-260717-layers4-post.jpg" class="img-fluid img-fit">
-					<!--img src="https://cdna.artstation.com/p/assets/images/images/019/646/066/large/denis-istomin-zelda.jpg" class="img-fluid img-fit"-->
+					<img th:src="@{/image/content/{id}(id=${image.id})}" class="img-fluid img-fit">
 				</div>
 			</div>
 			<div class="col-3">

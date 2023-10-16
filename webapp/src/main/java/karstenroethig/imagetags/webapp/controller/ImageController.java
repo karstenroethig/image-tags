@@ -86,16 +86,18 @@ public class ImageController extends AbstractController
 
 	@GetMapping(value = UrlMappings.ACTION_CONTENT)
 	@ResponseBody
-	public ResponseEntity<Resource> content(@PathVariable("id") Long id, @RequestParam(name = "inline", defaultValue = "true") boolean inline, Model model) throws IOException
+	public ResponseEntity<Resource> content(@PathVariable("id") Long id,
+		@RequestParam(name = "thumb", defaultValue = "false") boolean thumb,
+		@RequestParam(name = "inline", defaultValue = "true") boolean inline, Model model) throws IOException
 	{
 		ImageDto image = imageService.find(id);
 		if (image == null)
 			throw new NotFoundException(String.valueOf(id));
 
-		Resource fileResource = storageService.loadAsResource(image);
+		Resource fileResource = storageService.loadAsResource(image, thumb);
 		return ResponseEntity
 				.ok()
-				.contentLength(image.getSize())
+				.contentLength(fileResource.contentLength())
 				.cacheControl(CacheControl.noCache())
 				.header(HttpHeaders.CONTENT_DISPOSITION, (inline ? "inline" : "attachment") + "; filename=\"" + image.getStorageKey() + "." + image.getExtension() + "\"")
 				.body(fileResource);
