@@ -17,3 +17,8 @@
 .tag-type-album {
 	background-color: #563d7c;
 }
+
+.img-fit {
+	max-height: calc(100vh - 92px);
+/*	max-height: calc(100vh - var(--main-menu-height));*/
+}

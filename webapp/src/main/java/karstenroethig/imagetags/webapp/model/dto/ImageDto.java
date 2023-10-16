@@ -21,6 +21,7 @@ public class ImageDto extends AbstractDtoId
 {
 	private String extension;
 	private Long size;
+	private String sizeFormatted;
 	private String hash;
 	private String importPath;
 	private ImageThumbStatusEnum thumbStatus;

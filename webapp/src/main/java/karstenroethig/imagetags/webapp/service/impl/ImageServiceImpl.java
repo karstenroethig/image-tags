@@ -22,6 +22,7 @@ import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
 import karstenroethig.imagetags.webapp.repository.specification.ImageSpecifications;
 import karstenroethig.imagetags.webapp.util.DateUtils;
+import karstenroethig.imagetags.webapp.util.FilesizeUtils;
 import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
 import karstenroethig.imagetags.webapp.util.validation.ValidationException;
 import karstenroethig.imagetags.webapp.util.validation.ValidationResult;
@@ -199,6 +200,7 @@ public class ImageServiceImpl
 		imageDto.setId(image.getId());
 		imageDto.setExtension(image.getExtension());
 		imageDto.setSize(image.getSize());
+		imageDto.setSizeFormatted(FilesizeUtils.formatFilesize(image.getSize()));
 		imageDto.setHash(image.getHash());
 		imageDto.setImportPath(image.getImportPath());
 		imageDto.setThumbStatus(image.getThumbStatus());
