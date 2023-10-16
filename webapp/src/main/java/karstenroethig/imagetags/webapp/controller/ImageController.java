@@ -4,11 +4,15 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +22,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +37,7 @@ import karstenroethig.imagetags.webapp.model.domain.Image_;
 import karstenroethig.imagetags.webapp.model.dto.ImageDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import karstenroethig.imagetags.webapp.service.impl.ImageServiceImpl;
+import karstenroethig.imagetags.webapp.service.impl.StorageServiceImpl;
 import karstenroethig.imagetags.webapp.service.impl.TagServiceImpl;
 import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
 import karstenroethig.imagetags.webapp.util.Messages;
@@ -43,6 +50,7 @@ public class ImageController extends AbstractController
 {
 	@Autowired private ImageServiceImpl imageService;
 	@Autowired private TagServiceImpl tagService;
+	@Autowired private StorageServiceImpl storageService;
 
 	@Autowired private ImageSearchBean imageSearchBean;
 
@@ -74,6 +82,23 @@ public class ImageController extends AbstractController
 
 		model.addAttribute(AttributeNames.IMAGE, image);
 		return ViewEnum.IMAGE_SHOW.getViewName();
+	}
+
+	@GetMapping(value = UrlMappings.ACTION_CONTENT)
+	@ResponseBody
+	public ResponseEntity<Resource> content(@PathVariable("id") Long id, @RequestParam(name = "inline", defaultValue = "true") boolean inline, Model model) throws IOException
+	{
+		ImageDto image = imageService.find(id);
+		if (image == null)
+			throw new NotFoundException(String.valueOf(id));
+
+		Resource fileResource = storageService.loadAsResource(image);
+		return ResponseEntity
+				.ok()
+				.contentLength(image.getSize())
+				.cacheControl(CacheControl.noCache())
+				.header(HttpHeaders.CONTENT_DISPOSITION, (inline ? "inline" : "attachment") + "; filename=\"" + image.getStorageKey() + "." + image.getExtension() + "\"")
+				.body(fileResource);
 	}
 
 	@GetMapping(value = UrlMappings.ACTION_DELETE)

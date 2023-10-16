@@ -32,6 +32,7 @@ import karstenroethig.imagetags.webapp.util.validation.ValidationResult;
 public class ImageServiceImpl
 {
 	@Autowired private TagServiceImpl tagService;
+	@Autowired private StorageServiceImpl storageService;
 
 	@Autowired private ImageRepository imageRepository;
 
@@ -198,6 +199,8 @@ public class ImageServiceImpl
 		ImageDto imageDto = new ImageDto();
 
 		imageDto.setId(image.getId());
+		imageDto.setStorage(storageService.transform(image.getStorage()));
+		imageDto.setStorageKey(image.getStorageKey());
 		imageDto.setExtension(image.getExtension());
 		imageDto.setSize(image.getSize());
 		imageDto.setSizeFormatted(FilesizeUtils.formatFilesize(image.getSize()));

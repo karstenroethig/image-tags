@@ -32,6 +32,13 @@ import lombok.ToString;
 @Table(name = "image")
 public class Image extends AbstractEntityId
 {
+	@JoinColumn(name = "storage_id")
+	@ManyToOne(optional = true)
+	private Storage storage;
+
+	@Column(name = "storage_key", length = 100, nullable = false)
+	private String storageKey;
+
 	@Column(name = "file_extension", length = 50, nullable = false)
 	private String extension;
 
@@ -47,10 +54,6 @@ public class Image extends AbstractEntityId
 	@Column(name = "thumb_status", length = 191, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private ImageThumbStatusEnum thumbStatus;
-
-	@JoinColumn(name = "storage_id")
-	@ManyToOne(optional = true)
-	private Storage storage;
 
 	@Column(name = "resolution_width", nullable = false)
 	private Integer resolutionWidth;

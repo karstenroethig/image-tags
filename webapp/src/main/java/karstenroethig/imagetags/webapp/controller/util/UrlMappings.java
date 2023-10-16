@@ -21,6 +21,7 @@ public class UrlMappings
 	public static final String ACTION_SAVE = "/save";
 	public static final String ACTION_UPDATE = "/update";
 	public static final String ACTION_SEARCH = "/search";
+	public static final String ACTION_CONTENT = "/content";
 
 	private UrlMappings() {}
 

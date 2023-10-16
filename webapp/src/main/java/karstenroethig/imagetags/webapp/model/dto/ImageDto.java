@@ -19,6 +19,9 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class ImageDto extends AbstractDtoId
 {
+	private StorageDto storage;
+	private String storageKey;
+
 	private String extension;
 	private Long size;
 	private String sizeFormatted;

@@ -32,7 +32,7 @@
 			<column name="id" type="${type.id}" autoIncrement="true">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
-			<column name="storage_key" type="varchar(100)">
+			<column name="storage_key" type="varchar(191)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="file_size" type="int">
@@ -40,7 +40,7 @@
 			</column>
 		</createTable>
 
-		<addUniqueConstraint tableName="storage" columnNames="storage_key" constraintName="u_storage__key"/>
+		<addUniqueConstraint tableName="storage" columnNames="storage_key" constraintName="u_storage__storage_key"/>
 
 		<!-- ============= -->
 		<!-- Table "image" -->
@@ -48,6 +48,12 @@
 		<createTable tableName="image">
 			<column name="id" type="${type.id}" autoIncrement="true">
 				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="storage_id" type="${type.idRef}">
+				<constraints nullable="false"/>
+			</column>
+			<column name="storage_key" type="varchar(191)">
+				<constraints nullable="false"/>
 			</column>
 			<column name="file_extension" type="varchar(50)">
 				<constraints nullable="false"/>
@@ -64,9 +70,6 @@
 			<column name="thumb_status" type="varchar(191)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="storage_id" type="${type.idRef}">
-				<constraints nullable="false"/>
-			</column>
 			<column name="resolution_width" type="int">
 				<constraints nullable="false"/>
 			</column>
@@ -80,6 +83,8 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
+
+		<addUniqueConstraint tableName="image" columnNames="storage_key" constraintName="u_image__storage_key"/>
 
 		<addForeignKeyConstraint
 			baseTableName="image"
