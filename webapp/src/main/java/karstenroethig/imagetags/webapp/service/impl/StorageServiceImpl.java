@@ -1,14 +1,18 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.UUID;
 import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -26,11 +30,29 @@ import karstenroethig.imagetags.webapp.repository.StorageRepository;
 @Transactional
 public class StorageServiceImpl
 {
+	private static final long STORAGE_MAX_SIZE = 500000000l;
 	private static final String ROOT_PATH_DELIMITER = "/";
 
 	@Autowired private ApplicationProperties applicationProperties;
 
 	@Autowired private StorageRepository storageRepository;
+
+	public void saveImage(Path imageFilePath, Long imageId, FileSystem fileSystem, boolean thumbnail) throws IOException
+	{
+		String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
+		String filename = buildImageFilename(imageId, extension);
+		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/")+filename);
+
+		Files.copy(imageFilePath, path);
+	}
+
+	public void saveImage(byte[] imageData, Long imageId, String extension, FileSystem fileSystem, boolean thumbnail) throws IOException
+	{
+		String filename = buildImageFilename(imageId, extension);
+		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/")+filename);
+
+		Files.copy(new ByteArrayInputStream(imageData), path);
+	}
 
 	public Resource loadAsResource(ImageDto image, boolean thumb) throws IOException
 	{
@@ -100,6 +122,83 @@ public class StorageServiceImpl
 		return storageDirectory;
 	}
 
+	protected void createStorageFileIfItDoesNotExist(String storageKey, boolean thumbnail) throws IOException
+	{
+		Path storagePath = createStoragePath(storageKey, thumbnail);
+
+		if (Files.exists(storagePath))
+			return;
+
+		try (ZipOutputStream out = new ZipOutputStream(
+				Files.newOutputStream(
+						storagePath,
+						StandardOpenOption.CREATE,
+						StandardOpenOption.TRUNCATE_EXISTING)))
+		{
+			out.setLevel(Deflater.NO_COMPRESSION);
+
+			if (thumbnail)
+				out.putNextEntry(new ZipEntry("thumbs/"));
+
+			out.closeEntry();
+		}
+	}
+
+	public Storage addAndSaveFilesize(Long storageId, long delta)
+	{
+		Storage storage = storageRepository.findById(storageId).orElse(null);
+
+		if (storage == null)
+			return null;
+
+		storage.setSize(storage.getSize() + delta);
+		return storageRepository.save(storage);
+	}
+
+	public void subtractAndSaveFilesize(Long storageId, long delta)
+	{
+		Storage storage = storageRepository.findById(storageId).orElse(null);
+
+		if (storage == null)
+			return;
+
+		long newSize = storage.getSize() - delta;
+
+		if (newSize < 0)
+			newSize = 0l;
+
+		storage.setSize(newSize);
+		storageRepository.save(storage);
+	}
+
+	public Storage findOrCreateStorage(Storage currentStorage, long nextFileSize)
+	{
+		if (isAcceptableStorage(currentStorage, nextFileSize))
+			return currentStorage;
+
+		for (Storage storage : storageRepository.findBySizeLessThanOrderBySizeAsc(STORAGE_MAX_SIZE))
+		{
+			if (isAcceptableStorage(storage, nextFileSize))
+				return storage;
+		}
+
+		Storage storage = new Storage();
+		storage.setKey(UUID.randomUUID().toString());
+		storage.setSize(0l);
+
+		return storageRepository.save(storage);
+	}
+
+	private boolean isAcceptableStorage(Storage storage, long nextFileSize)
+	{
+		if (storage == null)
+			return false;
+
+		long finalFileSize = storage.getSize() + nextFileSize;
+
+		return finalFileSize <= STORAGE_MAX_SIZE;
+	}
+
 	private String buildStorageFilename(String storageKey, boolean thumbs)
 	{
 		StringBuilder filename = new StringBuilder();
@@ -118,5 +217,18 @@ public class StorageServiceImpl
 		filename.append(".zip");
 
 		return filename.toString();
+	}
+
+	private String buildImageFilename(Long imageId, String extension)
+	{
+		return StringUtils.leftPad(imageId.toString(), 12, "0") + "." + extension;
+	}
+
+	public Path createStoragePath(String storageKey, boolean thumbnail)
+	{
+		String storageFilename = buildStorageFilename(storageKey, thumbnail);
+		Path storagePath = applicationProperties.getStorageDirectory().resolve(storageFilename);
+
+		return storagePath;
 	}
 }

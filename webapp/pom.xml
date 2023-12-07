@@ -118,6 +118,12 @@
 			<artifactId>commons-codec</artifactId>
 		</dependency>
 
+		<!-- Thumbnails with Thumbnailator -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+		</dependency>
+
 		<!-- JAXB API only -->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
