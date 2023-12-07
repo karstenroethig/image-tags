@@ -29,7 +29,7 @@
 
 		<div class="mb-2">
 			<a th:each="image : ${page.content}" th:href="@{/image/show/{id}(id=${image.id})}" style="text-decoration: none;">
-				<img th:src="@{/image/content/{id}?thumb=true(id=${image.id})}" class="img-thumbnail mb-1">
+				<img th:src="@{/image/content/{id}?thumb=true(id=${image.id})}" class="mb-1" style="width: 120px; height: 120px;">
 			</a>
 		</div>
 

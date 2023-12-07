@@ -55,7 +55,7 @@ public class ImageController extends AbstractController
 	@Autowired private ImageSearchBean imageSearchBean;
 
 	@GetMapping(value = UrlMappings.ACTION_LIST)
-	public String list(Model model, @PageableDefault(size = 20, sort = Image_.CREATED_DATETIME, direction = Direction.DESC) Pageable pageable)
+	public String list(Model model, @PageableDefault(size = 30, sort = Image_.CREATED_DATETIME, direction = Direction.DESC) Pageable pageable)
 	{
 		Page<ImageDto> resultsPage = imageService.findBySearchParams(imageSearchBean.getImageSearchDto(), pageable);
 		addPagingAttributes(model, resultsPage);
