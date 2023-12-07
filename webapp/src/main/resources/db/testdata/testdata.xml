@@ -43,7 +43,7 @@
 
 		<insert tableName="image">
 			<column name="storage_id"        valueNumeric="select id from storage where storage_key = '6b9070cc-2c07-4f64-ac44-6b713bf91dcd'"/>
-			<column name="storage_key"       value="000000000001.png"/>
+			<column name="storage_filename"  value="000000000001.png"/>
 			<column name="file_extension"    value="png"/>
 			<column name="file_size"         value="75315"/>
 			<column name="hash"              value="a175f61fca912ec49ce9379f02dbebfb"/>
@@ -65,7 +65,7 @@
 
 		<insert tableName="image">
 			<column name="storage_id"        valueNumeric="select id from storage where storage_key = '6b9070cc-2c07-4f64-ac44-6b713bf91dcd'"/>
-			<column name="storage_key"       value="000000000002.jpg"/>
+			<column name="storage_filename"  value="000000000002.jpg"/>
 			<column name="file_extension"    value="jpg"/>
 			<column name="file_size"         value="74479"/>
 			<column name="hash"              value="3773af58a5b072a094c53f628e7160fa"/>
@@ -78,7 +78,7 @@
 
 		<insert tableName="image">
 			<column name="storage_id"        valueNumeric="select id from storage where storage_key = '6b9070cc-2c07-4f64-ac44-6b713bf91dcd'"/>
-			<column name="storage_key"       value="000000000003.png"/>
+			<column name="storage_filename"  value="000000000003.png"/>
 			<column name="file_extension"    value="png"/>
 			<column name="file_size"         value="178917"/>
 			<column name="hash"              value="1ef2bdcf054c278cab5f321e99b4dd89"/>
@@ -99,7 +99,7 @@
 
 		<insert tableName="image">
 			<column name="storage_id"        valueNumeric="select id from storage where storage_key = '6b9070cc-2c07-4f64-ac44-6b713bf91dcd'"/>
-			<column name="storage_key"       value="000000000004.jpg"/>
+			<column name="storage_filename"  value="000000000004.jpg"/>
 			<column name="file_extension"    value="jpg"/>
 			<column name="file_size"         value="53623"/>
 			<column name="hash"              value="1fd1c4ba07fa847691d092ca618c549e"/>

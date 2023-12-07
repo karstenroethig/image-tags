@@ -99,7 +99,7 @@ public class ImageController extends AbstractController
 				.ok()
 				.contentLength(fileResource.contentLength())
 				.cacheControl(CacheControl.noCache())
-				.header(HttpHeaders.CONTENT_DISPOSITION, (inline ? "inline" : "attachment") + "; filename=\"" + image.getStorageKey() + "." + image.getExtension() + "\"")
+				.header(HttpHeaders.CONTENT_DISPOSITION, (inline ? "inline" : "attachment") + "; filename=\"" + image.getStorageFilename() + "\"")
 				.body(fileResource);
 	}
 

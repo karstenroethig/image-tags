@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -24,6 +25,7 @@ import jakarta.transaction.Transactional;
 import karstenroethig.imagetags.webapp.config.ApplicationProperties;
 import karstenroethig.imagetags.webapp.model.domain.Image;
 import karstenroethig.imagetags.webapp.model.domain.Storage;
+import karstenroethig.imagetags.webapp.model.domain.Tag;
 import karstenroethig.imagetags.webapp.model.enums.ImageResolutionStatusEnum;
 import karstenroethig.imagetags.webapp.model.enums.ImageThumbStatusEnum;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
@@ -42,6 +44,7 @@ public class ImageImportServiceImpl
 
 	@Autowired protected ImageOperationServiceImpl imageOperationService;
 	@Autowired protected StorageServiceImpl storageService;
+	@Autowired protected TagServiceImpl tagService;
 
 	@Autowired protected ImageRepository imageRepository;
 
@@ -138,12 +141,12 @@ public class ImageImportServiceImpl
 			imageRepository.save(image);
 
 			// copy file
-			storageService.saveImage(imagePath, image.getId(), fileSystem, false);
+			storageService.saveImage(imagePath, image.getStorageFilename(), fileSystem, false);
 
 			// create thumbnail and copy it to the storage
 			try {
 				byte[] thumbData = imageOperationService.createImageThumbnail(imagePath);
-				storageService.saveImage(thumbData, image.getId(), image.getExtension(), fileSystemThumbs, true);
+				storageService.saveImage(thumbData, image.getStorageFilename(), fileSystemThumbs, true);
 				image.setThumbStatus(ImageThumbStatusEnum.THUMB_100_100);
 			}
 			catch (Exception ex)
@@ -167,9 +170,13 @@ public class ImageImportServiceImpl
 
 	private Image createImage(Path imagePath) throws IOException
 	{
+		String extension = FilenameUtils.getExtension(imagePath.getFileName().toString());
+		String filename = String.format("%s.%s", UUID.randomUUID().toString(), extension);
+
 		Image image = new Image();
 
-		image.setExtension(FilenameUtils.getExtension(imagePath.getFileName().toString()));
+		image.setStorageFilename(filename);
+		image.setExtension(extension);
 		image.setSize(Files.size(imagePath));
 		image.setThumbStatus(ImageThumbStatusEnum.NO_THUMB);
 		image.setImportPath(findRelativeImportPath(imagePath));
@@ -194,6 +201,9 @@ public class ImageImportServiceImpl
 			image.setResolutionHeight(RESOLUTION_DEFAULT.y);
 			image.setResolutionStatus(ImageResolutionStatusEnum.GENERATION_ERROR);
 		}
+
+		Tag tagNew = tagService.findOrCreate(TagServiceImpl.TAG_NEW);
+		image.addTag(tagNew);
 
 		return image;
 	}

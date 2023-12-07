@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import karstenroethig.imagetags.webapp.model.domain.Tag;
 import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
+import karstenroethig.imagetags.webapp.model.enums.TagTypeEnum;
 import karstenroethig.imagetags.webapp.repository.TagRepository;
 import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
 import karstenroethig.imagetags.webapp.util.validation.ValidationException;
@@ -21,6 +22,8 @@ import karstenroethig.imagetags.webapp.util.validation.ValidationResult;
 @Transactional
 public class TagServiceImpl
 {
+	public static final String TAG_NEW = "NEW";
+
 	@Autowired private ImageServiceImpl imageService;
 
 	@Autowired private TagRepository tagRepository;
@@ -193,5 +196,19 @@ public class TagServiceImpl
 			return false;
 
 		return Objects.equals(tag1.getId(), tag2.getId());
+	}
+
+	public Tag findOrCreate(String name)
+	{
+		Tag tag = tagRepository.findOneByNameIgnoreCase(name).orElse(null);
+
+		if (tag != null)
+			return tag;
+
+		tag = new Tag();
+		tag.setName(name);
+		tag.setType(TagTypeEnum.CATEGORY);
+
+		return tagRepository.save(tag);
 	}
 }

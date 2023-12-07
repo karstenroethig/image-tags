@@ -29,7 +29,7 @@ spring:
       ddl-auto: none
 
   datasource:
-    url: jdbc:h2:mem:image-tags-db;MODE=MariaDB;DATABASE_TO_LOWER=TRUE;NON_KEYWORDS=USER
+    url: jdbc:h2:mem:image-tags-db;MODE=MariaDB;DATABASE_TO_LOWER=TRUE
     username: image-tags_user
     password: image-tags_password
     # Connection Pooling (see https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby)

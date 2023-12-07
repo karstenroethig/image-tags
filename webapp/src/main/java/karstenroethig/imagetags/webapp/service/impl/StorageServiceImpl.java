@@ -12,7 +12,6 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -37,20 +36,15 @@ public class StorageServiceImpl
 
 	@Autowired private StorageRepository storageRepository;
 
-	public void saveImage(Path imageFilePath, Long imageId, FileSystem fileSystem, boolean thumbnail) throws IOException
+	public void saveImage(Path imageFilePath, String storageFilename, FileSystem fileSystem, boolean thumbnail) throws IOException
 	{
-		String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
-		String filename = buildImageFilename(imageId, extension);
-		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/")+filename);
-
+		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/") + storageFilename);
 		Files.copy(imageFilePath, path);
 	}
 
-	public void saveImage(byte[] imageData, Long imageId, String extension, FileSystem fileSystem, boolean thumbnail) throws IOException
+	public void saveImage(byte[] imageData, String storageFilename, FileSystem fileSystem, boolean thumbnail) throws IOException
 	{
-		String filename = buildImageFilename(imageId, extension);
-		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/")+filename);
-
+		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/") + storageFilename);
 		Files.copy(new ByteArrayInputStream(imageData), path);
 	}
 
@@ -64,7 +58,7 @@ public class StorageServiceImpl
 		try (FileSystem storageFileSystem = FileSystems.newFileSystem(storageArchivePath))
 		{
 			String thumbsPath = thumb ? "/thumbs" : StringUtils.EMPTY;
-			Path pathToFileInArchive = storageFileSystem.getPath(thumbsPath + ROOT_PATH_DELIMITER + image.getStorageKey());
+			Path pathToFileInArchive = storageFileSystem.getPath(thumbsPath + ROOT_PATH_DELIMITER + image.getStorageFilename());
 			return new ByteArrayResource(Files.readAllBytes(pathToFileInArchive));
 		}
 	}
@@ -217,11 +211,6 @@ public class StorageServiceImpl
 		filename.append(".zip");
 
 		return filename.toString();
-	}
-
-	private String buildImageFilename(Long imageId, String extension)
-	{
-		return StringUtils.leftPad(imageId.toString(), 12, "0") + "." + extension;
 	}
 
 	public Path createStoragePath(String storageKey, boolean thumbnail)

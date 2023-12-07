@@ -200,7 +200,7 @@ public class ImageServiceImpl
 
 		imageDto.setId(image.getId());
 		imageDto.setStorage(storageService.transform(image.getStorage()));
-		imageDto.setStorageKey(image.getStorageKey());
+		imageDto.setStorageFilename(image.getStorageFilename());
 		imageDto.setExtension(image.getExtension());
 		imageDto.setSize(image.getSize());
 		imageDto.setSizeFormatted(FilesizeUtils.formatFilesize(image.getSize()));

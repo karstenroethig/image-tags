@@ -36,8 +36,8 @@ public class Image extends AbstractEntityId
 	@ManyToOne(optional = true)
 	private Storage storage;
 
-	@Column(name = "storage_key", length = 100, nullable = false)
-	private String storageKey;
+	@Column(name = "storage_filename", length = 100, nullable = false)
+	private String storageFilename;
 
 	@Column(name = "file_extension", length = 50, nullable = false)
 	private String extension;

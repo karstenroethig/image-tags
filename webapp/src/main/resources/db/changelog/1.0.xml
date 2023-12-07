@@ -52,7 +52,7 @@
 			<column name="storage_id" type="${type.idRef}">
 				<constraints nullable="false"/>
 			</column>
-			<column name="storage_key" type="varchar(191)">
+			<column name="storage_filename" type="varchar(191)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="file_extension" type="varchar(50)">
@@ -84,7 +84,7 @@
 			</column>
 		</createTable>
 
-		<addUniqueConstraint tableName="image" columnNames="storage_key" constraintName="u_image__storage_key"/>
+		<addUniqueConstraint tableName="image" columnNames="storage_filename" constraintName="u_image__storage_filename"/>
 
 		<addForeignKeyConstraint
 			baseTableName="image"

@@ -20,7 +20,7 @@ import lombok.ToString;
 public class ImageDto extends AbstractDtoId
 {
 	private StorageDto storage;
-	private String storageKey;
+	private String storageFilename;
 
 	private String extension;
 	private Long size;
