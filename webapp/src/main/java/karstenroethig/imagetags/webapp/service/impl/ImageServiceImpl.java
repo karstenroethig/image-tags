@@ -1,5 +1,6 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,6 +27,9 @@ import karstenroethig.imagetags.webapp.util.FilesizeUtils;
 import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
 import karstenroethig.imagetags.webapp.util.validation.ValidationException;
 import karstenroethig.imagetags.webapp.util.validation.ValidationResult;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 
 @Service
 @Transactional
@@ -111,6 +115,14 @@ public class ImageServiceImpl
 		Image image = imageRepository.findById(id).orElse(null);
 		if (image == null)
 			return false;
+
+		try {
+			storageService.deleteImage(image);
+		}
+		catch (IOException ex)
+		{
+			log.error("unable to delete file with id " + image.getId());
+		}
 
 		imageRepository.delete(image);
 

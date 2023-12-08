@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import karstenroethig.imagetags.webapp.config.ApplicationProperties;
+import karstenroethig.imagetags.webapp.model.domain.Image;
 import karstenroethig.imagetags.webapp.model.domain.Storage;
 import karstenroethig.imagetags.webapp.model.dto.ImageDto;
 import karstenroethig.imagetags.webapp.model.dto.StorageDto;
@@ -74,6 +75,30 @@ public class StorageServiceImpl
 		storageDto.setKey(storage.getKey());
 
 		return storageDto;
+	}
+
+	public void deleteImage(Image image) throws IOException
+	{
+		String storageKey = image.getStorage().getKey();
+		String storageFilename = image.getStorageFilename();
+
+		deleteImage(storageKey, storageFilename, false);
+		deleteImage(storageKey, storageFilename, true);
+
+		subtractAndSaveFilesize(image.getStorage().getId(), image.getSize());
+	}
+
+	private void deleteImage(String storageKey, String storageFilename, boolean thumbnail) throws IOException
+	{
+		createStorageFileIfItDoesNotExist(storageKey, thumbnail);
+
+		Path storagePath = createStoragePath(storageKey, thumbnail);
+
+		try (FileSystem fileSystem = FileSystems.newFileSystem(storagePath))
+		{
+			Path path = fileSystem.getPath((thumbnail?"/thumbs/":"/") + storageFilename);
+			Files.deleteIfExists(path);
+		}
 	}
 
 	private Path createAndGetStorageArchiveIfItDoesNotExist(String storageKey, boolean thumbs) throws IOException
@@ -149,7 +174,7 @@ public class StorageServiceImpl
 		return storageRepository.save(storage);
 	}
 
-	public void subtractAndSaveFilesize(Long storageId, long delta)
+	private void subtractAndSaveFilesize(Long storageId, long delta)
 	{
 		Storage storage = storageRepository.findById(storageId).orElse(null);
 

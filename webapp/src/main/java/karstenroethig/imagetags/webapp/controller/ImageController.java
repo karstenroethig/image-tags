@@ -35,6 +35,7 @@ import karstenroethig.imagetags.webapp.controller.util.UrlMappings;
 import karstenroethig.imagetags.webapp.controller.util.ViewEnum;
 import karstenroethig.imagetags.webapp.model.domain.Image_;
 import karstenroethig.imagetags.webapp.model.dto.ImageDto;
+import karstenroethig.imagetags.webapp.model.dto.ImageTagsUpdateDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import karstenroethig.imagetags.webapp.service.impl.ImageServiceImpl;
 import karstenroethig.imagetags.webapp.service.impl.StorageServiceImpl;
@@ -121,9 +122,16 @@ public class ImageController extends AbstractController
 	}
 
 	@PostMapping(value = UrlMappings.ACTION_UPDATE)
-	public String update(@ModelAttribute(AttributeNames.IMAGE) @Valid ImageDto image, BindingResult bindingResult,
+	public String update(@ModelAttribute(AttributeNames.IMAGE) @Valid ImageTagsUpdateDto imageTagsUpdate, BindingResult bindingResult,
 		final RedirectAttributes redirectAttributes, Model model)
 	{
+		Long id = imageTagsUpdate.getId();
+		ImageDto image = imageService.find(id);
+		if (image == null)
+			throw new NotFoundException(String.valueOf(id));
+
+		image.setTags(imageTagsUpdate.getTags());
+
 		if (!validate(image, bindingResult))
 		{
 			model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.IMAGE_UPDATE_INVALID));
