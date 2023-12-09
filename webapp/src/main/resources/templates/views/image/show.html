@@ -24,10 +24,17 @@
 				</div>
 			</div>
 			<div class="col-3">
+				<div class="card mb-2" th:if="${page!=null}">
+					<h5 class="card-header">List</h5>
+					<div class="card-body">
+						<div th:replace="~{fragments/paging :: paging-single-fragment(controller='image', page=${page}, currentItems=${currentItems}, sortProperty=${sortProperty}, sortDesc=${sortDesc})}"></div>
+						<a th:href="@{/image/list}" class="btn btn-outline-secondary">Back to list</a>
+					</div>
+				</div>
 				<div class="card">
 					<h5 class="card-header">Image</h5>
 					<div class="card-body">
-						<form th:object="${image}" th:action="@{/image/update}" action="#" method="post">
+						<form th:object="${image}" th:action="${page==null} ? @{/image/update} : @{/image/update?page={page}(page=${page.number})}" action="#" method="post">
 							<input type="hidden" th:field="*{id}"/>
 							<div class="mb-3">
 								<select th:field="*{tags}" class="form-control search-tags-input" size="1" multiple="multiple">

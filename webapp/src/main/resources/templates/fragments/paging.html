@@ -72,5 +72,27 @@
 
 	</div>
 
+	<div th:fragment="paging-single-fragment (controller, page, currentItems, sortProperty, sortDesc)">
+
+		<p class="lead fst-italic text-center" th:if="${page.hasContent()}">
+			<i th:if="${page.isFirst()}" class="fas fa-chevron-left fa-lg text-muted"></i>
+			<a th:if="${page.hasPrevious()}"
+				th:href="@{/{controller}/list(controller=${controller}, size=${page.size}, page=${page.previousPageable().pageNumber}, sort=${sortParam})}"
+				class="text-decoration-none">
+				<i class="fas fa-chevron-left fa-lg text-primary"></i>
+			</a>
+			<span th:text="${#numbers.formatInteger(page.number+1,1,'POINT')}">[currentPageNumber]</span>
+			/
+			<span th:text="${#numbers.formatInteger(page.totalPages,1,'POINT')}">[maxPageNumber]</span>
+			<a th:if="${page.hasNext()}"
+				th:href="@{/{controller}/list(controller=${controller}, size=${page.size}, page=${page.nextPageable().pageNumber}, sort=${sortParam})}"
+				class="text-decoration-none">
+				<i class="fas fa-chevron-right fa-lg text-primary"></i>
+			</a>
+			<i th:if="${page.isLast()}" class="fas fa-chevron-right fa-lg text-muted"></i>
+		</p>
+
+	</div>
+
 </body>
 </html>

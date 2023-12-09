@@ -64,6 +64,13 @@ public class ImageController extends AbstractController
 		model.addAttribute(AttributeNames.SEARCH_PARAMS, imageSearchBean.getImageSearchDto());
 		addBasicAttributes(model);
 
+		if (pageable.getPageSize() == 1 && resultsPage.hasContent())
+		{
+			ImageDto image = resultsPage.getContent().stream().findFirst().orElseThrow();
+			model.addAttribute(AttributeNames.IMAGE, image);
+			return ViewEnum.IMAGE_SHOW.getViewName();
+		}
+
 		return ViewEnum.IMAGE_LIST.getViewName();
 	}
 
@@ -122,8 +129,9 @@ public class ImageController extends AbstractController
 	}
 
 	@PostMapping(value = UrlMappings.ACTION_UPDATE)
-	public String update(@ModelAttribute(AttributeNames.IMAGE) @Valid ImageTagsUpdateDto imageTagsUpdate, BindingResult bindingResult,
-		final RedirectAttributes redirectAttributes, Model model)
+	public String update(@ModelAttribute(AttributeNames.IMAGE) @Valid ImageTagsUpdateDto imageTagsUpdate,
+		@RequestParam(name = "page", required = false) Integer page,
+		BindingResult bindingResult, final RedirectAttributes redirectAttributes, Model model)
 	{
 		Long id = imageTagsUpdate.getId();
 		ImageDto image = imageService.find(id);
@@ -142,9 +150,13 @@ public class ImageController extends AbstractController
 		ImageDto updatedImage = imageService.update(image);
 		if (updatedImage != null)
 		{
-			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
-					Messages.createWithSuccess(MessageKeyEnum.IMAGE_UPDATE_SUCCESS));
-			return UrlMappings.redirectWithId(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_SHOW, updatedImage.getId());
+//			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
+//					Messages.createWithSuccess(MessageKeyEnum.IMAGE_UPDATE_SUCCESS));
+			if (page == null)
+				return UrlMappings.redirectWithId(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_SHOW, updatedImage.getId());
+			else
+				return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST)
+					+ String.format("?page=%s&size=1", page);
 		}
 
 		model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.IMAGE_UPDATE_ERROR));

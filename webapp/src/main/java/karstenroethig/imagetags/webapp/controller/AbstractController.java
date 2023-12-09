@@ -41,7 +41,7 @@ public abstract class AbstractController
 			break;
 		}
 
-		model.addAttribute(AttributeNames.AVAILABLE_PAGESIZES, Arrays.asList(10, 15, 20, 25, 30, 50, 100));
+		model.addAttribute(AttributeNames.AVAILABLE_PAGESIZES, Arrays.asList(1, 10, 15, 20, 25, 30, 50, 100));
 	}
 
 	private String createCurrentItemsText(Page<?> page)
