@@ -86,7 +86,7 @@ spring:
 
   h2:
     console:
-      enabled: false # accessible via http://localhost:8080/h2-console
+      enabled: true # accessible via http://localhost:8080/h2-console
 
   liquibase:
     change-log: classpath:/db/changelog/master-dev.xml
