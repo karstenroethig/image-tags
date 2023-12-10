@@ -39,6 +39,8 @@
 				<tr>
 					<th scope="col" class="clickable" data-sort-prop="name" th:text="#{tag.name.label}">Name</th>
 					<th scope="col" class="clickable" data-sort-prop="type" th:text="#{tag.type.label}">Type</th>
+					<th scope="col" class="text-end">Usage</th>
+					<th scope="col" class="text-end">File size</th>
 					<th scope="col" th:text="#{common.table.operations.label}">Actions</th>
 				</tr>
 			</thead>
@@ -52,6 +54,18 @@
 					</td>
 					<td>
 						<span class="badge badge-secondary" th:classappend="${'tag-type-'+tag.type.name().toLowerCase()}" th:text="${#messages.msg('tag.type.'+tag.type.name()+'.label')}">[type]</span>
+					</td>
+					<td class="text-end ajaxFetchUsage" th:attr="data-id=${tag.id}">
+						<i class="fa fa-question" title="Ermittlung startet automatisch nach 5 Sekunden"></i>
+<!-- 					<i class="fa fa-spinner fa-spin"></i> -->
+<!-- 					<i class="fa fa-exclamation-circle" style="color: red;" title="Error message"></i> -->
+<!-- 					1.245 -->
+					</td>
+					<td class="text-end ajaxFetchFilesize" th:attr="data-id=${tag.id}">
+						<i class="fa fa-question" title="Ermittlung startet automatisch nach 5 Sekunden"></i>
+<!-- 					<i class="fa fa-spinner fa-spin"></i> -->
+<!-- 					<i class="fa fa-exclamation-circle" style="color: red;" title="Error message"></i> -->
+<!-- 					1.245 -->
 					</td>
 					<td>
 						<div class="btn-group">

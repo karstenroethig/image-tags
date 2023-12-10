@@ -14,8 +14,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import karstenroethig.imagetags.webapp.model.domain.Image;
+import karstenroethig.imagetags.webapp.model.domain.Image_;
 import karstenroethig.imagetags.webapp.model.domain.Tag;
 import karstenroethig.imagetags.webapp.model.dto.ImageDto;
 import karstenroethig.imagetags.webapp.model.dto.TagDto;
@@ -39,6 +45,8 @@ public class ImageServiceImpl
 	@Autowired private StorageServiceImpl storageService;
 
 	@Autowired private ImageRepository imageRepository;
+
+	@Autowired private EntityManager entityManager;
 
 	public ImageDto create()
 	{
@@ -144,6 +152,20 @@ public class ImageServiceImpl
 		Page<Image> page = imageRepository.findAll(
 			Specification.where(ImageSpecifications.matchesSearchParam(imageSearchDto)), pageable);
 		return page.map(this::transform);
+	}
+
+	public String findSizeBySearchParams(ImageSearchDto imageSearchDto)
+	{
+		Specification<Image> specification = ImageSpecifications.matchesSearchParam(imageSearchDto);
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> query = builder.createQuery(Long.class);
+		Root<Image> root = query.from(Image.class);
+		Predicate predicate = specification.toPredicate(root, query, builder);
+		if (predicate != null)
+			query.where(predicate);
+		Long fileSize = entityManager.createQuery(query.select(builder.sum(root.<Long>get(Image_.SIZE)))).getSingleResult();
+
+		return FilesizeUtils.formatFilesize(fileSize != null ? fileSize : 0);
 	}
 
 	public Page<ImageDto> findAll(Pageable pageable)
