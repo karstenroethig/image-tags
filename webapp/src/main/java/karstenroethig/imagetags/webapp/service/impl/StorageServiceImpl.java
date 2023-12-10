@@ -2,6 +2,7 @@ package karstenroethig.imagetags.webapp.service.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -12,6 +13,7 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -24,6 +26,7 @@ import karstenroethig.imagetags.webapp.model.domain.Image;
 import karstenroethig.imagetags.webapp.model.domain.Storage;
 import karstenroethig.imagetags.webapp.model.dto.ImageDto;
 import karstenroethig.imagetags.webapp.model.dto.StorageDto;
+import karstenroethig.imagetags.webapp.model.enums.ImageThumbStatusEnum;
 import karstenroethig.imagetags.webapp.repository.StorageRepository;
 
 @Service
@@ -51,6 +54,16 @@ public class StorageServiceImpl
 
 	public Resource loadAsResource(ImageDto image, boolean thumb) throws IOException
 	{
+		if (thumb &&
+			(image.getThumbStatus() == ImageThumbStatusEnum.NO_THUMB
+			|| image.getThumbStatus() == ImageThumbStatusEnum.GENERATION_ERROR))
+		{
+			try (InputStream input = StorageServiceImpl.class.getResourceAsStream("no_thumb.png"))
+			{
+				return new ByteArrayResource(IOUtils.toByteArray(input));
+			}
+		}
+
 		Storage storage = storageRepository.findById(image.getStorage().getId()).orElse(null);
 		if (storage == null)
 			return null;
