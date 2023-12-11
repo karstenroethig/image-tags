@@ -42,11 +42,11 @@ public class ImageImportServiceImpl
 
 	@Autowired private ApplicationProperties applicationProperties;
 
-	@Autowired protected ImageOperationServiceImpl imageOperationService;
-	@Autowired protected StorageServiceImpl storageService;
-	@Autowired protected TagServiceImpl tagService;
+	@Autowired private ImageOperationServiceImpl imageOperationService;
+	@Autowired private StorageServiceImpl storageService;
+	@Autowired private TagServiceImpl tagService;
 
-	@Autowired protected ImageRepository imageRepository;
+	@Autowired private ImageRepository imageRepository;
 
 	public void execute()
 	{

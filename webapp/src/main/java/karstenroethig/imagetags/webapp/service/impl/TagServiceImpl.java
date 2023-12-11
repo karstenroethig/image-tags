@@ -23,6 +23,7 @@ import karstenroethig.imagetags.webapp.util.validation.ValidationResult;
 public class TagServiceImpl
 {
 	public static final String TAG_NEW = "NEW";
+	public static final String TAG_DELETE = "DELETE";
 
 	@Autowired private ImageServiceImpl imageService;
 
