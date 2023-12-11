@@ -2,6 +2,10 @@
 	color: #F00;
 }
 
+.clickable {
+	cursor: pointer;
+}
+
 .tag-type-category {
 	background-color: #80bdff;
 }
@@ -12,4 +16,9 @@
 
 .tag-type-album {
 	background-color: #563d7c;
+}
+
+.img-fit {
+	max-height: calc(100vh - 92px);
+/*	max-height: calc(100vh - var(--main-menu-height));*/
 }

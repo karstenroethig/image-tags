@@ -1,9 +1,10 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
-import java.util.Date;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -11,9 +12,9 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
-import karstenroethig.imagetags.webapp.dto.info.MemoryInfoDto;
-import karstenroethig.imagetags.webapp.dto.info.ServerInfoDto;
-import karstenroethig.imagetags.webapp.dto.info.SystemInfoDto;
+import karstenroethig.imagetags.webapp.model.dto.info.MemoryInfoDto;
+import karstenroethig.imagetags.webapp.model.dto.info.ServerInfoDto;
+import karstenroethig.imagetags.webapp.model.dto.info.SystemInfoDto;
 import karstenroethig.imagetags.webapp.util.FilesizeUtils;
 import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
 
@@ -26,7 +27,7 @@ public class ServerInfoServiceImpl implements ApplicationContextAware
 	private ApplicationContext applicationContext;
 
 	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+	public void setApplicationContext(ApplicationContext applicationContext)
 	{
 		this.applicationContext = applicationContext;
 	}
@@ -50,7 +51,7 @@ public class ServerInfoServiceImpl implements ApplicationContextAware
 		systemInfo.setVersion(version);
 		systemInfo.setRevision(revision);
 		systemInfo.setBuildDate(buildDate);
-		systemInfo.setServerTime(new Date().toString());
+		systemInfo.setServerTime(LocalDateTime.now());
 		systemInfo.setUptime(formatUptime(uptimeMilis));
 		systemInfo.setJavaVersion(System.getProperty("java.version"));
 		systemInfo.setJavaVendor(System.getProperty("java.vendor"));
@@ -67,9 +68,10 @@ public class ServerInfoServiceImpl implements ApplicationContextAware
 		systemInfo.setUserTimezone(System.getProperty("user.timezone"));
 
 		if (System.getProperty("user.country") != null && System.getProperty("user.language") != null)
-		{
 			systemInfo.setUserLocale(new Locale(System.getProperty("user.country"), System.getProperty("user.language")).toString());
-		}
+
+		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+		systemInfo.setInputArguments(runtimeMxBean.getInputArguments());
 
 		/*
 		 * collect memory infos
@@ -104,7 +106,7 @@ public class ServerInfoServiceImpl implements ApplicationContextAware
 		diff[3] = ((diffInSeconds >= 60) ? (diffInSeconds % 60) : diffInSeconds); // min
 		diff[2] = ((diffInSeconds = (diffInSeconds / 60)) >= 60) ? (diffInSeconds % 60) : diffInSeconds; // hours
 		diff[1] = ((diffInSeconds = (diffInSeconds / 60)) >= 24) ? (diffInSeconds % 24) : diffInSeconds; // days
-		diff[0] = (diffInSeconds = (diffInSeconds / 24));
+		diff[0] = (diffInSeconds / 24);
 
 		return String.format("%d day%s, %d hour%s, %d minute%s, %d second%s", diff[0], (diff[0] != 1) ? "s" : "",
 			diff[1], (diff[1] != 1) ? "s" : "", diff[2], (diff[2] != 1) ? "s" : "", diff[3],

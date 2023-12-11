@@ -1,0 +1,98 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+</head>
+<body>
+
+	<div th:fragment="pagesize-fragment (availablePagesizes, currentSize)">
+
+		<form class="float-end mb-2 row g-2" autocomplete="off">
+			<div class="col-auto">
+				<select class="form-control me-2 pagination-pagesize">
+					<option th:each="size : ${availablePagesizes}" th:value="${size}" th:text="${size}" th:selected="${size == currentSize}"></option>
+				</select>
+			</div>
+			<div class="col-auto">
+				<span class="form-control-plaintext" th:text="#{common.pagination.perPage.label}">per page</span>
+			</div>
+		</form>
+
+	</div>
+
+	<div th:fragment="paging-fragment (controller, page, currentItems, sortProperty, sortDesc)">
+
+		<div class="row mb-3" th:if="${page.hasContent()}">
+			<div class="col-sm-12">
+				<form class="float-end row g-2" th:with="sortParam=${sortProperty+','+(sortDesc?'desc':'asc')}" autocomplete="off">
+					<div class="col-auto">
+						<span class="form-control-plaintext me-2">
+							<span th:text="${currentItems}">[currentItems]</span>
+							<span th:text="#{common.pagination.pageOfPages.label}">of</span>
+							<span th:text="${page.totalElements}">[page.totalElements]</span>
+						</span>
+					</div>
+					<div class="col-auto" th:if="${page.isFirst()}">
+						<div class="btn-group me-2">
+							<button class="btn btn-outline-secondary" th:title="#{common.pagination.firstPage.label}" disabled><em class="fa fa-angle-double-left"></em></button>
+							<button class="btn btn-outline-secondary" th:title="#{common.pagination.previousPage.label}" disabled><em class="fa fa-angle-left"></em></button>
+						</div>
+					</div>
+					<div class="col-auto" th:if="${page.hasPrevious()}">
+						<div class="btn-group me-2">
+							<a class="btn btn-outline-secondary" th:href="@{/{controller}/list(controller=${controller}, size=${page.size}, page=0, sort=${sortParam})}" th:title="#{common.pagination.firstPage.label}"><em class="fa fa-angle-double-left"></em></a>
+							<a class="btn btn-outline-secondary" th:href="@{/{controller}/list(controller=${controller}, size=${page.size}, page=${page.previousPageable().pageNumber}, sort=${sortParam})}" th:title="#{common.pagination.previousPage.label}"><em class="i fa fa-angle-left"></em></a>
+						</div>
+					</div>
+					<div class="col-auto">
+						<input type="text" class="form-control me-2 pagination-page" style="width: 3em;" th:value="${page.number+1}">
+					</div>
+					<div class="col-auto">
+						<span class="form-control-plaintext me-2">
+							<span th:text="#{common.pagination.pageOfPages.label}">of</span>
+							<span th:text="${page.totalPages}">[page.totalPages]</span>
+						</span>
+					</div>
+					<div class="col-auto" th:if="${page.isLast()}">
+						<div class="btn-group">
+							<button class="btn btn-outline-secondary" th:title="#{common.pagination.nextPage.label}" disabled><em class="fa fa-angle-right"></em></button>
+							<button class="btn btn-outline-secondary" th:title="#{common.pagination.lastPage.label}" disabled><em class="fa fa-angle-double-right"></em></button>
+						</div>
+					</div>
+					<div class="col-auto" th:if="${page.hasNext()}">
+						<div class="btn-group">
+							<a class="btn btn-outline-secondary" th:href="@{/{controller}/list(controller=${controller}, size=${page.size}, page=${page.nextPageable().pageNumber}, sort=${sortParam})}" th:title="#{common.pagination.nextPage.label}"><em class="fa fa-angle-right"></em></a>
+							<a class="btn btn-outline-secondary" th:href="@{/{controller}/list(controller=${controller}, size=${page.size}, page=${page.totalPages-1}, sort=${sortParam})}" th:title="#{common.pagination.lastPage.label}"><em class="fa fa-angle-double-right"></em></a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+	</div>
+
+	<div th:fragment="paging-single-fragment (controller, page, currentItems, sortProperty, sortDesc)">
+
+		<p class="lead fst-italic text-center" th:if="${page.hasContent()}">
+			<i th:if="${page.isFirst()}" class="fas fa-chevron-left fa-lg text-muted"></i>
+			<a th:if="${page.hasPrevious()}"
+				th:href="@{/{controller}/list(controller=${controller}, size=${page.size}, page=${page.previousPageable().pageNumber}, sort=${sortParam})}"
+				class="text-decoration-none">
+				<i class="fas fa-chevron-left fa-lg text-primary"></i>
+			</a>
+			<span th:text="${#numbers.formatInteger(page.number+1,1,'POINT')}">[currentPageNumber]</span>
+			/
+			<span th:text="${#numbers.formatInteger(page.totalPages,1,'POINT')}">[maxPageNumber]</span>
+			<a th:if="${page.hasNext()}"
+				th:href="@{/{controller}/list(controller=${controller}, size=${page.size}, page=${page.nextPageable().pageNumber}, sort=${sortParam})}"
+				class="text-decoration-none">
+				<i class="fas fa-chevron-right fa-lg text-primary"></i>
+			</a>
+			<i th:if="${page.isLast()}" class="fas fa-chevron-right fa-lg text-muted"></i>
+		</p>
+
+	</div>
+
+</body>
+</html>

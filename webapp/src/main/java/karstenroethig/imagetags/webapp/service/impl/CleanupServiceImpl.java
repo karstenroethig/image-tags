@@ -1,19 +1,19 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-import javax.transaction.Transactional;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import karstenroethig.imagetags.webapp.dto.ImageSearchDto;
-import karstenroethig.imagetags.webapp.dto.TagDto;
+import jakarta.transaction.Transactional;
+import karstenroethig.imagetags.webapp.model.domain.AbstractEntityId_;
+import karstenroethig.imagetags.webapp.model.dto.ImageDto;
+import karstenroethig.imagetags.webapp.model.dto.TagDto;
+import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -22,40 +22,40 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class CleanupServiceImpl
 {
-	private static final String TAG_FOR_DELETE = "DELETE";
-
-	@Autowired private TagServiceImpl tagService;
 	@Autowired private ImageServiceImpl imageService;
+	@Autowired private TagServiceImpl tagService;
 
-	@PostConstruct
 	public void execute()
 	{
-		List<TagDto> tags = tagService.getAllTags();
-		Optional<TagDto> deleteTag = tags.stream().filter(tag -> StringUtils.equals(tag.getName(), TAG_FOR_DELETE)).findFirst();
-
-		if (!deleteTag.isPresent())
-		{
-			log.info("clean-up task is skipped (tag '{}' does not exist)", TAG_FOR_DELETE);
-			return;
-		}
-
+		TagDto tagDelete = tagService.findOrCreateDto(TagServiceImpl.TAG_DELETE);
 		ImageSearchDto searchParams = new ImageSearchDto();
-		searchParams.setTags(Stream.of(deleteTag.get()).collect(Collectors.toList()));
+		searchParams.setTags(List.of(tagDelete));
 
-		List<Long> imageIds = imageService.findImages(searchParams);
-
-		int totalImageCount = imageIds.size();
+		Pageable pageRequest = PageRequest.of(0, 10, Direction.ASC, AbstractEntityId_.ID);
+		boolean first = true;
 		int currentImageCount = 0;
 
-		log.info(String.format("start clean-up of %s images", totalImageCount));
-
-		for (Long imageId : imageIds)
+		do
 		{
-			currentImageCount++;
+			Page<ImageDto> page = imageService.findBySearchParams(searchParams, pageRequest);
 
-			log.info(String.format("deleting image [%s/%s]: %s", currentImageCount, totalImageCount, imageId));
+			if (first)
+			{
+				log.info("start clean-up of {} images", page.getTotalElements());
+				first = false;
+			}
 
-			imageService.deleteImage(imageId);
+			for (ImageDto image : page.getContent())
+			{
+				currentImageCount++;
+
+				log.info(String.format("deleting image [%s/%s]: %s", currentImageCount, page.getTotalElements(), image.getId()));
+
+				imageService.delete(image.getId());
+			}
+
+			pageRequest = page.hasNext() ? page.nextPageable() : null;
 		}
+		while (pageRequest != null);
 	}
 }

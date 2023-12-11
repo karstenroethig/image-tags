@@ -1,14 +1,14 @@
 package karstenroethig.imagetags.webapp.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,178 +17,171 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import karstenroethig.imagetags.webapp.bean.ImagesSearchBean;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import karstenroethig.imagetags.webapp.bean.search.ImageSearchBean;
 import karstenroethig.imagetags.webapp.controller.exceptions.NotFoundException;
+import karstenroethig.imagetags.webapp.controller.util.AttributeNames;
 import karstenroethig.imagetags.webapp.controller.util.UrlMappings;
 import karstenroethig.imagetags.webapp.controller.util.ViewEnum;
-import karstenroethig.imagetags.webapp.dto.ImageDataDto;
-import karstenroethig.imagetags.webapp.dto.ImageDto;
-import karstenroethig.imagetags.webapp.dto.ImageSearchDto;
-import karstenroethig.imagetags.webapp.dto.TagDto;
+import karstenroethig.imagetags.webapp.model.domain.Image_;
+import karstenroethig.imagetags.webapp.model.dto.ImageDto;
+import karstenroethig.imagetags.webapp.model.dto.ImageTagsUpdateDto;
+import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import karstenroethig.imagetags.webapp.service.impl.ImageServiceImpl;
+import karstenroethig.imagetags.webapp.service.impl.StorageServiceImpl;
 import karstenroethig.imagetags.webapp.service.impl.TagServiceImpl;
 import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
+import karstenroethig.imagetags.webapp.util.Messages;
+import karstenroethig.imagetags.webapp.util.validation.ValidationResult;
 
 @ComponentScan
 @Controller
-@RequestMapping( UrlMappings.CONTROLLER_IMAGE )
-public class ImageController
+@RequestMapping(UrlMappings.CONTROLLER_IMAGE)
+public class ImageController extends AbstractController
 {
-	@Autowired
-	private ImageServiceImpl imageService;
+	@Autowired private ImageServiceImpl imageService;
+	@Autowired private TagServiceImpl tagService;
+	@Autowired private StorageServiceImpl storageService;
 
-	@Autowired
-	private TagServiceImpl tagService;
+	@Autowired private ImageSearchBean imageSearchBean;
 
-	@Autowired
-	private ImagesSearchBean imagesSearchBean;
-
-	@RequestMapping(method = RequestMethod.GET)
-	public String image(Model model)
+	@GetMapping(value = UrlMappings.ACTION_LIST)
+	public String list(Model model, @PageableDefault(size = 30, sort = Image_.CREATED_DATETIME, direction = Direction.DESC) Pageable pageable)
 	{
-		return executeNewSearch(new ImageSearchDto());
-	}
+		Page<ImageDto> resultsPage = imageService.findBySearchParams(imageSearchBean.getImageSearchDto(), pageable);
+		addPagingAttributes(model, resultsPage);
 
-	@RequestMapping(
-		value = "/search",
-		method = RequestMethod.POST
-	)
-	public String search(@ModelAttribute("searchParams") @Valid ImageSearchDto searchParams, BindingResult bindingResult,
-		RedirectAttributes redirectAttributes, Model model)
-	{
-		return executeNewSearch(searchParams);
-	}
+		model.addAttribute(AttributeNames.SEARCH_PARAMS, imageSearchBean.getImageSearchDto());
+		addBasicAttributes(model);
 
-	@RequestMapping(
-		value = "/tag/{id}",
-		method = RequestMethod.GET
-	)
-	public String tag(@PathVariable("id") Long tagId, Model model)
-	{
-		TagDto searchTag = tagService.findTag(tagId);
-
-		List<TagDto> searchTags = new ArrayList<>();
-		searchTags.add(searchTag);
-
-		ImageSearchDto searchParams = new ImageSearchDto();
-		searchParams.setTags(searchTags);
-
-		return executeNewSearch(searchParams);
-	}
-
-	@RequestMapping(
-		value = "/page/{page}",
-		method = RequestMethod.GET
-	)
-	public String page(@PathVariable("page") Integer page, Model model)
-	{
-		if (imagesSearchBean.getSearchParams() == null)
+		if (pageable.getPageSize() == 1 && resultsPage.hasContent())
 		{
-			executeNewSearch(new ImageSearchDto());
+			ImageDto image = resultsPage.getContent().stream().findFirst().orElseThrow();
+			model.addAttribute(AttributeNames.IMAGE, image);
+			return ViewEnum.IMAGE_SHOW.getViewName();
 		}
 
-		imagesSearchBean.switchToCurrentPage(page);
-
-		model.addAttribute("allTags", tagService.getAllTagsByType());
-		model.addAttribute("searchParams", imagesSearchBean.getSearchParams());
-		model.addAttribute("imagePage", imagesSearchBean.getCurrentImagePage());
-		model.addAttribute("image", imageService.findImage(imagesSearchBean.getImageIdForCurrentPage()));
-
-		return ViewEnum.IMAGE.getViewName();
+		return ViewEnum.IMAGE_LIST.getViewName();
 	}
 
-	@RequestMapping(
-		value = UrlMappings.ACTION_DELETE,
-		method = RequestMethod.GET
-	)
-	public String delete(@PathVariable("id") Long imageId, Model model)
+	@PostMapping(value = UrlMappings.ACTION_SEARCH)
+	public String search(@ModelAttribute(AttributeNames.IMAGE_SEARCH_PARAMS) ImageSearchDto imageSearchDto, Model model)
 	{
-		imageService.deleteImage(imageId);
-
-		imagesSearchBean.removeImageFormSearchResult(imageId);
-
-		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, "/page/" + imagesSearchBean.getCurrentPage());
+		imageSearchBean.setImageSearchDto(imageSearchDto);
+		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST);
 	}
 
-	@RequestMapping(
-		value = UrlMappings.ACTION_SHOW,
-		method = RequestMethod.GET
-	)
-	public ResponseEntity<byte[]> show(@PathVariable("id") Long imageId) throws IOException
+	@GetMapping(value = UrlMappings.ACTION_SHOW)
+	public String show(@PathVariable("id") Long id, Model model)
 	{
-		ImageDataDto imageData = imageService.getImageData(imageId, false);
+		ImageDto image = imageService.find(id);
+		if (image == null)
+			throw new NotFoundException(String.valueOf(id));
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
-		headers.setContentDispositionFormData("attachment", imageData.getFilename());
-		headers.setContentLength(imageData.getSize());
-
-		return new ResponseEntity<>(imageData.getData(), headers, HttpStatus.OK);
+		model.addAttribute(AttributeNames.IMAGE, image);
+		return ViewEnum.IMAGE_SHOW.getViewName();
 	}
 
-	@RequestMapping(
-			value = UrlMappings.ACTION_SHOW + "/thumb",
-			method = RequestMethod.GET
-			)
-	public ResponseEntity<byte[]> showThumbnail(@PathVariable("id") Long imageId) throws IOException
+	@GetMapping(value = UrlMappings.ACTION_CONTENT)
+	@ResponseBody
+	public ResponseEntity<Resource> content(@PathVariable("id") Long id,
+		@RequestParam(name = "thumb", defaultValue = "false") boolean thumb,
+		@RequestParam(name = "inline", defaultValue = "true") boolean inline, Model model) throws IOException
 	{
-		ImageDataDto imageData = imageService.getImageData(imageId, true);
+		ImageDto image = imageService.find(id);
+		if (image == null)
+			throw new NotFoundException(String.valueOf(id));
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
-		headers.setContentDispositionFormData("attachment", imageData.getFilename());
-		headers.setContentLength(imageData.getSize());
-
-		return new ResponseEntity<>(imageData.getData(), headers, HttpStatus.OK);
+		Resource fileResource = storageService.loadAsResource(image, thumb);
+		return ResponseEntity
+				.ok()
+				.contentLength(fileResource.contentLength())
+				.cacheControl(CacheControl.noCache())
+				.header(HttpHeaders.CONTENT_DISPOSITION, (inline ? "inline" : "attachment") + "; filename=\"" + image.getStorageFilename() + "\"")
+				.body(fileResource);
 	}
 
-	@RequestMapping(
-		value = UrlMappings.ACTION_UPDATE,
-		method = RequestMethod.POST
-	)
-	public String update(@ModelAttribute("image") @Valid ImageDto image, BindingResult bindingResult, Model model)
+	@GetMapping(value = UrlMappings.ACTION_DELETE)
+	public String delete(@PathVariable("id") Long id, final RedirectAttributes redirectAttributes, Model model)
 	{
-		imageService.editImage(image);
+		ImageDto image = imageService.find(id);
+		if (image == null)
+			throw new NotFoundException(String.valueOf(id));
 
-		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, "/page/" + imagesSearchBean.getCurrentPage());
-	}
-
-	private String executeNewSearch(ImageSearchDto searchParams)
-	{
-		imagesSearchBean.clear();
-		imagesSearchBean.setSearchParams(searchParams);
-
-		List<Long> foundImagesIds = imageService.findImages(searchParams);
-
-		if (foundImagesIds == null || foundImagesIds.isEmpty())
-		{
-			imagesSearchBean.setErrorMessageKey(MessageKeyEnum.IMAGES_SEARCH_EMPTY_RESULT.getKey());
-		}
+		if (imageService.delete(id))
+			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
+					Messages.createWithSuccess(MessageKeyEnum.IMAGE_DELETE_SUCCESS));
 		else
+			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
+				Messages.createWithError(MessageKeyEnum.IMAGE_DELETE_ERROR));
+
+		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST);
+	}
+
+	@PostMapping(value = UrlMappings.ACTION_UPDATE)
+	public String update(@ModelAttribute(AttributeNames.IMAGE) @Valid ImageTagsUpdateDto imageTagsUpdate,
+		@RequestParam(name = "page", required = false) Integer page,
+		BindingResult bindingResult, final RedirectAttributes redirectAttributes, Model model)
+	{
+		Long id = imageTagsUpdate.getId();
+		ImageDto image = imageService.find(id);
+		if (image == null)
+			throw new NotFoundException(String.valueOf(id));
+
+		image.setTags(imageTagsUpdate.getTags());
+
+		if (!validate(image, bindingResult))
 		{
-			imagesSearchBean.setSearchResultImageIds(foundImagesIds);
+			model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.IMAGE_UPDATE_INVALID));
+			addBasicAttributes(model);
+			return ViewEnum.IMAGE_SHOW.getViewName();
 		}
 
-		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, "/page/1");
+		ImageDto updatedImage = imageService.update(image);
+		if (updatedImage != null)
+		{
+//			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
+//					Messages.createWithSuccess(MessageKeyEnum.IMAGE_UPDATE_SUCCESS));
+			if (page == null)
+				return UrlMappings.redirectWithId(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_SHOW, updatedImage.getId());
+			else
+				return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST)
+					+ String.format("?page=%s&size=1", page);
+		}
+
+		model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.IMAGE_UPDATE_ERROR));
+		addBasicAttributes(model);
+		return ViewEnum.IMAGE_SHOW.getViewName();
 	}
 
+	private boolean validate(ImageDto image, BindingResult bindingResult)
+	{
+		ValidationResult validationResult = imageService.validate(image);
+		if (validationResult.hasErrors())
+			addValidationMessagesToBindingResult(validationResult.getErrors(), bindingResult);
+
+		return !bindingResult.hasErrors() && !validationResult.hasErrors();
+	}
+
+	private void addBasicAttributes(Model model)
+	{
+		model.addAttribute(AttributeNames.ALL_TAGS, tagService.findAll(Pageable.unpaged()));
+	}
+
+	@Override
 	@ExceptionHandler(NotFoundException.class)
-	void handleNotFoundException(HttpServletResponse response, NotFoundException ex) throws IOException {
+	void handleNotFoundException(HttpServletResponse response, NotFoundException ex) throws IOException
+	{
 		response.sendError(HttpStatus.NOT_FOUND.value(), String.format("Image %s does not exist.", ex.getMessage()));
-	}
-
-	@ExceptionHandler(IOException.class)
-	void handleIOException(HttpServletResponse response, NotFoundException ex) throws IOException {
-		log.error("Error on loading image", ex);
-		response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error on loading image.");
 	}
 }

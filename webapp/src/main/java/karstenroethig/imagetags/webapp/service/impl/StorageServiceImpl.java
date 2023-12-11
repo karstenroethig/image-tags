@@ -13,85 +13,165 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.transaction.Transactional;
-
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import karstenroethig.imagetags.webapp.config.properties.ImageDataProperties;
-import karstenroethig.imagetags.webapp.domain.Storage;
+import jakarta.transaction.Transactional;
+import karstenroethig.imagetags.webapp.config.ApplicationProperties;
+import karstenroethig.imagetags.webapp.model.domain.Image;
+import karstenroethig.imagetags.webapp.model.domain.Storage;
+import karstenroethig.imagetags.webapp.model.dto.ImageDto;
+import karstenroethig.imagetags.webapp.model.dto.StorageDto;
+import karstenroethig.imagetags.webapp.model.enums.ImageThumbStatusEnum;
 import karstenroethig.imagetags.webapp.repository.StorageRepository;
 
 @Service
 @Transactional
-@EnableConfigurationProperties(ImageDataProperties.class)
 public class StorageServiceImpl
 {
 	private static final long STORAGE_MAX_SIZE = 500000000l;
+	private static final String ROOT_PATH_DELIMITER = "/";
 
-	@Autowired
-	protected ImageDataProperties imageDataProperties;
+	@Autowired private ApplicationProperties applicationProperties;
 
-	@Autowired
-	protected StorageRepository storageRepository;
+	@Autowired private StorageRepository storageRepository;
 
-	public void saveImage(Path imageFilePath, Long imageId, FileSystem fileSystem, boolean thumbnail) throws IOException
+	public void saveImage(Path imageFilePath, String storageFilename, FileSystem fileSystem, boolean thumbnail) throws IOException
 	{
-		String extension = FilenameUtils.getExtension(imageFilePath.getFileName().toString());
-		String filename = buildImageFilename(imageId, extension);
-		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/")+filename);
-
+		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/") + storageFilename);
 		Files.copy(imageFilePath, path);
 	}
 
-	public void saveImage(byte[] imageData, Long imageId, String extension, FileSystem fileSystem, boolean thumbnail) throws IOException
+	public void saveImage(byte[] imageData, String storageFilename, FileSystem fileSystem, boolean thumbnail) throws IOException
 	{
-		String filename = buildImageFilename(imageId, extension);
-		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/")+filename);
-
+		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/") + storageFilename);
 		Files.copy(new ByteArrayInputStream(imageData), path);
 	}
 
-	public byte[] loadImage(Long imageId, String extension, String storageKey, boolean thumbnail) throws IOException
+	public void saveImage(byte[] imageData, String storageFilename, StorageDto storageDto, boolean thumb) throws IOException
 	{
-		createStorageFileIfItDoesNotExist(storageKey, thumbnail);
+		Storage storage = storageRepository.findById(storageDto.getId()).orElse(null);
+		if (storage == null)
+			return;
 
-		Path storagePath = createStoragePath(storageKey, thumbnail);
-
-		try (FileSystem fileSystem = FileSystems.newFileSystem(storagePath, null))
+		Path storageArchivePath = createAndGetStorageArchiveIfItDoesNotExist(storage.getKey(), thumb);
+		try (FileSystem storageFileSystem = FileSystems.newFileSystem(storageArchivePath))
 		{
-			String filename = buildImageFilename(imageId, extension);
-			Path path = fileSystem.getPath((thumbnail?"/thumbs/":"/")+filename);
+			String thumbsPath = thumb ? "/thumbs" : StringUtils.EMPTY;
+			Path pathToFileInArchive = storageFileSystem.getPath(thumbsPath + ROOT_PATH_DELIMITER + storageFilename);
 
-			try (InputStream inputStream = Files.newInputStream(path))
+			Files.copy(new ByteArrayInputStream(imageData), pathToFileInArchive);
+		}
+	}
+
+	public Resource loadAsResource(ImageDto image, boolean thumb) throws IOException
+	{
+		if (thumb &&
+			(image.getThumbStatus() == ImageThumbStatusEnum.NO_THUMB
+			|| image.getThumbStatus() == ImageThumbStatusEnum.GENERATION_ERROR))
+		{
+			try (InputStream input = StorageServiceImpl.class.getResourceAsStream("no_thumb.png"))
 			{
-				return IOUtils.toByteArray(inputStream);
+				return new ByteArrayResource(IOUtils.toByteArray(input));
 			}
 		}
+
+		Storage storage = storageRepository.findById(image.getStorage().getId()).orElse(null);
+		if (storage == null)
+			return null;
+
+		Path storageArchivePath = createAndGetStorageArchiveIfItDoesNotExist(storage.getKey(), thumb);
+		try (FileSystem storageFileSystem = FileSystems.newFileSystem(storageArchivePath))
+		{
+			String thumbsPath = thumb ? "/thumbs" : StringUtils.EMPTY;
+			Path pathToFileInArchive = storageFileSystem.getPath(thumbsPath + ROOT_PATH_DELIMITER + image.getStorageFilename());
+			return new ByteArrayResource(Files.readAllBytes(pathToFileInArchive));
+		}
 	}
 
-	public void deleteImage(Long imageId, String extension, String storageKey) throws IOException
+	protected StorageDto transform(Storage storage)
 	{
-		deleteImage(imageId, extension, storageKey, false);
-		deleteImage(imageId, extension, storageKey, true);
+		if (storage == null)
+			return null;
+
+		StorageDto storageDto = new StorageDto();
+
+		storageDto.setId(storage.getId());
+		storageDto.setKey(storage.getKey());
+
+		return storageDto;
 	}
 
-	private void deleteImage(Long imageId, String extension, String storageKey, boolean thumbnail) throws IOException
+	public void deleteImage(Image image) throws IOException
+	{
+		String storageKey = image.getStorage().getKey();
+		String storageFilename = image.getStorageFilename();
+
+		deleteImage(storageKey, storageFilename, false);
+		deleteImage(storageKey, storageFilename, true);
+
+		subtractAndSaveFilesize(image.getStorage().getId(), image.getSize());
+	}
+
+	private void deleteImage(String storageKey, String storageFilename, boolean thumbnail) throws IOException
 	{
 		createStorageFileIfItDoesNotExist(storageKey, thumbnail);
 
-		String filename = buildImageFilename(imageId, extension);
 		Path storagePath = createStoragePath(storageKey, thumbnail);
 
-		try (FileSystem fileSystem = FileSystems.newFileSystem(storagePath, null))
+		try (FileSystem fileSystem = FileSystems.newFileSystem(storagePath))
 		{
-			Path path = fileSystem.getPath((thumbnail?"/thumbs/":"/")+filename);
+			Path path = fileSystem.getPath((thumbnail?"/thumbs/":"/") + storageFilename);
 			Files.deleteIfExists(path);
 		}
+	}
+
+	private Path createAndGetStorageArchiveIfItDoesNotExist(String storageKey, boolean thumbs) throws IOException
+	{
+		Path storageArchivePath = resolvePathToStorageArchive(storageKey, thumbs);
+
+		if (!Files.exists(storageArchivePath))
+		{
+			try (ZipOutputStream out = new ZipOutputStream(
+					Files.newOutputStream(
+							storageArchivePath,
+							StandardOpenOption.CREATE,
+							StandardOpenOption.TRUNCATE_EXISTING)))
+			{
+				out.setLevel(Deflater.NO_COMPRESSION);
+
+				if (thumbs)
+					out.putNextEntry(new ZipEntry("thumbs/"));
+
+				out.closeEntry();
+			}
+		}
+
+		return storageArchivePath;
+	}
+
+	private Path resolvePathToStorageArchive(String storageKey, boolean thumbs) throws IOException
+	{
+		Path storageDirectory = createAndGetStorageDirectory();
+		String storageArchiveFilename = buildStorageFilename(storageKey, thumbs);
+		Path storageArchivePath = storageDirectory.resolve(storageArchiveFilename);
+
+		return storageArchivePath;
+	}
+
+	private Path createAndGetStorageDirectory() throws IOException
+	{
+		Path storageDirectory = applicationProperties.getStorageDirectory();
+		if (!Files.exists(storageDirectory))
+		{
+			Files.createDirectories(storageDirectory);
+		}
+
+		return storageDirectory;
 	}
 
 	protected void createStorageFileIfItDoesNotExist(String storageKey, boolean thumbnail) throws IOException
@@ -127,7 +207,7 @@ public class StorageServiceImpl
 		return storageRepository.save(storage);
 	}
 
-	public void subtractAndSaveFilesize(Long storageId, long delta)
+	private void subtractAndSaveFilesize(Long storageId, long delta)
 	{
 		Storage storage = storageRepository.findById(storageId).orElse(null);
 
@@ -171,16 +251,14 @@ public class StorageServiceImpl
 		return finalFileSize <= STORAGE_MAX_SIZE;
 	}
 
-	public String buildStorageFilename(String storageKey, boolean thumbnail)
+	private String buildStorageFilename(String storageKey, boolean thumbs)
 	{
 		StringBuilder filename = new StringBuilder();
 
 		filename.append("images");
 
-		if (thumbnail)
-		{
+		if (thumbs)
 			filename.append("_thumbs");
-		}
 
 		if (StringUtils.isNotBlank(storageKey))
 		{
@@ -193,15 +271,10 @@ public class StorageServiceImpl
 		return filename.toString();
 	}
 
-	public String buildImageFilename(Long imageId, String extension)
-	{
-		return StringUtils.leftPad(imageId.toString(), 12, "0") + "." + extension;
-	}
-
 	public Path createStoragePath(String storageKey, boolean thumbnail)
 	{
 		String storageFilename = buildStorageFilename(storageKey, thumbnail);
-		Path storagePath = imageDataProperties.getStorageDirectory().resolve(storageFilename);
+		Path storagePath = applicationProperties.getStorageDirectory().resolve(storageFilename);
 
 		return storagePath;
 	}

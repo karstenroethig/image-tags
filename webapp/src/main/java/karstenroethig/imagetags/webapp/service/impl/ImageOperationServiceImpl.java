@@ -9,18 +9,18 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import javax.imageio.ImageIO;
-import javax.transaction.Transactional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import net.coobird.thumbnailator.Thumbnails;
 
 @Service
 @Transactional
 public class ImageOperationServiceImpl
 {
-	private static final int THUMBNAIL_SIZE = 100;
+	private static final int THUMBNAIL_SIZE = 120;
 
 	public byte[] createImageThumbnail(Path imageFilePath) throws IOException
 	{

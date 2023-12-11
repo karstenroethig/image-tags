@@ -1,0 +1,32 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout-error :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							null,
+							'error'
+							)}">
+<head>
+	<title th:text="#{application.title-pattern(#{application.name}, #{error.xxx.title})}">Error</title>
+</head>
+<body>
+
+	<div th:fragment="content">
+
+		<h4 class="card-title mt-1 mb-3 text-center"th:text="#{error.xxx.title}">Error</h4>
+
+		<p>
+			<span th:text="#{error.xxx.text}">An unexpected condition was encountered:</span>
+			<strong><span th:text="${error}">[error]</span> (<span th:text="${status}">[status]</span>)</strong>
+		</p>
+		<p>
+			<span th:text="#{error.xxx.text.support}">If the problem persists, contact Support and provide the following timestamp:</span>
+			<strong th:text="${#dates.format(#dates.createNow(), #messages.msg('common.dateTimeHHmmssFormat'))}"></strong>
+		</p>
+
+	</div>
+
+</body>
+</html>

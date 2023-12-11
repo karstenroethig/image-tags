@@ -1,184 +1,221 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.Objects;
 
-import javax.transaction.Transactional;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import karstenroethig.imagetags.webapp.domain.Tag;
-import karstenroethig.imagetags.webapp.dto.DtoTransformer;
-import karstenroethig.imagetags.webapp.dto.TagDto;
-import karstenroethig.imagetags.webapp.dto.TagTypeWrapper;
-import karstenroethig.imagetags.webapp.dto.api.TagApiDto;
-import karstenroethig.imagetags.webapp.dto.api.TagUsageApiDto;
+import jakarta.transaction.Transactional;
+import karstenroethig.imagetags.webapp.model.domain.Tag;
+import karstenroethig.imagetags.webapp.model.dto.TagDto;
+import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
+import karstenroethig.imagetags.webapp.model.enums.TagTypeEnum;
 import karstenroethig.imagetags.webapp.repository.TagRepository;
-import karstenroethig.imagetags.webapp.service.exceptions.TagAlreadyExistsException;
+import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
+import karstenroethig.imagetags.webapp.util.validation.ValidationException;
+import karstenroethig.imagetags.webapp.util.validation.ValidationResult;
 
 @Service
 @Transactional
 public class TagServiceImpl
 {
-	@Autowired
-	protected JdbcTemplate jdbcTemplate;
+	public static final String TAG_NEW = "NEW";
+	public static final String TAG_DELETE = "DELETE";
 
-	@Autowired
-	protected TagRepository tagRepository;
+	@Autowired private ImageServiceImpl imageService;
 
-	public TagDto newTag()
+	@Autowired private TagRepository tagRepository;
+
+	public TagDto create()
 	{
 		return new TagDto();
 	}
 
-	public TagDto saveTag(TagDto tagDto) throws TagAlreadyExistsException
+	public ValidationResult validate(TagDto tag)
 	{
-		List<Tag> existingTags = tagRepository.findByNameIgnoreCase(
-			StringUtils.trim(tagDto.getName()));
+		ValidationResult result = new ValidationResult();
 
-		if (existingTags != null && existingTags.isEmpty() == false)
+		if (tag == null)
 		{
-			throw new TagAlreadyExistsException();
+			result.addError(MessageKeyEnum.COMMON_VALIDATION_OBJECT_CANNOT_BE_EMPTY);
+			return result;
 		}
+
+		result.add(validateUniqueness(tag));
+
+		return result;
+	}
+
+	private void checkValidation(TagDto tag)
+	{
+		ValidationResult result = validate(tag);
+		if (result.hasErrors())
+			throw new ValidationException(result);
+	}
+
+	private ValidationResult validateUniqueness(TagDto tag)
+	{
+		ValidationResult result = new ValidationResult();
+
+		Tag existing = tagRepository.findOneByNameIgnoreCase(tag.getName()).orElse(null);
+		if (existing != null
+				&& (tag.getId() == null
+				|| !existing.getId().equals(tag.getId())))
+			result.addError("name", MessageKeyEnum.COMMON_VALIDATION_ALREADY_EXISTS);
+
+		return result;
+	}
+
+	public TagDto save(TagDto tagDto)
+	{
+		checkValidation(tagDto);
 
 		Tag tag = new Tag();
+		merge(tag, tagDto);
 
-		tag = DtoTransformer.merge(tag, tagDto);
-
-		return DtoTransformer.transform(tagRepository.save(tag));
+		return transform(tagRepository.save(tag));
 	}
 
-	public Boolean deleteTag(Long tagId)
+	public TagDto update(TagDto tagDto)
 	{
-		Tag temp = tagRepository.findById(tagId).orElse(null);
-
-		if (temp != null)
-		{
-			tagRepository.delete(temp);
-
-			return true;
-		}
-
-		return false;
-	}
-
-	public TagDto editTag(TagDto tagDto) throws TagAlreadyExistsException
-	{
-		List<Tag> existingTags = tagRepository.findByNameIgnoreCase(
-			StringUtils.trim(tagDto.getName()));
-
-		if (existingTags != null
-			&& existingTags.isEmpty() == false
-			&& existingTags.get(0).getId().equals(tagDto.getId()) == false)
-		{
-			throw new TagAlreadyExistsException();
-		}
+		checkValidation(tagDto);
 
 		Tag tag = tagRepository.findById(tagDto.getId()).orElse(null);
+		if (tag == null)
+			return null;
 
-		tag = DtoTransformer.merge(tag, tagDto);
+		merge(tag, tagDto);
 
-		return DtoTransformer.transform(tagRepository.save(tag));
+		return transform(tagRepository.save(tag));
 	}
 
-	public TagDto findTag(Long tagId)
+	public ValidationResult validateDelete(TagDto tag)
 	{
-		return DtoTransformer.transform(tagRepository.findById(tagId).orElse(null));
-	}
+		ValidationResult result = new ValidationResult();
 
-	public List<TagDto> getAllTags()
-	{
-		return transformTags(tagRepository.findAll());
-	}
-
-	private List<TagDto> transformTags(Iterable<Tag> tags)
-	{
-		return transformTags(StreamSupport.stream(tags.spliterator(), false));
-	}
-
-	private List<TagDto> transformTags(Stream<Tag> tagsStream)
-	{
-		List<TagDto> transformedTags = tagsStream
-			.map(DtoTransformer::transform )
-			.sorted(Comparator.comparing(TagDto::getName ))
-			.collect(Collectors.toList());
-
-		return transformedTags;
-	}
-
-	public TagTypeWrapper getAllTagsByType()
-	{
-		TagTypeWrapper tagTypeWrapper = new TagTypeWrapper();
-
-		for (Tag tag : tagRepository.findAll()) {
-			tagTypeWrapper.add(DtoTransformer.transform(tag));
-		}
-
-		return tagTypeWrapper;
-	}
-
-	public Long findTotalTags()
-	{
-		StringBuilder sql = new StringBuilder();
-
-		sql.append("SELECT COUNT(id) ");
-		sql.append("FROM   Tag;");
-
-		return jdbcTemplate.queryForObject(sql.toString(), Long.class);
-	}
-
-	public List<Long> findUnusedTags()
-	{
-		StringBuilder sql = new StringBuilder();
-
-		sql.append("SELECT    t.id ");
-		sql.append("FROM      Tag t ");
-		sql.append("LEFT JOIN Image_Tag it ON it.tag_id = t.id ");
-		sql.append("WHERE     it.tag_id IS NULL;");
-
-		return jdbcTemplate.queryForList(sql.toString(), Long.class);
-	}
-
-	public List<TagApiDto> findAllTagsWithOccurrences()
-	{
-		StringBuilder sql = new StringBuilder();
-
-		sql.append("SELECT it.tag_id AS id, t.name AS name, COUNT(it.image_id) AS amount ");
-		sql.append("FROM   Image_Tag it ");
-		sql.append("JOIN   Tag t ON t.id = it.tag_id ");
-		sql.append("GROUP  BY it.tag_id;");
-
-		return jdbcTemplate.query(sql.toString(), new BeanPropertyRowMapper<>(TagApiDto.class));
-	}
-
-	public TagUsageApiDto findTagUsage(Long tagId)
-	{
-		StringBuilder sql = new StringBuilder();
-
-		sql.append("SELECT it.tag_id AS id, COUNT(it.image_id) AS usage ");
-		sql.append("FROM   Image_Tag it ");
-		sql.append("JOIN   Tag t ON t.id = it.tag_id ");
-		sql.append("WHERE  it.tag_id = ? ");
-		sql.append("GROUP  BY it.tag_id;");
-
-		List<TagUsageApiDto> tagsUsage = jdbcTemplate.query(sql.toString(), new Long[]{tagId}, new BeanPropertyRowMapper<>(TagUsageApiDto.class));
-
-		if (tagsUsage.isEmpty())
+		if (tag == null)
 		{
-			TagUsageApiDto tagUsage = new TagUsageApiDto();
-			tagUsage.setId(tagId);
-			tagUsage.setUsage(0);
-
-			return tagUsage;
+			result.addError(MessageKeyEnum.COMMON_VALIDATION_OBJECT_CANNOT_BE_EMPTY);
+			return result;
 		}
 
-		return tagsUsage.get(0);
+		ImageSearchDto imageSearch = new ImageSearchDto();
+		imageSearch.setTags(List.of(tag));
+		long totalImagesUsedBy = imageService.countBySearchParams(imageSearch);
+		if (totalImagesUsedBy > 0)
+			result.addError(MessageKeyEnum.TAG_DELETE_INVALID_STILL_IN_USE_BY_IMAGES, totalImagesUsedBy);
+
+		return result;
+	}
+
+	private void checkValidationDelete(TagDto tag)
+	{
+		ValidationResult result = validateDelete(tag);
+		if (result.hasErrors())
+			throw new ValidationException(result);
+	}
+
+	public boolean delete(Long id)
+	{
+		Tag tag = tagRepository.findById(id).orElse(null);
+		if (tag == null)
+			return false;
+
+		TagDto tagDto = transform(tag);
+		checkValidationDelete(tagDto);
+
+		tagRepository.delete(tag);
+
+		return true;
+	}
+
+	public long count()
+	{
+		return tagRepository.count();
+	}
+
+	public List<TagDto> findAll()
+	{
+		Page<Tag> page = tagRepository.findAll(Pageable.unpaged());
+		Page<TagDto> pageDto = page.map(this::transform);
+		return pageDto.getContent();
+	}
+
+	public Page<TagDto> findAll(Pageable pageable)
+	{
+		Page<Tag> page = tagRepository.findAll(pageable);
+		return page.map(this::transform);
+	}
+
+	public TagDto find(Long id)
+	{
+		return transform(tagRepository.findById(id).orElse(null));
+	}
+
+	private Tag merge(Tag tag, TagDto tagDto)
+	{
+		if (tag == null || tagDto == null )
+			return null;
+
+		tag.setName(tagDto.getName());
+		tag.setType(tagDto.getType());
+
+		return tag;
+	}
+
+	protected TagDto transform(Tag tag)
+	{
+		if (tag == null)
+			return null;
+
+		TagDto tagDto = new TagDto();
+
+		tagDto.setId(tag.getId());
+		tagDto.setName(tag.getName());
+		tagDto.setType(tag.getType());
+
+		return tagDto;
+	}
+
+	protected Tag transform(TagDto tagDto)
+	{
+		if (tagDto == null || tagDto.getId() == null)
+			return null;
+
+		return tagRepository.findById(tagDto.getId()).orElse(null);
+	}
+
+	protected boolean equals(TagDto tag1, TagDto tag2)
+	{
+		if (tag1 == null && tag2 == null)
+			return true;
+
+		if (tag1 == null || tag2 == null)
+			return false;
+
+		return Objects.equals(tag1.getId(), tag2.getId());
+	}
+
+	public Tag findOrCreate(String name)
+	{
+		Tag tag = tagRepository.findOneByNameIgnoreCase(name).orElse(null);
+
+		if (tag != null)
+			return tag;
+
+		tag = new Tag();
+		tag.setName(name);
+		tag.setType(TagTypeEnum.CATEGORY);
+
+		return tagRepository.save(tag);
+	}
+
+	public TagDto findOrCreateDto(String name)
+	{
+		Tag tag = findOrCreate(name);
+		return transform(tag);
 	}
 }

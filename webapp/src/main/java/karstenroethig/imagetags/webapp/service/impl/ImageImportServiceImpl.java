@@ -12,22 +12,24 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-import javax.transaction.Transactional;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import karstenroethig.imagetags.webapp.config.properties.ImageDataProperties;
-import karstenroethig.imagetags.webapp.domain.Image;
-import karstenroethig.imagetags.webapp.domain.Storage;
-import karstenroethig.imagetags.webapp.domain.enums.ImageResolutionStatusEnum;
-import karstenroethig.imagetags.webapp.domain.enums.ImageThumbStatusEnum;
+import jakarta.transaction.Transactional;
+import karstenroethig.imagetags.webapp.config.ApplicationProperties;
+import karstenroethig.imagetags.webapp.model.domain.Image;
+import karstenroethig.imagetags.webapp.model.domain.Storage;
+import karstenroethig.imagetags.webapp.model.domain.Tag;
+import karstenroethig.imagetags.webapp.model.enums.ImageNewTagStatusEnum;
+import karstenroethig.imagetags.webapp.model.enums.ImageResolutionStatusEnum;
+import karstenroethig.imagetags.webapp.model.enums.ImageThumbStatusEnum;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,22 +42,17 @@ public class ImageImportServiceImpl
 	private static final String[] IMAGE_FILE_EXTENSIONS = new String[] {"gif", "GIF", "jpg", "JPG", "jpeg", "JPEG", "png", "PNG"};
 	private static final Point RESOLUTION_DEFAULT = new Point(0, 0);
 
-	@Autowired
-	protected ImageDataProperties imageDataProperties;
+	@Autowired private ApplicationProperties applicationProperties;
 
-	@Autowired
-	protected ImageRepository imageRepository;
+	@Autowired private ImageOperationServiceImpl imageOperationService;
+	@Autowired private StorageServiceImpl storageService;
+	@Autowired private TagServiceImpl tagService;
 
-	@Autowired
-	protected ImageOperationServiceImpl imageOperationService;
+	@Autowired private ImageRepository imageRepository;
 
-	@Autowired
-	protected StorageServiceImpl storageService;
-
-	@PostConstruct
 	public void execute()
 	{
-		Path importDirectory = imageDataProperties.getImportDirectory();
+		Path importDirectory = applicationProperties.getImportDirectory();
 
 		if (!Files.exists(importDirectory))
 		{
@@ -112,20 +109,18 @@ public class ImageImportServiceImpl
 					IOUtils.closeQuietly(currentFileSystem);
 					storageService.createStorageFileIfItDoesNotExist(currentStorageKey, false);
 					Path storagePath = storageService.createStoragePath(currentStorageKey, false);
-					currentFileSystem = FileSystems.newFileSystem(storagePath, null);
+					currentFileSystem = FileSystems.newFileSystem(storagePath);
 
 					IOUtils.closeQuietly(currentFileSystemThumbs);
 					storageService.createStorageFileIfItDoesNotExist(currentStorageKey, true);
 					storagePath = storageService.createStoragePath(currentStorageKey, true);
-					currentFileSystemThumbs = FileSystems.newFileSystem(storagePath, null);
+					currentFileSystemThumbs = FileSystems.newFileSystem(storagePath);
 				}
 
 				Image image = importImage(imagePath, currentStorage, currentFileCount, totalFileCount, currentFileSystem, currentFileSystemThumbs);
 
 				if (image != null)
-				{
 					currentStorage = storageService.addAndSaveFilesize(currentStorage.getId(), image.getSize());
-				}
 			}
 		}
 		finally
@@ -148,18 +143,19 @@ public class ImageImportServiceImpl
 			imageRepository.save(image);
 
 			// copy file
-			storageService.saveImage(imagePath, image.getId(), fileSystem, false);
+			storageService.saveImage(imagePath, image.getStorageFilename(), fileSystem, false);
 
 			// create thumbnail and copy it to the storage
-			try {
+			try
+			{
 				byte[] thumbData = imageOperationService.createImageThumbnail(imagePath);
-				storageService.saveImage(thumbData, image.getId(), image.getExtension(), fileSystemThumbs, true);
-				image.setThumbStatusEnum(ImageThumbStatusEnum.THUMB_100_100);
+				storageService.saveImage(thumbData, image.getStorageFilename(), fileSystemThumbs, true);
+				image.setThumbStatus(ImageThumbStatusEnum.THUMB_100_100);
 			}
 			catch (Exception ex)
 			{
 				log.warn(String.format("failed to generate thumbnail of image %s", imagePath.toString()), ex);
-				image.setThumbStatusEnum(ImageThumbStatusEnum.GENERATION_ERROR);
+				image.setThumbStatus(ImageThumbStatusEnum.GENERATION_ERROR);
 			}
 			imageRepository.save(image);
 		}
@@ -177,13 +173,18 @@ public class ImageImportServiceImpl
 
 	private Image createImage(Path imagePath) throws IOException
 	{
+		String extension = FilenameUtils.getExtension(imagePath.getFileName().toString());
+		String filename = String.format("%s.%s", UUID.randomUUID().toString(), extension);
+
 		Image image = new Image();
 
-		image.setExtension(FilenameUtils.getExtension(imagePath.getFileName().toString()));
+		image.setStorageFilename(filename);
+		image.setExtension(extension);
 		image.setSize(Files.size(imagePath));
-		image.setThumbStatusEnum(ImageThumbStatusEnum.NO_THUMB);
+		image.setThumbStatus(ImageThumbStatusEnum.NO_THUMB);
 		image.setImportPath(findRelativeImportPath(imagePath));
-		image.setCreatedDate(LocalDateTime.now());
+		image.setCreatedDatetime(LocalDateTime.now());
+		image.setNewTagStatus(ImageNewTagStatusEnum.CHECKED);
 
 		try (InputStream inputStream = Files.newInputStream(imagePath))
 		{
@@ -195,15 +196,18 @@ public class ImageImportServiceImpl
 			Point resolution = imageOperationService.resolveImageResolution(imagePath);
 			image.setResolutionWidth(resolution.x);
 			image.setResolutionHeight(resolution.y);
-			image.setResolutionStatusEnum(ImageResolutionStatusEnum.GENERATION_SUCCESS);
+			image.setResolutionStatus(ImageResolutionStatusEnum.GENERATION_SUCCESS);
 		}
 		catch (Exception ex)
 		{
 			log.warn(String.format("error on resolving resolution of image %s", imagePath.toString()), ex);
 			image.setResolutionWidth(RESOLUTION_DEFAULT.x);
 			image.setResolutionHeight(RESOLUTION_DEFAULT.y);
-			image.setResolutionStatusEnum(ImageResolutionStatusEnum.GENERATION_ERROR);
+			image.setResolutionStatus(ImageResolutionStatusEnum.GENERATION_ERROR);
 		}
+
+		Tag tagNew = tagService.findOrCreate(TagServiceImpl.TAG_NEW);
+		image.addTag(tagNew);
 
 		return image;
 	}
@@ -231,16 +235,18 @@ public class ImageImportServiceImpl
 	private boolean isImageFile(Path path)
 	{
 		if (path == null || Files.isDirectory(path))
-		{
 			return false;
-		}
 
-		return FilenameUtils.isExtension(path.getFileName().toString(), IMAGE_FILE_EXTENSIONS);
+		String filename = path.getFileName().toString();
+		if (StringUtils.startsWith(filename, "."))
+			return false;
+
+		return FilenameUtils.isExtension(filename, IMAGE_FILE_EXTENSIONS);
 	}
 
 	private String findRelativeImportPath(Path filePath)
 	{
-		return imageDataProperties.getImportDirectory().relativize(filePath).toString();
+		return applicationProperties.getImportDirectory().relativize(filePath).toString();
 	}
 
 	private boolean isEmptyDirectory(Path path)

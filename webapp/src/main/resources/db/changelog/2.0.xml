@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet id="2.0" author="roethig">
+
+		<!-- =========== -->
+		<!-- Table "tag" -->
+		<!-- =========== -->
+		<createTable tableName="tag">
+			<column name="id" type="${type.id}" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="name" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="type" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
+		<addUniqueConstraint tableName="tag" columnNames="name" constraintName="u_tag__name"/>
+
+		<!-- =============== -->
+		<!-- Table "storage" -->
+		<!-- =============== -->
+		<createTable tableName="storage">
+			<column name="id" type="${type.id}" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="storage_key" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="file_size" type="int">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
+		<addUniqueConstraint tableName="storage" columnNames="storage_key" constraintName="u_storage__storage_key"/>
+
+		<!-- ============= -->
+		<!-- Table "image" -->
+		<!-- ============= -->
+		<createTable tableName="image">
+			<column name="id" type="${type.id}" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="storage_id" type="${type.idRef}">
+				<constraints nullable="false"/>
+			</column>
+			<column name="storage_filename" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="file_extension" type="varchar(50)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="file_size" type="int">
+				<constraints nullable="false"/>
+			</column>
+			<column name="hash" type="varchar(256)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="import_path" type="varchar(256)">
+				<constraints nullable="true"/>
+			</column>
+			<column name="thumb_status" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="resolution_width" type="int">
+				<constraints nullable="false"/>
+			</column>
+			<column name="resolution_height" type="int">
+				<constraints nullable="false"/>
+			</column>
+			<column name="resolution_status" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_datetime" type="datetime">
+				<constraints nullable="false"/>
+			</column>
+			<column name="new_tag_status" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
+		<addUniqueConstraint tableName="image" columnNames="storage_filename" constraintName="u_image__storage_filename"/>
+
+		<addForeignKeyConstraint
+			baseTableName="image"
+			baseColumnNames="storage_id"
+			referencedTableName="storage"
+			referencedColumnNames="id"
+			constraintName="fk_image__storage_id__storage"/>
+
+		<!-- ================= -->
+		<!-- Table "image_tag" -->
+		<!-- ================= -->
+		<createTable tableName="image_tag">
+			<column name="image_id" type="${type.idRef}">
+				<constraints nullable="false"/>
+			</column>
+			<column name="tag_id" type="${type.idRef}">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
+		<addPrimaryKey tableName="image_tag" columnNames="image_id,tag_id" constraintName="pk_image_tag__image_id__tag_id"/>
+
+		<addForeignKeyConstraint
+			baseTableName="image_tag"
+			baseColumnNames="image_id"
+			referencedTableName="image"
+			referencedColumnNames="id"
+			constraintName="fk_image_tag__image_id__image"/>
+
+		<addForeignKeyConstraint
+			baseTableName="image_tag"
+			baseColumnNames="tag_id"
+			referencedTableName="tag"
+			referencedColumnNames="id"
+			constraintName="fk_image_tag__tag_id__tag"/>
+
+	</changeSet>
+
+</databaseChangeLog>

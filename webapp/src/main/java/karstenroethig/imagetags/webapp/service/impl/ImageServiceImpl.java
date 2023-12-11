@@ -1,31 +1,38 @@
 package karstenroethig.imagetags.webapp.service.impl;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import karstenroethig.imagetags.webapp.controller.exceptions.NotFoundException;
-import karstenroethig.imagetags.webapp.domain.Image;
-import karstenroethig.imagetags.webapp.domain.Tag;
-import karstenroethig.imagetags.webapp.domain.enums.ImageThumbStatusEnum;
-import karstenroethig.imagetags.webapp.dto.DtoTransformer;
-import karstenroethig.imagetags.webapp.dto.ImageDataDto;
-import karstenroethig.imagetags.webapp.dto.ImageDto;
-import karstenroethig.imagetags.webapp.dto.ImageSearchDto;
-import karstenroethig.imagetags.webapp.dto.TagDto;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
+import karstenroethig.imagetags.webapp.model.domain.Image;
+import karstenroethig.imagetags.webapp.model.domain.Image_;
+import karstenroethig.imagetags.webapp.model.domain.Tag;
+import karstenroethig.imagetags.webapp.model.dto.ImageDto;
+import karstenroethig.imagetags.webapp.model.dto.TagDto;
+import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
-import karstenroethig.imagetags.webapp.repository.TagRepository;
+import karstenroethig.imagetags.webapp.repository.specification.ImageSpecifications;
+import karstenroethig.imagetags.webapp.util.DateUtils;
 import karstenroethig.imagetags.webapp.util.FilesizeUtils;
+import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
+import karstenroethig.imagetags.webapp.util.validation.ValidationException;
+import karstenroethig.imagetags.webapp.util.validation.ValidationResult;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -34,154 +41,192 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class ImageServiceImpl
 {
-	@Autowired
-	protected JdbcTemplate jdbcTemplate;
+	@Autowired private TagServiceImpl tagService;
+	@Autowired private StorageServiceImpl storageService;
 
-	@Autowired
-	protected ImageRepository imageRepository;
+	@Autowired private ImageRepository imageRepository;
 
-	@Autowired
-	protected TagRepository tagRepository;
+	@Autowired private EntityManager entityManager;
 
-	@Autowired
-	protected StorageServiceImpl storageService;
-
-	public List<Long> findImages(ImageSearchDto searchParams)
+	public ImageDto create()
 	{
-		// tags available -> show images matching tags
-		if (searchParams != null
-			&& searchParams.getTags() != null
-			&& !searchParams.getTags().isEmpty())
-		{
-			return findTaggedImages(searchParams.getTags());
-		}
-
-		// no tags -> show untagged images
-		return findUntaggedImages();
+		return new ImageDto();
 	}
 
-	private List<Long> findUntaggedImages()
+	public ValidationResult validate(ImageDto image)
 	{
-		StringBuilder sql = new StringBuilder();
-
-		sql.append("SELECT i.id ");
-		sql.append("FROM   Image i ");
-		sql.append("LEFT   JOIN Image_Tag it ON it.image_id = i.id ");
-		sql.append("WHERE  it.image_id IS NULL ");
-		sql.append("ORDER  BY i.created_date DESC;");
-
-		return jdbcTemplate.queryForList(sql.toString(), Long.class);
-	}
-
-	private List<Long> findTaggedImages(List<TagDto> tags)
-	{
-		List<Long> tagIds = new ArrayList<>();
-		StringBuilder sql = new StringBuilder();
-
-		sql.append("SELECT i.id ");
-		sql.append("FROM   Image i ");
-		sql.append("WHERE  1=1 ");
-
-		for (TagDto tag : tags)
-		{
-			tagIds.add(tag.getId());
-
-			sql.append("AND ");
-			sql.append("EXISTS ( ");
-			sql.append("    SELECT it.image_id ");
-			sql.append("    FROM   image_tag it ");
-			sql.append("    WHERE  i.id = it.image_id AND it.tag_id = ? ");
-			sql.append(") ");
-		}
-
-		sql.append("ORDER  BY i.created_date DESC;");
-
-		return jdbcTemplate.queryForList(sql.toString(), tagIds.toArray(), Long.class);
-	}
-
-	public Long findTotalImages()
-	{
-		StringBuilder sql = new StringBuilder();
-
-		sql.append("SELECT COUNT(id) ");
-		sql.append("FROM   Image;");
-
-		return jdbcTemplate.queryForObject(sql.toString(), Long.class);
-	}
-
-	public Long findTotalFilesize()
-	{
-		StringBuilder sql = new StringBuilder();
-
-		sql.append("SELECT SUM(file_size) ");
-		sql.append("FROM   Image;");
-
-		Long totalFilesize = jdbcTemplate.queryForObject(sql.toString(), Long.class);
-
-		return totalFilesize != null ? totalFilesize : 0l;
-	}
-
-	public ImageDto findImage(Long imageId)
-	{
-		return transform(imageRepository.findById(imageId).orElse(null));
-	}
-
-	public ImageDataDto getImageData(Long imageId, boolean thumbnail) throws IOException
-	{
-		Image image = imageRepository.findById(imageId).orElse(null);
+		ValidationResult result = new ValidationResult();
 
 		if (image == null)
-			throw new NotFoundException(String.valueOf(imageId));
-
-		String storageKey = image.getStorage() == null ? null : image.getStorage().getKey();
-
-		ImageDataDto imageData = new ImageDataDto();
-
-		if (!thumbnail || image.getThumbStatusEnum() == ImageThumbStatusEnum.THUMB_100_100)
 		{
-			imageData.setData(storageService.loadImage(image.getId(), image.getExtension(), storageKey, thumbnail));
-		}
-		else
-		{
-			try(InputStream input = ImageServiceImpl.class.getResourceAsStream("thumb_error.png"))
-			{
-				imageData.setData(IOUtils.toByteArray(input));
-			}
+			result.addError(MessageKeyEnum.COMMON_VALIDATION_OBJECT_CANNOT_BE_EMPTY);
+			return result;
 		}
 
-		imageData.setFilename(
-			(thumbnail ? "thumb." : StringUtils.EMPTY)
-			+ storageService.buildImageFilename(imageId, image.getExtension()));
-		imageData.setSize(thumbnail ? Long.valueOf(imageData.getData().length) : image.getSize());
+		result.add(validateUniqueness(image));
 
-		return imageData;
+		return result;
 	}
 
-	public ImageDto editImage(ImageDto imageDto)
+	private void checkValidation(ImageDto image)
 	{
-		Image image = imageRepository.findById(imageDto.getId()).orElse(null);
+		ValidationResult result = validate(image);
+		if (result.hasErrors())
+			throw new ValidationException(result);
+	}
 
-		image = merge(image, imageDto);
+	public ValidationResult validateUniqueness(ImageDto image)
+	{
+		ValidationResult result = new ValidationResult();
 
-		return transform(imageRepository.save(image));
+		List<Image> images = imageRepository.findAll(ImageSpecifications.matchesUniqueProperties(image.getId(), image.getHash()));
+		if (images != null && !images.isEmpty())
+			result.addError("hash", MessageKeyEnum.COMMON_VALIDATION_ALREADY_EXISTS);
+
+		return result;
+	}
+
+	public ImageDto save(ImageDto imageDto)
+	{
+		checkValidation(imageDto);
+
+		Image image = new Image();
+		merge(image, imageDto);
+
+		LocalDateTime now = DateUtils.normalizedNowForDatabase();
+		image.setCreatedDatetime(now);
+
+		Image savedImage = imageRepository.save(image);
+
+		return transform(savedImage);
+	}
+
+	public ImageDto update(ImageDto imageDto)
+	{
+		checkValidation(imageDto);
+
+		List<Image> images = imageRepository.findAll(ImageSpecifications.matchesId(imageDto.getId()));
+		Image image = images.stream().findFirst().orElse(null);
+		//Image image = imageRepository.findById(imageDto.getId()).orElse(null);
+		if (image == null)
+			return null;
+
+		merge(image, imageDto);
+
+		Image updatedImage = imageRepository.save(image);
+
+		return transform(updatedImage);
+	}
+
+	public boolean delete(Long id)
+	{
+		Image image = imageRepository.findById(id).orElse(null);
+		if (image == null)
+			return false;
+
+		try {
+			storageService.deleteImage(image);
+		}
+		catch (IOException ex)
+		{
+			log.error("unable to delete file with id " + image.getId());
+		}
+
+		imageRepository.delete(image);
+
+		return true;
+	}
+
+	public long count()
+	{
+		return imageRepository.count();
+	}
+
+	public long countBySearchParams(ImageSearchDto imageSearchDto)
+	{
+		return imageRepository.count(ImageSpecifications.matchesSearchParam(imageSearchDto));
+	}
+
+	public Page<ImageDto> findBySearchParams(ImageSearchDto imageSearchDto, Pageable pageable)
+	{
+		Page<Image> page = imageRepository.findAll(
+			Specification.where(ImageSpecifications.matchesSearchParam(imageSearchDto)), pageable);
+		return page.map(this::transform);
+	}
+
+	public String findSizeBySearchParams(ImageSearchDto imageSearchDto)
+	{
+		Specification<Image> specification = ImageSpecifications.matchesSearchParam(imageSearchDto);
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Long> query = builder.createQuery(Long.class);
+		Root<Image> root = query.from(Image.class);
+		Predicate predicate = specification.toPredicate(root, query, builder);
+		if (predicate != null)
+			query.where(predicate);
+		Long fileSize = entityManager.createQuery(query.select(builder.sum(root.<Long>get(Image_.SIZE)))).getSingleResult();
+
+		return FilesizeUtils.formatFilesize(fileSize != null ? fileSize : 0);
+	}
+
+	public Page<ImageDto> findAll(Pageable pageable)
+	{
+		Page<Image> page = imageRepository.findAll(pageable);
+		return page.map(this::transform);
+	}
+
+	public ImageDto find(Long id)
+	{
+		List<Image> images = imageRepository.findAll(
+			Specification.where(ImageSpecifications.matchesId(id)));
+		return transform(images.stream().findAny().orElse(null));
 	}
 
 	private Image merge(Image image, ImageDto imageDto)
 	{
-		if (image == null || imageDto == null)
+		if (image == null || imageDto == null )
 			return null;
 
-		image.clearTags();
+		image.setExtension(imageDto.getExtension());
+		image.setSize(imageDto.getSize());
+		image.setHash(imageDto.getHash());
+		image.setImportPath(imageDto.getImportPath());
+		image.setThumbStatus(imageDto.getThumbStatus());
+		image.setResolutionWidth(imageDto.getResolutionWidth());
+		image.setResolutionHeight(imageDto.getResolutionHeight());
+		image.setResolutionStatus(imageDto.getResolutionStatus());
+		image.setNewTagStatus(imageDto.getNewTagStatus());
 
-		for (TagDto tagDto : imageDto.getTags())
+		mergeTags(image, imageDto);
+
+		return image;
+	}
+
+	private Image mergeTags(Image image, ImageDto imageDto)
+	{
+		// delete unassigned tags
+		List<Tag> previousAssignedTags = new ArrayList<>(image.getTags());
+		List<Long> newlyAssignedTagIds = imageDto.getTags().stream().map(TagDto::getId).collect(Collectors.toList());
+		Set<Long> alreadyAssignedTagIds = new HashSet<>();
+
+		for (Tag tag : previousAssignedTags)
 		{
-			image.addTag(tagRepository.findById(tagDto.getId()).orElse(null));
+			if (newlyAssignedTagIds.contains(tag.getId()))
+				alreadyAssignedTagIds.add(tag.getId());
+			else
+				image.removeTag(tag);
+		}
+
+		// add new assigned tags
+		for (TagDto tag : imageDto.getTags())
+		{
+			if (!alreadyAssignedTagIds.contains(tag.getId()))
+				image.addTag(tagService.transform(tag));
 		}
 
 		return image;
 	}
 
-	private ImageDto transform(Image image)
+	protected ImageDto transform(Image image)
 	{
 		if (image == null)
 			return null;
@@ -189,46 +234,25 @@ public class ImageServiceImpl
 		ImageDto imageDto = new ImageDto();
 
 		imageDto.setId(image.getId());
+		imageDto.setStorage(storageService.transform(image.getStorage()));
+		imageDto.setStorageFilename(image.getStorageFilename());
+		imageDto.setExtension(image.getExtension());
+		imageDto.setSize(image.getSize());
 		imageDto.setSizeFormatted(FilesizeUtils.formatFilesize(image.getSize()));
+		imageDto.setHash(image.getHash());
+		imageDto.setImportPath(image.getImportPath());
+		imageDto.setThumbStatus(image.getThumbStatus());
 		imageDto.setResolutionWidth(image.getResolutionWidth());
 		imageDto.setResolutionHeight(image.getResolutionHeight());
-		imageDto.setImportPath(image.getImportPath());
+		imageDto.setResolutionStatus(image.getResolutionStatus());
+		imageDto.setCreatedDatetime(image.getCreatedDatetime());
+		imageDto.setNewTagStatus(image.getNewTagStatus());
 
 		Set<Tag> tags = image.getTags();
-
 		if (tags != null && !tags.isEmpty())
-		{
 			for (Tag tag : tags)
-			{
-				imageDto.addTag(DtoTransformer.transform(tag));
-			}
-		}
+				imageDto.addTag(tagService.transform(tag));
 
 		return imageDto;
-	}
-
-	public void deleteImage(Long imageId)
-	{
-		Image image = imageRepository.findById(imageId).orElse(null);
-
-		if (image == null)
-			throw new NotFoundException(String.valueOf(imageId));
-
-		String storageKey = image.getStorage() == null ? null : image.getStorage().getKey();
-
-		try {
-			storageService.deleteImage(imageId, image.getExtension(), storageKey);
-		}
-		catch (IOException ex)
-		{
-			log.error("unable to delete file with id " + imageId);
-		}
-
-		if (image.getStorage() != null)
-		{
-			storageService.subtractAndSaveFilesize(image.getStorage().getId(), image.getSize());
-		}
-
-		imageRepository.deleteById(imageId);
 	}
 }

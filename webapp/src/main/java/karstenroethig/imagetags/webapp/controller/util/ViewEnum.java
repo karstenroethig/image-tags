@@ -2,68 +2,94 @@ package karstenroethig.imagetags.webapp.controller.util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.Getter;
+
 public enum ViewEnum
 {
-	DASHBOARD("dashboard"),
-	IMAGE("image"),
-	STATISTIC("statistic"),
+	DASHBOARD("/dashboard"),
 
-	ADMIN_SERVER_INFO( ControllerEnum.admin, "server-info" ),
+	SERVER_INFO("/server-info" ),
 
-	GALLERY_LIST(ControllerEnum.gallery, ActionEnum.list),
-	GALLERY_SHOW(ControllerEnum.gallery, ActionEnum.show),
+	TAG_LIST(ControllerEnum.TAG, ActionEnum.LIST),
+	TAG_CREATE(ControllerEnum.TAG, ActionEnum.CREATE),
+	TAG_EDIT(ControllerEnum.TAG, ActionEnum.EDIT),
 
-	TAG_CREATE(ControllerEnum.tag, ActionEnum.create),
-	TAG_EDIT(ControllerEnum.tag, ActionEnum.edit),
-	TAG_LIST(ControllerEnum.tag, ActionEnum.list);
+	IMAGE_LIST(ControllerEnum.IMAGE, ActionEnum.LIST),
+	IMAGE_SHOW(ControllerEnum.IMAGE, ActionEnum.SHOW);
 
 	private static final String VIEW_SUBDIRECTORY = "views";
 
+	@Getter
 	private String viewName = StringUtils.EMPTY;
 
 	private enum ControllerEnum
 	{
-		admin, gallery, tag;
+		TAG,
+		IMAGE;
+
+		private String path = null;
+
+		private ControllerEnum() {}
+
+		private ControllerEnum(String path)
+		{
+			this.path = path;
+		}
+
+		public String getPath()
+		{
+			return path != null ? path : ("/" + name().toLowerCase());
+		}
 	}
 
 	private enum ActionEnum
 	{
-		create, edit, list, show;
+		CREATE,
+		EDIT,
+		LIST,
+		SHOW;
+
+		private ActionEnum() {}
+
+		public String getPath()
+		{
+			return "/" + name().toLowerCase();
+		}
+	}
+
+	private ViewEnum(ControllerEnum subController, ControllerEnum controller, ActionEnum action)
+	{
+		this(subController, controller, action.getPath());
 	}
 
 	private ViewEnum(ControllerEnum controller, ActionEnum action)
 	{
-		this(controller, action.name());
+		this(null, controller, action.getPath());
 	}
 
-	private ViewEnum(ControllerEnum controller, String action)
+	private ViewEnum(ControllerEnum controller, String path)
 	{
-		viewName += VIEW_SUBDIRECTORY;
-
-		if (StringUtils.isNoneBlank(viewName))
-		{
-			viewName += "/";
-		}
-
-		viewName += controller.name();
-		viewName += "/";
-		viewName += action;
+		this(null, controller, path);
 	}
 
-	private ViewEnum(String viewPath)
+	private ViewEnum(String path)
 	{
-		viewName += VIEW_SUBDIRECTORY;
-
-		if (StringUtils.isNoneBlank(viewName))
-		{
-			viewName += "/";
-		}
-
-		viewName += viewPath;
+		this(null, null, path);
 	}
 
-	public String getViewName()
+	private ViewEnum(ControllerEnum subController, ControllerEnum controller, String path)
 	{
-		return viewName;
+		StringBuilder newViewName = new StringBuilder(VIEW_SUBDIRECTORY);
+
+		if (subController != null)
+			newViewName.append(subController.getPath());
+
+		if (controller != null)
+			newViewName.append(controller.getPath());
+
+		if (path != null)
+			newViewName.append(path);
+
+		viewName = StringUtils.removeStart(newViewName.toString(), "/"); // just in case if there is no view sub-directory
 	}
 }

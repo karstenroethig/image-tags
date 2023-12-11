@@ -1,39 +1,45 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8" />
 </head>
 <body>
 
-	<nav th:fragment="header-fragment (menu)" class="navbar navbar-expand-lg navbar-light bg-light">
-		<a class="navbar-brand" th:href="@{/}" th:text="#{application.name}">Image Tags</a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			<ul class="navbar-nav mr-auto">
-				<li class="nav-item" th:classappend="${#strings.equals(menu,'dashboard')} ? active">
-					<a class="nav-link" th:href="@{/dashboard}" th:text="#{dashboard.label}">Dashboard</a>
-				</li>
-				<li class="nav-item" th:classappend="${#strings.equals(menu,'image')} ? active">
-					<a class="nav-link" th:href="@{/image}" th:text="#{image.label}">Images</a>
-				</li>
-				<li class="nav-item" th:classappend="${#strings.equals(menu,'gallery')} ? active">
-					<a class="nav-link" th:href="@{/gallery/list}" th:text="#{gallery.label}">Gallery</a>
-				</li>
-				<li class="nav-item dropdown" th:classappend="${#strings.equals(menu,'tag')} ? active">
-					<a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-						href="#" th:text="#{tag.label.plural}">Tags</a>
-					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
-						<a class="dropdown-item" th:href="@{/tag/list}" th:text="#{tag.list.label}">List all tags</a>
-						<a class="dropdown-item" th:href="@{/tag/create}" th:text="#{tag.add.label}">Add tag</a>
-					</div>
-				</li>
-				<li class="nav-item" th:classappend="${#strings.equals(menu,'statistic')} ? active">
-					<a class="nav-link" th:href="@{/statistic}" th:text="#{statistic.label}">Statistic</a>
-				</li>
-			</ul>
-			<a th:href="@{/admin/server-info}"><i class="fas fa-info-circle fa-lg text-muted"></i></a>
+	<nav th:fragment="header-fragment (menu)" class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark">
+		<div class="container-fluid">
+			<span class="navbar-brand">
+				<span th:text="#{application.name}">[application.name]</span>
+			</span>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item">
+						<a class="nav-link" th:classappend="${#strings.equals(menu,'dashboard')} ? active"
+							th:href="@{/dashboard}" th:title="#{dashboard.label}"><em class="fas fa-home fa-lg"></em></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:classappend="${#strings.equals(menu,'image')} ? active"
+							th:href="@{/image/list}" th:text="#{image.label.plural}">Images</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:classappend="${#strings.equals(menu,'tag')} ? active"
+							th:href="@{/tag/list}" th:text="#{tag.label.plural}">Tags</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" th:classappend="${#strings.equals(menu,'server-info')} ? active"
+							th:href="@{/server-info}" th:title="#{utility.serverInfo.label}"><em class="fa-solid fa-circle-info"></em></a>
+					</li>
+				</ul>
+				<form class="d-flex ms-auto" th:object="${imageSearchParams}" th:action="@{/image/search}" action="#" method="post" autocomplete="off">
+					<select th:field="*{tags}" class="form-control search-tags-input" style="width: 400px;" size="1" multiple="multiple">
+						<option th:each="tag : ${allTags}" th:value="${{tag}}" th:text="${tag.name}">[name]</option>
+					</select>
+					<button class="btn btn-outline-primary ms-2" type="submit">Search</button>
+				</form>
+			</div>
 		</div>
 	</nav>
 

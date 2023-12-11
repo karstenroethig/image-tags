@@ -1,0 +1,27 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout-error :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							null,
+							'error'
+							)}">
+<head>
+	<title th:text="#{application.title-pattern(#{application.name}, #{error.401.title})}">Unauthorized</title>
+</head>
+<body>
+
+	<div th:fragment="content">
+
+		<h4 class="card-title mt-1 mb-3 text-center">
+			<span th:text="#{error.401.title}">Unauthorized</span> <span class="text-muted">(401)</span>
+		</h4>
+
+		<p th:text="#{error.401.text}">The requested resource requires an authentication.</p>
+
+	</div>
+
+</body>
+</html>

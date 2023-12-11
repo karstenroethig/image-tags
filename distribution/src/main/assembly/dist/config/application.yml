@@ -1,36 +1,48 @@
 #
 # Spring Boot configuration
-#  - options: https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-docs/src/main/asciidoc/appendix-application-properties.adoc
+#  - options: https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 #
 
 server:
-  port: 8080
+#  address: 0.0.0.0
+#  port: 8080
+#  contextPath: image-tags
+  # Necessary setting for reverse proxy
+  forward-headers-strategy: native
 
 spring:
-  datasource:
-    url: jdbc:h2:file:./data/${app.name.id}-db
-    username: ${app.name.id}-user
-    password: ${app.name.id}-user
-    poolName: SpringBootHikariCP
-    maximumPoolSize: 5
-    minimumIdle: 3
-    maxLifetime: 2000000
-    connectionTimeout: 30000
-    idleTimeout: 30000
-    pool-prepared-statements: true
-    max-open-prepared-statements: 250
 
-logging:
-  file: log/${app.name.id}.log
-  level:
-    ROOT: WARN
-    org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer: INFO
-    karstenroethig.imagetags.webapp.Application: INFO
-    karstenroethig.imagetags.webapp.service.impl.CleanupServiceImpl: INFO
-    karstenroethig.imagetags.webapp.service.impl.ImageImportServiceImpl: INFO
-    karstenroethig.imagetags.webapp.service.impl.UpgradeServiceImpl: INFO
-    karstenroethig.imagetags.webapp: WARN
+#  jpa:
+#    databasePlatform: org.hibernate.dialect.H2Dialect
+#    databasePlatform: org.hibernate.dialect.MySQLDialect
+#    databasePlatform: org.hibernate.dialect.MariaDBDialect
 
-imageData:
-    importDirectory: data/new
-    storageDirectory: data
+#  datasource:
+#    url: jdbc:h2:mem:image-tags-db;MODE=MariaDB;DATABASE_TO_LOWER=TRUE;NON_KEYWORDS=USER
+#    url: jdbc:h2:file:./data/image-tags-db;MODE=MariaDB;DATABASE_TO_LOWER=TRUE;NON_KEYWORDS=USER
+#    url: jdbc:mysql://localhost/image-tags?useSSL=false
+#    url: jdbc:mariadb://localhost/image-tags?useSSL=false
+#    username: image-tags_user
+#    password: image-tags_password
+    # Connection Pooling (see https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby)
+#    hikari:
+#      connectionTimeout: 30000
+#      idleTimeout: 30000
+#      maxLifetime: 2000000
+#      minimumIdle: 3
+#      maximumPoolSize: 5
+#      poolName: SpringBootHikariCP
+
+#  servlet:
+#    multipart:
+#      max-file-size: 50MB
+#      max-request-size: 50MB
+
+#logging:
+#  level:
+#    ROOT: WARN
+#    '[org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer]': INFO
+#    '[karstenroethig.imagetags.webapp.Application]': INFO
+#    '[karstenroethig.imagetags.webapp]': WARN
+#  file:
+#    name: log/image-tags.log
