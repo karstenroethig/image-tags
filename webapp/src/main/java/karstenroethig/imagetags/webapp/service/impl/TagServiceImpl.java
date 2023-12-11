@@ -211,4 +211,10 @@ public class TagServiceImpl
 
 		return tagRepository.save(tag);
 	}
+
+	public TagDto findOrCreateDto(String name)
+	{
+		Tag tag = findOrCreate(name);
+		return transform(tag);
+	}
 }

@@ -1,7 +1,6 @@
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
 	th:replace="~{layout :: layout-fragment(
 							~{::title},
 							~{::content},
@@ -29,7 +28,7 @@
 				<div class="card mb-3">
 					<h3 class="card-header" th:text="#{dashboard.card.welcome.title}">Welcome</h3>
 					<div class="card-body">
-						<p class="card-text" th:text="#{dashboard.card.welcome.text}">[text]</p>
+						<p class="card-text lead" th:text="#{dashboard.card.welcome.text}">[text]</p>
 					</div>
 				</div>
 
@@ -37,26 +36,12 @@
 
 			<div class="col-lg-6">
 
-				<div class="card mb-3" th:if="${showAdminCard}" sec:authorize="hasRole('ADMIN')">
-					<h3 class="card-header" th:text="#{admin.label}">Administration</h3>
+				<div class="card mb-3">
+					<h3 class="card-header">Statistics</h3>
 					<div class="card-body">
-						<div class="alert alert-danger" th:if="${numberOfNewRegisteredUsers gt 0}">
-							<a th:href="@{/user-admin/search/new-registered}" class="alert-link" th:text="#{dashboard.card.administration.newRegisteredUsersHint.link(${numberOfNewRegisteredUsers})}">[numberOfNewRegisteredUsers] user(s)</a>
-							<span th:text="#{dashboard.card.administration.newRegisteredUsersHint.text}"> have registered and are waiting to be activated.</span>
-						</div>
-						<div class="alert alert-warning" th:if="${hasNoIndustries}">
-							<a th:href="@{/industry/create}" class="alert-link" th:text="#{dashboard.card.administration.missingIndustriesHint.link}">Add industries</a>
-							<span th:text="#{dashboard.card.administration.missingIndustriesHint.text}"> so that use-cases can be provided with all the necessary data.</span>
-						</div>
-						<div class="alert alert-warning" th:if="${numberOfTechnologiesWaitingForVerification gt 0}">
-							<a th:href="@{/technology/search/verified-requested}" class="alert-link" th:text="#{dashboard.card.administration.technologiesWaitingForVerificationHint.link(${numberOfTechnologiesWaitingForVerification})}">[numberOfTechnologiesWaitingForVerification] technologies</a>
-							<span th:text="#{dashboard.card.administration.technologiesWaitingForVerificationHint.text}"> waiting to be verified.</span>
-						</div>
-						<div class="alert alert-warning" th:if="${numberOfUseCasesWaitingForVerification gt 0}">
-							<a th:href="@{/use-case/search/verified-requested}" class="alert-link" th:text="#{dashboard.card.administration.useCasesWaitingForVerificationHint.link(${numberOfUseCasesWaitingForVerification})}">[numberOfUseCasesWaitingForVerification] use case(s)</a>
-							<span th:text="#{dashboard.card.administration.useCasesWaitingForVerificationHint.text}"> waiting to be verified.</span>
-						</div>
-
+						<p class="card-text lead fst-italic">Total images: <span th:text="${#numbers.formatInteger(statsTotalImages,1,'POINT')}">[statsTotalImages]</span></p>
+						<p class="card-text lead fst-italic">Untagged images: <span th:text="${#numbers.formatInteger(statsUntaggedImages,1,'POINT')}">[statsUntaggedImages]</span></p>
+						<p class="card-text lead fst-italic">Total file size: <span th:text="${statsTotalFileSize}">[statsTotalFileSize]</span></p>
 					</div>
 				</div>
 
