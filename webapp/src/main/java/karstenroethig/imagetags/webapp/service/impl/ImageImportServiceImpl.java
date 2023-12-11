@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class ImageImportServiceImpl
 {
-	private static final String[] IMAGE_FILE_EXTENSIONS = new String[] {"gif", "GIF", "jpg", "JPG", "jpeg", "JPEG", "png", "PNG", "webp", "WEBP"};
+	private static final String[] IMAGE_FILE_EXTENSIONS = new String[] {"gif", "GIF", "jpg", "JPG", "jpeg", "JPEG", "png", "PNG"};
 	private static final Point RESOLUTION_DEFAULT = new Point(0, 0);
 
 	@Autowired private ApplicationProperties applicationProperties;
