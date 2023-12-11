@@ -82,6 +82,9 @@
 			<column name="created_datetime" type="datetime">
 				<constraints nullable="false"/>
 			</column>
+			<column name="new_tag_status" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
 		</createTable>
 
 		<addUniqueConstraint tableName="image" columnNames="storage_filename" constraintName="u_image__storage_filename"/>

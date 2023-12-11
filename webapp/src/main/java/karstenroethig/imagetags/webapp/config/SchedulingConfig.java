@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import karstenroethig.imagetags.webapp.service.impl.CleanupServiceImpl;
 import karstenroethig.imagetags.webapp.service.impl.ImageImportServiceImpl;
+import karstenroethig.imagetags.webapp.service.impl.UpdateImageNewTagStatusServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -19,10 +20,15 @@ public class SchedulingConfig
 {
 	@Autowired private ImageImportServiceImpl imageImportService;
 	@Autowired private CleanupServiceImpl cleanupService;
+	@Autowired private UpdateImageNewTagStatusServiceImpl updateImageNewTagStatusService;
 
 	@Scheduled(fixedRate = 30 /* executing every 30 minutes */, timeUnit = TimeUnit.MINUTES)
 	public void executeBackgroundTasks()
 	{
+		log.info("Background task: Check NEW tag on images (START)");
+		updateImageNewTagStatusService.execute();
+		log.info("Background task: Check NEW tag on images (END)");
+
 		log.info("Background task: Import new images (START)");
 		imageImportService.execute();
 		log.info("Background task: Import new images (END)");
