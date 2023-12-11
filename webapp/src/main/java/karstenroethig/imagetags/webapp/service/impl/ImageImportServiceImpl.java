@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -234,11 +235,13 @@ public class ImageImportServiceImpl
 	private boolean isImageFile(Path path)
 	{
 		if (path == null || Files.isDirectory(path))
-		{
 			return false;
-		}
 
-		return FilenameUtils.isExtension(path.getFileName().toString(), IMAGE_FILE_EXTENSIONS);
+		String filename = path.getFileName().toString();
+		if (StringUtils.startsWith(filename, "."))
+			return false;
+
+		return FilenameUtils.isExtension(filename, IMAGE_FILE_EXTENSIONS);
 	}
 
 	private String findRelativeImportPath(Path filePath)
