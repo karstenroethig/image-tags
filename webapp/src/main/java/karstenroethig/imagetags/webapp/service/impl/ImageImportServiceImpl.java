@@ -145,7 +145,8 @@ public class ImageImportServiceImpl
 			storageService.saveImage(imagePath, image.getStorageFilename(), fileSystem, false);
 
 			// create thumbnail and copy it to the storage
-			try {
+			try
+			{
 				byte[] thumbData = imageOperationService.createImageThumbnail(imagePath);
 				storageService.saveImage(thumbData, image.getStorageFilename(), fileSystemThumbs, true);
 				image.setThumbStatus(ImageThumbStatusEnum.THUMB_100_100);

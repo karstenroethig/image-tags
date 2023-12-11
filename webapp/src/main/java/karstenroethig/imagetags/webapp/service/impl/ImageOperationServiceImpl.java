@@ -20,7 +20,7 @@ import net.coobird.thumbnailator.Thumbnails;
 @Transactional
 public class ImageOperationServiceImpl
 {
-	private static final int THUMBNAIL_SIZE = 100;
+	private static final int THUMBNAIL_SIZE = 120;
 
 	public byte[] createImageThumbnail(Path imageFilePath) throws IOException
 	{

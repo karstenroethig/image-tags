@@ -19,6 +19,7 @@ import karstenroethig.imagetags.webapp.model.domain.Tag;
 import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import karstenroethig.imagetags.webapp.model.enums.ImageNewTagStatusEnum;
+import karstenroethig.imagetags.webapp.model.enums.ImageThumbStatusEnum;
 
 public class ImageSpecifications
 {
@@ -53,6 +54,7 @@ public class ImageSpecifications
 
 				addRestrictionsForTags(root, query, cb, restrictions, imageSearchDto.getTags());
 				addRestrictionsForNewTagStatus(root, query, cb, restrictions, imageSearchDto.getNewTagStatus());
+				addRestrictionsForThumbStatus(root, query, cb, restrictions, imageSearchDto.getThumbStatus());
 
 				return cb.and(restrictions.toArray(new Predicate[] {}));
 			};
@@ -81,5 +83,13 @@ public class ImageSpecifications
 			return;
 
 		restrictions.add(cb.equal(root.get(Image_.newTagStatus), newTagStatus));
+	}
+
+	private static void addRestrictionsForThumbStatus(Root<Image> root, CriteriaQuery<?> query, CriteriaBuilder cb, List<Predicate> restrictions, ImageThumbStatusEnum thumbStatus)
+	{
+		if (thumbStatus == null)
+			return;
+
+		restrictions.add(cb.equal(root.get(Image_.thumbStatus), thumbStatus));
 	}
 }

@@ -52,6 +52,22 @@ public class StorageServiceImpl
 		Files.copy(new ByteArrayInputStream(imageData), path);
 	}
 
+	public void saveImage(byte[] imageData, String storageFilename, StorageDto storageDto, boolean thumb) throws IOException
+	{
+		Storage storage = storageRepository.findById(storageDto.getId()).orElse(null);
+		if (storage == null)
+			return;
+
+		Path storageArchivePath = createAndGetStorageArchiveIfItDoesNotExist(storage.getKey(), thumb);
+		try (FileSystem storageFileSystem = FileSystems.newFileSystem(storageArchivePath))
+		{
+			String thumbsPath = thumb ? "/thumbs" : StringUtils.EMPTY;
+			Path pathToFileInArchive = storageFileSystem.getPath(thumbsPath + ROOT_PATH_DELIMITER + storageFilename);
+
+			Files.copy(new ByteArrayInputStream(imageData), pathToFileInArchive);
+		}
+	}
+
 	public Resource loadAsResource(ImageDto image, boolean thumb) throws IOException
 	{
 		if (thumb &&
@@ -127,6 +143,10 @@ public class StorageServiceImpl
 							StandardOpenOption.TRUNCATE_EXISTING)))
 			{
 				out.setLevel(Deflater.NO_COMPRESSION);
+
+				if (thumbs)
+					out.putNextEntry(new ZipEntry("thumbs/"));
+
 				out.closeEntry();
 			}
 		}
