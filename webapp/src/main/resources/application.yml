@@ -22,7 +22,6 @@ server:
 spring:
 
   jpa:
-    databasePlatform: org.hibernate.dialect.H2Dialect
     # Open Session In View (see https://www.baeldung.com/spring-open-session-in-view)
     open-in-view: true
     hibernate:
