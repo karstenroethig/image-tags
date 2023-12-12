@@ -67,6 +67,11 @@ logging:
     ROOT: WARN
     '[org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer]': INFO
     '[karstenroethig.imagetags.webapp.Application]': INFO
+    '[karstenroethig.imagetags.webapp.config.SchedulingConfig]': INFO
+    '[karstenroethig.imagetags.webapp.service.impl.ImageImportServiceImpl]': INFO
+    '[karstenroethig.imagetags.webapp.service.impl.CleanupServiceImpl]': INFO
+    '[karstenroethig.imagetags.webapp.service.impl.UpdateImageNewTagStatusServiceImpl]': INFO
+    '[karstenroethig.imagetags.webapp.service.impl.UpdateImageThumbStatusServiceImpl]': INFO
     '[karstenroethig.imagetags.webapp]': WARN
   file:
     name: log/image-tags.log

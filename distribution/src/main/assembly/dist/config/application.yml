@@ -14,7 +14,7 @@ spring:
 
 #  datasource:
 #    url: jdbc:h2:mem:image-tags-db;MODE=MariaDB;DATABASE_TO_LOWER=TRUE;NON_KEYWORDS=USER
-#    url: jdbc:h2:file:./data/image-tags-db;MODE=MariaDB;DATABASE_TO_LOWER=TRUE;NON_KEYWORDS=USER
+#    url: jdbc:h2:file:./data/image-tags-db
 #    url: jdbc:mysql://localhost/image-tags?useSSL=false
 #    url: jdbc:mariadb://localhost/image-tags?useSSL=false
 #    username: image-tags_user
@@ -28,6 +28,10 @@ spring:
 #      maximumPoolSize: 5
 #      poolName: SpringBootHikariCP
 
+#  h2:
+#    console:
+#      enabled: false # accessible via http://localhost:8080/h2-console
+
 #  servlet:
 #    multipart:
 #      max-file-size: 50MB
@@ -38,6 +42,11 @@ spring:
 #    ROOT: WARN
 #    '[org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer]': INFO
 #    '[karstenroethig.imagetags.webapp.Application]': INFO
+#    '[karstenroethig.imagetags.webapp.config.SchedulingConfig]': INFO
+#    '[karstenroethig.imagetags.webapp.service.impl.ImageImportServiceImpl]': INFO
+#    '[karstenroethig.imagetags.webapp.service.impl.CleanupServiceImpl]': INFO
+#    '[karstenroethig.imagetags.webapp.service.impl.UpdateImageNewTagStatusServiceImpl]': INFO
+#    '[karstenroethig.imagetags.webapp.service.impl.UpdateImageThumbStatusServiceImpl]': INFO
 #    '[karstenroethig.imagetags.webapp]': WARN
 #  file:
 #    name: log/image-tags.log
