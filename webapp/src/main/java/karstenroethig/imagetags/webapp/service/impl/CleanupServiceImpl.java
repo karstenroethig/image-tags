@@ -33,7 +33,8 @@ public class CleanupServiceImpl
 
 		Pageable pageRequest = PageRequest.of(0, 10, Direction.ASC, AbstractEntityId_.ID);
 		boolean first = true;
-		int currentImageCount = 0;
+		long totalElements = 0;
+		long currentImageCount = 0;
 
 		do
 		{
@@ -41,15 +42,16 @@ public class CleanupServiceImpl
 
 			if (first)
 			{
-				log.info("start clean-up of {} images", page.getTotalElements());
 				first = false;
+				totalElements = page.getTotalElements();
+				log.info("start clean-up of {} images", totalElements);
 			}
 
 			for (ImageDto image : page.getContent())
 			{
 				currentImageCount++;
 
-				log.info(String.format("deleting image [%s/%s]: %s", currentImageCount, page.getTotalElements(), image.getId()));
+				log.info(String.format("deleting image [%s/%s]: %s", currentImageCount, totalElements, image.getId()));
 
 				imageService.delete(image.getId());
 			}
