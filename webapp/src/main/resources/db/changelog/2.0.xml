@@ -12,7 +12,7 @@
 		<!-- Table "tag" -->
 		<!-- =========== -->
 		<createTable tableName="tag">
-			<column name="id" type="${type.id}" autoIncrement="true">
+			<column name="id" type="${type.id}" autoIncrement="true" startWith="100000">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="name" type="varchar(191)">
@@ -29,7 +29,7 @@
 		<!-- Table "storage" -->
 		<!-- =============== -->
 		<createTable tableName="storage">
-			<column name="id" type="${type.id}" autoIncrement="true">
+			<column name="id" type="${type.id}" autoIncrement="true" startWith="100000">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="storage_key" type="varchar(191)">
@@ -46,7 +46,7 @@
 		<!-- Table "image" -->
 		<!-- ============= -->
 		<createTable tableName="image">
-			<column name="id" type="${type.id}" autoIncrement="true">
+			<column name="id" type="${type.id}" autoIncrement="true" startWith="100000">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="storage_id" type="${type.idRef}">

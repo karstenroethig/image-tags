@@ -150,7 +150,7 @@ public class ImageImportServiceImpl
 			{
 				byte[] thumbData = imageOperationService.createImageThumbnail(imagePath);
 				storageService.saveImage(thumbData, image.getStorageFilename(), fileSystemThumbs, true);
-				image.setThumbStatus(ImageThumbStatusEnum.THUMB_100_100);
+				image.setThumbStatus(ImageThumbStatusEnum.THUMB_120_120);
 			}
 			catch (Exception ex)
 			{
