@@ -48,7 +48,7 @@
 			<column name="file_size"         value="75315"/>
 			<column name="hash"              value="a175f61fca912ec49ce9379f02dbebfb"/>
 			<column name="import_path"       value="abc/123/test.png"/>
-			<column name="thumb_status"      value="THUMB_100_100"/>
+			<column name="thumb_status"      value="THUMB_120_120"/>
 			<column name="resolution_width"  value="720"/>
 			<column name="resolution_height" value="540"/>
 			<column name="resolution_status" value="GENERATION_SUCCESS"/>
@@ -69,7 +69,7 @@
 			<column name="file_extension"    value="jpg"/>
 			<column name="file_size"         value="74479"/>
 			<column name="hash"              value="3773af58a5b072a094c53f628e7160fa"/>
-			<column name="thumb_status"      value="THUMB_100_100"/>
+			<column name="thumb_status"      value="THUMB_120_120"/>
 			<column name="resolution_width"  value="700"/>
 			<column name="resolution_height" value="700"/>
 			<column name="resolution_status" value="GENERATION_SUCCESS"/>
@@ -103,7 +103,7 @@
 			<column name="file_extension"    value="jpg"/>
 			<column name="file_size"         value="53623"/>
 			<column name="hash"              value="1fd1c4ba07fa847691d092ca618c549e"/>
-			<column name="thumb_status"      value="THUMB_100_100"/>
+			<column name="thumb_status"      value="THUMB_120_120"/>
 			<column name="resolution_width"  value="538"/>
 			<column name="resolution_height" value="540"/>
 			<column name="resolution_status" value="GENERATION_SUCCESS"/>
