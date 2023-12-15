@@ -194,7 +194,6 @@ public class ImageServiceImpl
 		image.setResolutionWidth(imageDto.getResolutionWidth());
 		image.setResolutionHeight(imageDto.getResolutionHeight());
 		image.setResolutionStatus(imageDto.getResolutionStatus());
-		image.setNewTagStatus(imageDto.getNewTagStatus());
 
 		mergeTags(image, imageDto);
 
@@ -246,7 +245,6 @@ public class ImageServiceImpl
 		imageDto.setResolutionHeight(image.getResolutionHeight());
 		imageDto.setResolutionStatus(image.getResolutionStatus());
 		imageDto.setCreatedDatetime(image.getCreatedDatetime());
-		imageDto.setNewTagStatus(image.getNewTagStatus());
 
 		Set<Tag> tags = image.getTags();
 		if (tags != null && !tags.isEmpty())

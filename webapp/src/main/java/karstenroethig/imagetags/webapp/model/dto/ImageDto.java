@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-import karstenroethig.imagetags.webapp.model.enums.ImageNewTagStatusEnum;
 import karstenroethig.imagetags.webapp.model.enums.ImageResolutionStatusEnum;
 import karstenroethig.imagetags.webapp.model.enums.ImageThumbStatusEnum;
 import lombok.EqualsAndHashCode;
@@ -33,7 +32,6 @@ public class ImageDto extends AbstractDtoId
 	private Integer resolutionHeight;
 	private ImageResolutionStatusEnum resolutionStatus;
 	private LocalDateTime createdDatetime;
-	private ImageNewTagStatusEnum newTagStatus;
 	private Set<TagDto> tags = new HashSet<>();
 
 	public void addTag(TagDto tag)
