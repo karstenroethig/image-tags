@@ -27,7 +27,6 @@ import karstenroethig.imagetags.webapp.config.ApplicationProperties;
 import karstenroethig.imagetags.webapp.model.domain.Image;
 import karstenroethig.imagetags.webapp.model.domain.Storage;
 import karstenroethig.imagetags.webapp.model.domain.Tag;
-import karstenroethig.imagetags.webapp.model.enums.ImageNewTagStatusEnum;
 import karstenroethig.imagetags.webapp.model.enums.ImageResolutionStatusEnum;
 import karstenroethig.imagetags.webapp.model.enums.ImageThumbStatusEnum;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
@@ -184,7 +183,6 @@ public class ImageImportServiceImpl
 		image.setThumbStatus(ImageThumbStatusEnum.NO_THUMB);
 		image.setImportPath(findRelativeImportPath(imagePath));
 		image.setCreatedDatetime(LocalDateTime.now());
-		image.setNewTagStatus(ImageNewTagStatusEnum.CHECKED);
 
 		try (InputStream inputStream = Files.newInputStream(imagePath))
 		{

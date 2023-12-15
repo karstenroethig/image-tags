@@ -14,7 +14,6 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import karstenroethig.imagetags.webapp.model.enums.ImageNewTagStatusEnum;
 import karstenroethig.imagetags.webapp.model.enums.ImageResolutionStatusEnum;
 import karstenroethig.imagetags.webapp.model.enums.ImageThumbStatusEnum;
 import lombok.EqualsAndHashCode;
@@ -68,10 +67,6 @@ public class Image extends AbstractEntityId
 
 	@Column(name = "created_datetime", nullable = false)
 	private LocalDateTime createdDatetime;
-
-	@Column(name = "new_tag_status", length = 191, nullable = false)
-	@Enumerated(EnumType.STRING)
-	private ImageNewTagStatusEnum newTagStatus;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "image_tag", joinColumns = { @JoinColumn(name = "image_id") }, inverseJoinColumns = { @JoinColumn(name = "tag_id") })
