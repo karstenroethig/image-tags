@@ -31,8 +31,9 @@ public class CleanupServiceImpl
 		ImageSearchDto searchParams = new ImageSearchDto();
 		searchParams.setTags(List.of(tagDelete));
 
-		Pageable pageRequest = PageRequest.of(0, 10, Direction.ASC, AbstractEntityId_.ID);
+		Pageable pageRequest = PageRequest.of(0, 50, Direction.ASC, AbstractEntityId_.ID);
 		boolean first = true;
+		boolean hasNext = false;
 		long totalElements = 0;
 		long currentImageCount = 0;
 
@@ -56,8 +57,8 @@ public class CleanupServiceImpl
 				imageService.delete(image.getId());
 			}
 
-			pageRequest = page.hasNext() ? page.nextPageable() : null;
+			hasNext = page.hasNext();
 		}
-		while (pageRequest != null);
+		while (hasNext);
 	}
 }
