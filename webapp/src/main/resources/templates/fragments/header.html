@@ -28,9 +28,32 @@
 						<a class="nav-link" th:classappend="${#strings.equals(menu,'tag')} ? active"
 							th:href="@{/tag/list}" th:text="#{tag.label.plural}">Tags</a>
 					</li>
-					<li class="nav-item">
-						<a class="nav-link" th:classappend="${#strings.equals(menu,'server-info')} ? active"
-							th:href="@{/server-info}" th:title="#{utility.serverInfo.label}"><em class="fa-solid fa-circle-info"></em></a>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+							th:classappend="${#strings.equals(menu,'settings')} ? active">
+							<i class="fa-solid fa-gears"></i>
+						</a>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" th:href="@{/server-info}">
+									<i class="fa-solid fa-circle-info"></i>
+									<span th:text="#{utility.serverInfo.label}">Server Info</span>
+								</a>
+							</li>
+							<li><hr class="dropdown-divider"></li>
+							<li>
+								<a class="dropdown-item" th:href="@{/backup}">
+									<i class="fa-solid fa-file-export"></i>
+									Backup
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" th:href="@{/backup/restore}">
+									<i class="fa-solid fa-file-import"></i>
+									Restore
+								</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 				<form class="d-flex ms-auto" th:object="${imageSearchParams}" th:action="@{/image/search}" action="#" method="post" autocomplete="off">

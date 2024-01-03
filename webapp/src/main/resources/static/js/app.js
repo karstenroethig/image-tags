@@ -25,6 +25,8 @@ $( document ).ready( function() {
 	});
 
 	initializeSearchSortAndPagination();
+
+	initializeHelpIcons();
 });
 
 function initializeSearchSortAndPagination()
@@ -87,3 +89,17 @@ function initializeSearchSortAndPagination()
 function postShowSearchParams() {}
 
 function postDeleteSearchParams() {}
+
+function initializeHelpIcons()
+{
+	$('.help-icon').click(function(event) {
+		var sectionElement = $('#' + event.target.id + '_content');
+		if (sectionElement.length) {
+			if (sectionElement.is(':visible')) {
+				sectionElement.hide('slow');
+			} else {
+				sectionElement.show('slow');
+			}
+		}
+	});
+}

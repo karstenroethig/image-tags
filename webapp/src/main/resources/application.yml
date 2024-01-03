@@ -107,3 +107,7 @@ logging:
     '[karstenroethig.imagetags.webapp]': DEBUG
   file:
     name: target/log/image-tags.log
+
+app:
+  backup:
+    backupDirectory: target/backups

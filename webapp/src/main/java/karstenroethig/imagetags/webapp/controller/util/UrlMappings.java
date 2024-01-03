@@ -12,6 +12,7 @@ public class UrlMappings
 
 	public static final String CONTROLLER_TAG = "/tag";
 	public static final String CONTROLLER_IMAGE = "/image";
+	public static final String CONTROLLER_BACKUP = "/backup";
 
 	public static final String ACTION_LIST = "/list";
 	public static final String ACTION_SHOW = "/show/{id}";
