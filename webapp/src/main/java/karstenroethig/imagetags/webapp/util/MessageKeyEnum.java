@@ -35,7 +35,28 @@ public enum MessageKeyEnum
 	IMAGE_UPDATE_ERROR("image.update.error"),
 	IMAGE_DELETE_INVALID("image.delete.invalid"),
 	IMAGE_DELETE_SUCCESS("image.delete.success"),
-	IMAGE_DELETE_ERROR("image.delete.error");
+	IMAGE_DELETE_ERROR("image.delete.error"),
+
+	BACKUP_NOW_SUCCESS("backup.now.success"),
+	BACKUP_NOW_ERROR("backup.now.error"),
+
+	BACKUP_TASK_INITIALIZE("backup.task.initialize"),
+	BACKUP_TASK_EXPORT_TAGS("backup.task.exportTags"),
+	BACKUP_TASK_EXPORT_STORAGES("backup.task.exportStorages"),
+	BACKUP_TASK_EXPORT_IMAGES("backup.task.exportImages"),
+
+	RESTORE_EXECUTE_SUCCESS("restore.execute.success"),
+	RESTORE_EXECUTE_INVALID("restore.execute.invalid"),
+	RESTORE_EXECUTE_INVALID_FILE_PATH_DOES_NOT_EXIST("restore.execute.invalid.filePath.doesNotExist"),
+	RESTORE_EXECUTE_INVALID_FILE_PATH_NOT_READABLE("restore.execute.invalid.filePath.notReadable"),
+	RESTORE_EXECUTE_INVALID_FILE_PATH_NOT_A_FILE("restore.execute.invalid.filePath.notAFile"),
+	RESTORE_EXECUTE_ERROR("restore.execute.error"),
+
+	RESTORE_TASK_INITIALIZE("restore.task.initialize"),
+	RESTORE_TASK_RESET_DATABASE("restore.task.resetDatabase"),
+	RESTORE_TASK_IMPORT_TAGS("restore.task.importTags"),
+	RESTORE_TASK_IMPORT_STORAGES("restore.task.importStorages"),
+	RESTORE_TASK_IMPORT_IMAGES("restore.task.importImages");
 
 	@Getter
 	private String key;

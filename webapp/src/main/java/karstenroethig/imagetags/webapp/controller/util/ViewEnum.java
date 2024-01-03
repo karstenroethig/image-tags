@@ -15,7 +15,11 @@ public enum ViewEnum
 	TAG_EDIT(ControllerEnum.TAG, ActionEnum.EDIT),
 
 	IMAGE_LIST(ControllerEnum.IMAGE, ActionEnum.LIST),
-	IMAGE_SHOW(ControllerEnum.IMAGE, ActionEnum.SHOW);
+	IMAGE_SHOW(ControllerEnum.IMAGE, ActionEnum.SHOW),
+
+	BACKUP_INDEX(ControllerEnum.BACKUP, "/index"),
+	BACKUP_RESTORE(ControllerEnum.BACKUP, "/restore"),
+	BACKUP_RESTORE_STATUS(ControllerEnum.BACKUP, "/restore-status");
 
 	private static final String VIEW_SUBDIRECTORY = "views";
 
@@ -25,7 +29,8 @@ public enum ViewEnum
 	private enum ControllerEnum
 	{
 		TAG,
-		IMAGE;
+		IMAGE,
+		BACKUP;
 
 		private String path = null;
 

@@ -3,6 +3,7 @@ package karstenroethig.imagetags.webapp.util;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class DateUtils
 {
@@ -23,5 +24,10 @@ public class DateUtils
 		if (dateTime == null)
 			return null;
 		return ZonedDateTime.of(dateTime, ZoneOffset.UTC);
+	}
+
+	public static long secondsFromDateTimeUntilNow(LocalDateTime datetime)
+	{
+		return datetime.until(LocalDateTime.now(), ChronoUnit.SECONDS);
 	}
 }
