@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class ImageImportServiceImpl
 {
-	private static final String[] IMAGE_FILE_EXTENSIONS = new String[] {"gif", "GIF", "jpg", "JPG", "jpeg", "JPEG", "png", "PNG"};
+	private static final String[] IMAGE_FILE_EXTENSIONS = new String[] {"gif", "jpg", "jpeg", "png", "webp"};
 	private static final Point RESOLUTION_DEFAULT = new Point(0, 0);
 
 	@Autowired private ApplicationProperties applicationProperties;
@@ -56,7 +56,6 @@ public class ImageImportServiceImpl
 		if (!Files.exists(importDirectory))
 		{
 			log.info("import of images skipped (directory '" + importDirectory + "' does not exist)");
-
 			return;
 		}
 
@@ -235,7 +234,7 @@ public class ImageImportServiceImpl
 		if (path == null || Files.isDirectory(path))
 			return false;
 
-		String filename = path.getFileName().toString();
+		String filename = path.getFileName().toString().toLowerCase();
 		if (StringUtils.startsWith(filename, "."))
 			return false;
 
@@ -250,9 +249,7 @@ public class ImageImportServiceImpl
 	private boolean isEmptyDirectory(Path path)
 	{
 		if (path == null || !Files.isDirectory(path))
-		{
 			return false;
-		}
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path))
 		{

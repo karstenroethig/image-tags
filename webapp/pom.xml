@@ -124,6 +124,12 @@
 			<artifactId>thumbnailator</artifactId>
 		</dependency>
 
+		<!-- webp support for ImageIO -->
+		<dependency>
+			<groupId>org.sejda.imageio</groupId>
+			<artifactId>webp-imageio</artifactId>
+		</dependency>
+
 		<!-- JAXB API only -->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
