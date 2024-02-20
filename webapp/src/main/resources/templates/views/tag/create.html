@@ -39,8 +39,8 @@
 				</label>
 				<div class="col-sm-10 col-form-label">
 					<div class="form-check" th:each="ty : ${T(karstenroethig.imagetags.webapp.model.enums.TagTypeEnum).values()}">
-						<input type="radio" th:field="*{type}" th:value="${ty}" class="form-check-input" th:classappend="${#fields.hasErrors('type')} ? is-invalid">
-						<label class="form-check-label" th:text="${#messages.msg('tag.type.'+ty.name()+'.label')}">[type]</label>
+						<input type="radio" th:field="*{type}" th:value="${ty}" class="form-check-input" th:classappend="${#fields.hasErrors('type')} ? is-invalid" th:id="${'input_'+ty.name()}">
+						<label class="form-check-label" th:text="${#messages.msg('tag.type.'+ty.name()+'.label')}" th:for="${'input_'+ty.name()}">[type]</label>
 					</div>
 					<div class="invalid-feedback" th:if="${#fields.hasErrors('type')}" th:each="err : ${#fields.errors('type')}" th:text="${err}">validation error</div>
 				</div>
