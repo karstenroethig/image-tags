@@ -40,7 +40,7 @@ public class TagController extends AbstractController
 	@Autowired private TagServiceImpl tagService;
 
 	@GetMapping(value = UrlMappings.ACTION_LIST)
-	public String list(Model model, @PageableDefault(size = 20, sort = { Tag_.TYPE, Tag_.NAME } ) Pageable pageable)
+	public String list(Model model, @PageableDefault(size = 20, sort = Tag_.NAME) Pageable pageable)
 	{
 		Page<TagDto> resultsPage = tagService.findAll(pageable);
 		addPagingAttributes(model, resultsPage);
