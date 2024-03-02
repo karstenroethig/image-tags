@@ -27,6 +27,8 @@ $( document ).ready( function() {
 	initializeSearchSortAndPagination();
 
 	initializeHelpIcons();
+
+	initializeMagnify();
 });
 
 function initializeSearchSortAndPagination()
@@ -101,5 +103,12 @@ function initializeHelpIcons()
 				sectionElement.show('slow');
 			}
 		}
+	});
+}
+
+function initializeMagnify()
+{
+	$('.zoom').magnify({
+		speed: 300
 	});
 }
