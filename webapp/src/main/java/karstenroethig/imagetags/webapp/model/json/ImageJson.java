@@ -24,4 +24,5 @@ public class ImageJson
 	private ImageResolutionStatusEnum resolutionStatus;
 	private LocalDateTime createdDatetime;
 	private List<String> tags;
+	private String album;
 }

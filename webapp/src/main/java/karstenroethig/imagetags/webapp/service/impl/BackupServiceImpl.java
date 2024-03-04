@@ -31,14 +31,17 @@ import karstenroethig.imagetags.webapp.config.ApplicationProperties;
 import karstenroethig.imagetags.webapp.config.ApplicationProperties.BackupSettings;
 import karstenroethig.imagetags.webapp.config.AsyncTaskExecutorConfig;
 import karstenroethig.imagetags.webapp.model.domain.AbstractEntityId_;
+import karstenroethig.imagetags.webapp.model.domain.Album;
 import karstenroethig.imagetags.webapp.model.domain.Image;
 import karstenroethig.imagetags.webapp.model.domain.Storage;
 import karstenroethig.imagetags.webapp.model.domain.Tag;
 import karstenroethig.imagetags.webapp.model.dto.backup.BackupInfoDto;
+import karstenroethig.imagetags.webapp.model.json.AlbumJson;
 import karstenroethig.imagetags.webapp.model.json.BackupJson;
 import karstenroethig.imagetags.webapp.model.json.ImageJson;
 import karstenroethig.imagetags.webapp.model.json.StorageJson;
 import karstenroethig.imagetags.webapp.model.json.TagJson;
+import karstenroethig.imagetags.webapp.repository.AlbumRepository;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
 import karstenroethig.imagetags.webapp.repository.StorageRepository;
 import karstenroethig.imagetags.webapp.repository.TagRepository;
@@ -58,6 +61,7 @@ public class BackupServiceImpl
 	@Autowired private TagRepository tagRepository;
 	@Autowired private StorageRepository storageRepository;
 	@Autowired private ImageRepository imageRepository;
+	@Autowired private AlbumRepository albumRepository;
 
 	public BackupInfoDto getBackupInfo()
 	{
@@ -86,6 +90,7 @@ public class BackupServiceImpl
 
 			BackupJson backup = new BackupJson();
 			backup.setTags(convertTags());
+			backup.setAlbums(convertAlbums());
 			backup.setStorages(convertStorages());
 			backup.setImages(convertImages());
 
@@ -117,6 +122,7 @@ public class BackupServiceImpl
 	{
 		int totalWork = 0;
 		totalWork += tagRepository.count();
+		totalWork += albumRepository.count();
 		totalWork += storageRepository.count();
 		totalWork += imageRepository.count();
 
@@ -194,6 +200,55 @@ public class BackupServiceImpl
 		tagJson.setType(tag.getType());
 
 		return tagJson;
+	}
+
+	private List<AlbumJson> convertAlbums()
+	{
+		backupInfo.beginTask(MessageKeyEnum.BACKUP_TASK_EXPORT_ALBUMS, (int)albumRepository.count());
+
+		List<AlbumJson> albums = null;
+
+		Pageable pageRequest = PageRequest.of(0, 50, Direction.ASC, AbstractEntityId_.ID);
+
+		do
+		{
+			Page<Album> page = albumRepository.findAll(pageRequest);
+
+			if (!page.hasContent())
+				break;
+
+			if (albums == null)
+				albums = new ArrayList<>();
+
+			for (Album album : page.getContent())
+			{
+				AlbumJson albumJson = convertAlbum(album);
+				if (albumJson != null)
+					albums.add(albumJson);
+
+				backupInfo.worked(1);
+			}
+
+			if (page.hasNext())
+				pageRequest = page.nextPageable();
+			else
+				pageRequest = null;
+		}
+		while (pageRequest != null);
+
+		return albums;
+	}
+
+	private AlbumJson convertAlbum(Album album)
+	{
+		if (album == null)
+			return null;
+
+		AlbumJson albumJson = new AlbumJson();
+		albumJson.setName(album.getName());
+		albumJson.setAuthor(album.getAuthor());
+
+		return albumJson;
 	}
 
 	private List<StorageJson> convertStorages()
@@ -305,6 +360,9 @@ public class BackupServiceImpl
 			.toList();
 		if (!tags.isEmpty())
 			imageJson.setTags(tags);
+
+		if (image.getAlbum() != null)
+			imageJson.setAlbum(image.getAlbum().getName());
 
 		return imageJson;
 	}

@@ -23,15 +23,18 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.transaction.Transactional;
 import karstenroethig.imagetags.webapp.config.AsyncTaskExecutorConfig;
+import karstenroethig.imagetags.webapp.model.domain.Album;
 import karstenroethig.imagetags.webapp.model.domain.Image;
 import karstenroethig.imagetags.webapp.model.domain.Storage;
 import karstenroethig.imagetags.webapp.model.domain.Tag;
 import karstenroethig.imagetags.webapp.model.dto.backup.RestoreDto;
 import karstenroethig.imagetags.webapp.model.dto.backup.RestoreInfoDto;
+import karstenroethig.imagetags.webapp.model.json.AlbumJson;
 import karstenroethig.imagetags.webapp.model.json.BackupJson;
 import karstenroethig.imagetags.webapp.model.json.ImageJson;
 import karstenroethig.imagetags.webapp.model.json.StorageJson;
 import karstenroethig.imagetags.webapp.model.json.TagJson;
+import karstenroethig.imagetags.webapp.repository.AlbumRepository;
 import karstenroethig.imagetags.webapp.repository.ImageRepository;
 import karstenroethig.imagetags.webapp.repository.StorageRepository;
 import karstenroethig.imagetags.webapp.repository.TagRepository;
@@ -51,6 +54,7 @@ public class RestoreServiceImpl
 	private static RestoreInfoDto restoreInfo = new RestoreInfoDto();
 
 	@Autowired private TagRepository tagRepository;
+	@Autowired private AlbumRepository albumRepository;
 	@Autowired private StorageRepository storageRepository;
 	@Autowired private ImageRepository imageRepository;
 
@@ -124,6 +128,7 @@ public class RestoreServiceImpl
 			resetDatabase();
 
 			importTags(backup.getTags());
+			importAlbums(backup.getAlbums());
 			importStorages(backup.getStorages());
 			importImages(backup.getImages());
 		}
@@ -167,6 +172,7 @@ public class RestoreServiceImpl
 	{
 		int totalWork = 0;
 		totalWork += backup.getTags().size();
+		totalWork += backup.getAlbums().size();
 		totalWork += backup.getStorages().size();
 		totalWork += backup.getImages().size();
 
@@ -178,6 +184,7 @@ public class RestoreServiceImpl
 		restoreInfo.beginTask(MessageKeyEnum.RESTORE_TASK_RESET_DATABASE, 0);
 
 		tagRepository.deleteAllInBatch();
+		albumRepository.deleteAllInBatch();
 		imageRepository.deleteAllInBatch();
 		storageRepository.deleteAllInBatch();
 	}
@@ -193,6 +200,22 @@ public class RestoreServiceImpl
 			tag.setType(tagJson.getType());
 
 			tagRepository.save(tag);
+
+			restoreInfo.worked(1);
+		}
+	}
+
+	private void importAlbums(List<AlbumJson> albums)
+	{
+		restoreInfo.beginTask(MessageKeyEnum.RESTORE_TASK_IMPORT_ALBUMS, albums.size());
+
+		for (AlbumJson albumJson : albums)
+		{
+			Album album = new Album();
+			album.setName(albumJson.getName());
+			album.setAuthor(albumJson.getAuthor());
+
+			albumRepository.save(album);
 
 			restoreInfo.worked(1);
 		}
@@ -242,6 +265,12 @@ public class RestoreServiceImpl
 					Tag tag = tagRepository.findOneByNameIgnoreCase(tagName).orElseThrow();
 					image.addTag(tag);
 				}
+			}
+
+			if (imageJson.getAlbum() != null)
+			{
+				Album album = albumRepository.findOneByNameIgnoreCase(imageJson.getAlbum()).orElseThrow();
+				image.setAlbum(album);
 			}
 
 			imageRepository.save(image);

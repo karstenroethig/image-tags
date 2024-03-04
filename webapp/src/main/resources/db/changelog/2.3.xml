@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+	                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+	<changeSet id="2.3" author="roethig">
+
+		<update tableName="tag">
+			<column name="type" value="CATEGORY"/>
+			<where>type = 'ALBUM'</where>
+		</update>
+
+		<!-- ============= -->
+		<!-- Table "album" -->
+		<!-- ============= -->
+		<createTable tableName="album">
+			<column name="id" type="${type.id}" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="name" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="author" type="varchar(191)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
+		<addUniqueConstraint tableName="album" columnNames="name" constraintName="u_album__name"/>
+
+		<addColumn tableName="image">
+			<column name="album_id" type="${type.idRef}">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+
+		<addForeignKeyConstraint
+			baseTableName="image" baseColumnNames="album_id"
+			referencedTableName="album" referencedColumnNames="id"
+			constraintName="fk_image__album_id__album"/>
+
+	</changeSet>
+
+</databaseChangeLog>

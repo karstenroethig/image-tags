@@ -24,6 +24,8 @@ public class AttributeNames
 
 	public static final String TAG = "tag";
 	public static final String IMAGE = "image";
+	public static final String ALBUM = "album";
 
 	public static final String ALL_TAGS = "allTags";
+	public static final String ALL_ALBUMS = "allAlbums";
 }

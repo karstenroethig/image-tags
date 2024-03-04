@@ -37,11 +37,23 @@ public enum MessageKeyEnum
 	IMAGE_DELETE_SUCCESS("image.delete.success"),
 	IMAGE_DELETE_ERROR("image.delete.error"),
 
+	ALBUM_SAVE_INVALID("album.save.invalid"),
+	ALBUM_SAVE_SUCCESS("album.save.success"),
+	ALBUM_SAVE_ERROR("album.save.error"),
+	ALBUM_UPDATE_INVALID("album.update.invalid"),
+	ALBUM_UPDATE_SUCCESS("album.update.success"),
+	ALBUM_UPDATE_ERROR("album.update.error"),
+	ALBUM_DELETE_INVALID("album.delete.invalid"),
+	ALBUM_DELETE_INVALID_STILL_IN_USE_BY_IMAGES("album.delete.invalid.stillInUseByImages"),
+	ALBUM_DELETE_SUCCESS("album.delete.success"),
+	ALBUM_DELETE_ERROR("album.delete.error"),
+
 	BACKUP_NOW_SUCCESS("backup.now.success"),
 	BACKUP_NOW_ERROR("backup.now.error"),
 
 	BACKUP_TASK_INITIALIZE("backup.task.initialize"),
 	BACKUP_TASK_EXPORT_TAGS("backup.task.exportTags"),
+	BACKUP_TASK_EXPORT_ALBUMS("backup.task.exportAlbums"),
 	BACKUP_TASK_EXPORT_STORAGES("backup.task.exportStorages"),
 	BACKUP_TASK_EXPORT_IMAGES("backup.task.exportImages"),
 
@@ -55,6 +67,7 @@ public enum MessageKeyEnum
 	RESTORE_TASK_INITIALIZE("restore.task.initialize"),
 	RESTORE_TASK_RESET_DATABASE("restore.task.resetDatabase"),
 	RESTORE_TASK_IMPORT_TAGS("restore.task.importTags"),
+	RESTORE_TASK_IMPORT_ALBUMS("restore.task.importAlbums"),
 	RESTORE_TASK_IMPORT_STORAGES("restore.task.importStorages"),
 	RESTORE_TASK_IMPORT_IMAGES("restore.task.importImages");
 

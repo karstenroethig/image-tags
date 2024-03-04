@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import karstenroethig.imagetags.webapp.model.dto.AlbumDto;
 import karstenroethig.imagetags.webapp.model.dto.ImageDto;
 import karstenroethig.imagetags.webapp.model.dto.TagDto;
+import karstenroethig.imagetags.webapp.model.dto.api.AlbumFilesizeApiDto;
+import karstenroethig.imagetags.webapp.model.dto.api.AlbumUsageApiDto;
 import karstenroethig.imagetags.webapp.model.dto.api.TagFilesizeApiDto;
 import karstenroethig.imagetags.webapp.model.dto.api.TagUsageApiDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
@@ -58,5 +61,39 @@ public class ApiController
 			.filesize(filesize)
 			.build();
 		return new ResponseEntity<>(tagFilesize, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/album/{id}/usage", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<AlbumUsageApiDto> fetchAlbumUsage(@PathVariable("id") Long albumId)
+	{
+		AlbumDto album = new AlbumDto();
+		album.setId(albumId);
+		ImageSearchDto searchParams = new ImageSearchDto();
+		searchParams.setAlbum(album);
+
+		Page<ImageDto> resultsPage = imageService.findBySearchParams(searchParams, Pageable.ofSize(1));
+
+		AlbumUsageApiDto albumUsage = AlbumUsageApiDto.builder()
+			.id(albumId)
+			.usage(resultsPage.getTotalElements())
+			.build();
+		return new ResponseEntity<>(albumUsage, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/album/{id}/filesize", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<AlbumFilesizeApiDto> fetchAlbumFilesize(@PathVariable("id") Long albumId)
+	{
+		AlbumDto album = new AlbumDto();
+		album.setId(albumId);
+		ImageSearchDto searchParams = new ImageSearchDto();
+		searchParams.setAlbum(album);
+
+		String filesize = imageService.findSizeBySearchParams(searchParams);
+
+		AlbumFilesizeApiDto albumFilesize = AlbumFilesizeApiDto.builder()
+			.id(albumId)
+			.filesize(filesize)
+			.build();
+		return new ResponseEntity<>(albumFilesize, HttpStatus.OK);
 	}
 }

@@ -17,6 +17,10 @@ public enum ViewEnum
 	IMAGE_LIST(ControllerEnum.IMAGE, ActionEnum.LIST),
 	IMAGE_SHOW(ControllerEnum.IMAGE, ActionEnum.SHOW),
 
+	ALBUM_LIST(ControllerEnum.ALBUM, ActionEnum.LIST),
+	ALBUM_CREATE(ControllerEnum.ALBUM, ActionEnum.CREATE),
+	ALBUM_EDIT(ControllerEnum.ALBUM, ActionEnum.EDIT),
+
 	BACKUP_INDEX(ControllerEnum.BACKUP, "/index"),
 	BACKUP_RESTORE(ControllerEnum.BACKUP, "/restore"),
 	BACKUP_RESTORE_STATUS(ControllerEnum.BACKUP, "/restore-status");
@@ -30,6 +34,7 @@ public enum ViewEnum
 	{
 		TAG,
 		IMAGE,
+		ALBUM,
 		BACKUP;
 
 		private String path = null;

@@ -16,6 +16,7 @@ import karstenroethig.imagetags.webapp.model.domain.AbstractEntityId_;
 import karstenroethig.imagetags.webapp.model.domain.Image;
 import karstenroethig.imagetags.webapp.model.domain.Image_;
 import karstenroethig.imagetags.webapp.model.domain.Tag;
+import karstenroethig.imagetags.webapp.model.dto.AlbumDto;
 import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 
@@ -51,6 +52,7 @@ public class ImageSpecifications
 				List<Predicate> restrictions = new ArrayList<>();
 
 				addRestrictionsForTags(root, query, cb, restrictions, imageSearchDto.getTags());
+				addRestrictionsForAlbum(root, cb, restrictions, imageSearchDto.getAlbum());
 
 				return cb.and(restrictions.toArray(new Predicate[] {}));
 			};
@@ -71,5 +73,13 @@ public class ImageSpecifications
 
 			restrictions.add(cb.exists(sub));
 		}
+	}
+
+	private static void addRestrictionsForAlbum(Root<Image> root, CriteriaBuilder cb, List<Predicate> restrictions, AlbumDto album)
+	{
+		if (album == null || album.getId() == null)
+			return;
+
+		restrictions.add(cb.equal(root.get(Image_.album).get(AbstractEntityId_.id), album.getId()));
 	}
 }

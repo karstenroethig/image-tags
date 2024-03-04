@@ -72,6 +72,10 @@ public class Image extends AbstractEntityId
 	@JoinTable(name = "image_tag", joinColumns = { @JoinColumn(name = "image_id") }, inverseJoinColumns = { @JoinColumn(name = "tag_id") })
 	private Set<Tag> tags = new HashSet<>();
 
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "album_id")
+	private Album album;
+
 	public void addTag(Tag tag)
 	{
 		tags.add(tag);

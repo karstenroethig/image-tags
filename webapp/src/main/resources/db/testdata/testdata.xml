@@ -118,6 +118,15 @@
 			<column name="tag_id"   valueNumeric="select id from tag where name='scrum'"/>
 		</insert>
 
+		<insert tableName="album">
+			<column name="name" value="Album 1"/>
+			<column name="author" value="John Doe"/>
+		</insert>
+		<insert tableName="album">
+			<column name="name" value="Album 2"/>
+			<column name="author" value="Emily Doe"/>
+		</insert>
+
 	</changeSet>
 
 </databaseChangeLog>

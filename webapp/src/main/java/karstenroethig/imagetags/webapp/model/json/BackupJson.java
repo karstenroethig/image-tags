@@ -10,6 +10,7 @@ import lombok.Setter;
 public class BackupJson
 {
 	private List<TagJson> tags;
+	private List<AlbumJson> albums;
 	private List<StorageJson> storages;
 	private List<ImageJson> images;
 }
