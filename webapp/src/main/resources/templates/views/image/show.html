@@ -43,8 +43,18 @@
 								</select>
 							</div>
 							<button type="submit" class="btn btn-primary">Save</button>
-							<a th:href="@{/image/content/{id}?inline=false(id=${image.id})}" class="btn btn-outline-secondary">Download</a>
-							<a href="" data-bs-toggle="modal" data-bs-target="#deleteModal" class="btn btn-outline-danger" th:attr="data-id=${image.id}">Delete</a>
+							<a th:href="${page==null} ? @{/image/mark-deleted/{id}(id=${image.id})} : @{/image/mark-deleted/{id}?page={page}(id=${image.id}, page=${page.number})}"
+								class="btn btn-outline-danger">Delete</a>
+							<div class="btn-group">
+								<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+									<em class="fa fa-ellipsis-v"></em>
+								</button>
+								<div class="dropdown-menu dropdown-menu-end">
+									<hr class="dropdown-divider">
+									<a th:href="@{/image/content/{id}?inline=false(id=${image.id})}" class="dropdown-item">Download</a>
+									<a href="" data-bs-toggle="modal" data-bs-target="#deleteModal" class="dropdown-item" th:attr="data-id=${image.id}">Delete permanently</a>
+								</div>
+							</div>
 						</form>
 					</div>
 					<div class="card-footer">
@@ -57,6 +67,13 @@
 								<span th:text="${image.resolutionWidth}">[resolutionWidth]</span> x <span th:text="${image.resolutionHeight}">[resolutionHeight]</span>
 							</span>
 							<span th:if="${image.resolutionWidth &lt; 1}">?</span>
+						</p>
+					</div>
+					<div class="card-footer" th:if="${image.album!=null}">
+						<p class="lead fst-italic">
+							<span>Album</span>:
+							<span th:text="${image.album.name}">[album.name]</span>
+							[<span th:text="${image.album.author}">[album.author]</span>]
 						</p>
 					</div>
 					<div class="card-footer" th:if="${image.importPath != null}">

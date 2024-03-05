@@ -100,7 +100,7 @@
 						Do you really want to remove this image from the album?</span>
 					</div>
 					<div class="modal-footer">
-						<a th:href="@{/album/remove/{id}/{imageId}(id=${album.id}, imageId=${image.id})}" class="btn btn-danger">Remove</a>
+						<a th:href="@{/album/remove/{id}/{imageId}(id=${album.id}, imageId=${image.id})}" class="btn btn-outline-danger">Remove</a>
 						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" th:text="#{common.button.cancel.label}">Cancel</button>
 					</div>
 				</div>

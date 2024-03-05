@@ -1,6 +1,7 @@
 package karstenroethig.imagetags.webapp.controller;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -36,6 +37,7 @@ import karstenroethig.imagetags.webapp.controller.util.ViewEnum;
 import karstenroethig.imagetags.webapp.model.domain.Image_;
 import karstenroethig.imagetags.webapp.model.dto.ImageDto;
 import karstenroethig.imagetags.webapp.model.dto.ImageTagsUpdateDto;
+import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import karstenroethig.imagetags.webapp.service.impl.ImageServiceImpl;
 import karstenroethig.imagetags.webapp.service.impl.StorageServiceImpl;
@@ -126,6 +128,25 @@ public class ImageController extends AbstractController
 				Messages.createWithError(MessageKeyEnum.IMAGE_DELETE_ERROR));
 
 		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST);
+	}
+
+	@GetMapping(value = "/mark-deleted/{id}")
+	public String markDeleted(@PathVariable("id") Long id,
+		@RequestParam(name = "page", required = false) Integer page)
+	{
+		ImageDto image = imageService.find(id);
+		if (image == null)
+			throw new NotFoundException(String.valueOf(id));
+
+		TagDto tag = tagService.findOrCreateDto(TagServiceImpl.TAG_DELETE);
+		image.setTags(Set.of(tag));
+		imageService.update(image);
+
+		if (page == null)
+			return UrlMappings.redirectWithId(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_SHOW, id);
+		else
+			return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST)
+				+ String.format("?page=%s&size=1", page);
 	}
 
 	@PostMapping(value = UrlMappings.ACTION_UPDATE)
