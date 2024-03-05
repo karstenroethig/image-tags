@@ -1,0 +1,117 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							~{:: #additionalJs},
+							'album'
+							)}">
+<head>
+	<title th:text="#{application.title-pattern(#{application.name}, #{album.label.plural})}"></title>
+</head>
+<body>
+
+	<div th:fragment="content">
+
+		<div th:replace="~{fragments/messages :: messages-fragment(${messages})}"></div>
+
+		<div class="row mt-2">
+
+			<div class="col-9">
+				<div class="text-center" th:if="${image!=null}">
+					<img th:src="@{/image/content/{id}(id=${image.id})}" class="img-fluid zoom"
+						th:attr="data-magnify-src=@{/image/content/{id}(id=${image.id})}">
+				</div>
+			</div>
+
+			<div class="col-3">
+				<div class="card mb-3">
+
+					<h5 class="card-header">Album</h5>
+					<div class="card-body">
+						<p class="lead fst-italic">
+							<span th:text="${album.name}">[name]</span>
+							[<span th:text="${album.author}">[author]</span>]
+						</p>
+						<p class="lead fst-italic text-center" th:if="${page!=null and page.hasContent()}">
+							<i th:if="${page.isFirst()}" class="fas fa-chevron-left fa-lg text-muted"></i>
+							<a th:if="${page.hasPrevious()}"
+								th:href="@{/album/show/{id}(id=${album.id}, page=${page.previousPageable().pageNumber})}"
+								class="text-decoration-none">
+								<i class="fas fa-chevron-left fa-lg text-primary"></i>
+							</a>
+							<span th:text="${#numbers.formatInteger(page.number+1,1,'POINT')}">[currentPageNumber]</span>
+							/
+							<span th:text="${#numbers.formatInteger(page.totalPages,1,'POINT')}">[maxPageNumber]</span>
+							<a th:if="${page.hasNext()}"
+								th:href="@{/album/show/{id}(id=${album.id}, page=${page.nextPageable().pageNumber})}"
+								class="text-decoration-none">
+								<i class="fas fa-chevron-right fa-lg text-primary"></i>
+							</a>
+							<i th:if="${page.isLast()}" class="fas fa-chevron-right fa-lg text-muted"></i>
+						</p>
+					</div>
+				</div>
+
+				<div class="card" th:if="${image!=null}">
+					<h5 class="card-header">Image</h5>
+					<div class="card-body">
+						<form th:object="${image}" th:action="@{/album/update-image/{id}?page={page}(id=${album.id}, page=${page.number})}" action="#" method="post">
+							<input type="hidden" th:field="*{id}"/>
+							<div class="mb-3">
+								<label class="form-label">Page</label>
+								<input type="text" th:field="*{albumPage}" class="form-control" th:classappend="${#fields.hasErrors('albumPage')} ? is-invalid">
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('albumPage')}" th:each="err : ${#fields.errors('albumPage')}" th:text="${err}">validation error</div>
+							</div>
+							<button type="submit" class="btn btn-primary">Save</button>
+							<a href="" data-bs-toggle="modal" data-bs-target="#removeFromAlbumModal" class="btn btn-outline-danger">Remove</a>
+						</form>
+					</div>
+					<div class="card-footer">
+						<p class="lead fst-italic">
+							<span>File size</span>: <span th:text="${image.sizeFormatted}">[sizeFormatted]</span>
+						</p>
+						<p class="lead fst-italic">
+							<span>Resolution</span>:
+							<span th:if="${image.resolutionWidth &gt; 0}">
+								<span th:text="${image.resolutionWidth}">[resolutionWidth]</span> x <span th:text="${image.resolutionHeight}">[resolutionHeight]</span>
+							</span>
+							<span th:if="${image.resolutionWidth &lt; 1}">?</span>
+						</p>
+					</div>
+					<div class="card-footer" th:if="${image.importPath != null}">
+						<p class="lead fst-italic" th:text="${image.importPath}">[importPath]</p>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<div th:if="${image!=null}" class="modal fade" id="removeFromAlbumModal" tabindex="-1" role="dialog" aria-labelledby="removeFromAlbumLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="removeFromAlbumLabel">Remove from album</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						Do you really want to remove this image from the album?</span>
+					</div>
+					<div class="modal-footer">
+						<a th:href="@{/album/remove/{id}/{imageId}(id=${album.id}, imageId=${image.id})}" class="btn btn-danger">Remove</a>
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" th:text="#{common.button.cancel.label}">Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<th:block id="additionalJs">
+		<script th:src="@{/js/album-show.js}"></script>
+	</th:block>
+
+</body>
+</html>

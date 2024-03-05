@@ -20,6 +20,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
+import karstenroethig.imagetags.webapp.model.domain.Album;
 import karstenroethig.imagetags.webapp.model.domain.Image;
 import karstenroethig.imagetags.webapp.model.domain.Image_;
 import karstenroethig.imagetags.webapp.model.domain.Tag;
@@ -42,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ImageServiceImpl
 {
 	@Autowired private TagServiceImpl tagService;
+	@Autowired private AlbumServiceImpl albumService;
 	@Autowired private StorageServiceImpl storageService;
 
 	@Autowired private ImageRepository imageRepository;
@@ -197,6 +199,9 @@ public class ImageServiceImpl
 
 		mergeTags(image, imageDto);
 
+		image.setAlbum(albumService.transform(imageDto.getAlbum()));
+		image.setAlbumPage(imageDto.getAlbumPage());
+
 		return image;
 	}
 
@@ -250,6 +255,11 @@ public class ImageServiceImpl
 		if (tags != null && !tags.isEmpty())
 			for (Tag tag : tags)
 				imageDto.addTag(tagService.transform(tag));
+
+		Album album = image.getAlbum();
+		if (album != null)
+			imageDto.setAlbum(albumService.transform(album));
+		imageDto.setAlbumPage(image.getAlbumPage());
 
 		return imageDto;
 	}

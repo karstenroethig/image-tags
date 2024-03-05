@@ -34,6 +34,9 @@
 			<column name="album_id" type="${type.idRef}">
 				<constraints nullable="true"/>
 			</column>
+			<column name="album_page" type="int">
+				<constraints nullable="true"/>
+			</column>
 		</addColumn>
 
 		<addForeignKeyConstraint

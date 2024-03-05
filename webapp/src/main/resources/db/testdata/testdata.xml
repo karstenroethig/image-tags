@@ -36,6 +36,15 @@
 			<column name="type" value="PERSON"/>
 		</insert>
 
+		<insert tableName="album">
+			<column name="name" value="Album 1"/>
+			<column name="author" value="John Doe"/>
+		</insert>
+		<insert tableName="album">
+			<column name="name" value="Album 2"/>
+			<column name="author" value="Emily Doe"/>
+		</insert>
+
 		<insert tableName="storage">
 			<column name="storage_key" value="6b9070cc-2c07-4f64-ac44-6b713bf91dcd"/>
 			<column name="file_size"   value="203417"/>
@@ -53,6 +62,8 @@
 			<column name="resolution_height" value="540"/>
 			<column name="resolution_status" value="GENERATION_SUCCESS"/>
 			<column name="created_datetime"  value="now()"/>
+			<column name="album_id"          valueNumeric="select id from album where name = 'Album 1'"/>
+			<column name="album_page"        value="1"/>
 		</insert>
 		<insert tableName="image_tag">
 			<column name="image_id" valueNumeric="select id from image where hash='a175f61fca912ec49ce9379f02dbebfb'"/>
@@ -74,6 +85,8 @@
 			<column name="resolution_height" value="700"/>
 			<column name="resolution_status" value="GENERATION_SUCCESS"/>
 			<column name="created_datetime"  value="now()"/>
+			<column name="album_id"          valueNumeric="select id from album where name = 'Album 1'"/>
+			<column name="album_page"        value="2"/>
 		</insert>
 
 		<insert tableName="image">
@@ -116,15 +129,6 @@
 		<insert tableName="image_tag">
 			<column name="image_id" valueNumeric="select id from image where hash='1fd1c4ba07fa847691d092ca618c549e'"/>
 			<column name="tag_id"   valueNumeric="select id from tag where name='scrum'"/>
-		</insert>
-
-		<insert tableName="album">
-			<column name="name" value="Album 1"/>
-			<column name="author" value="John Doe"/>
-		</insert>
-		<insert tableName="album">
-			<column name="name" value="Album 2"/>
-			<column name="author" value="Emily Doe"/>
 		</insert>
 
 	</changeSet>

@@ -76,6 +76,9 @@ public class Image extends AbstractEntityId
 	@JoinColumn(name = "album_id")
 	private Album album;
 
+	@Column(name = "album_page", nullable = true)
+	private Integer albumPage;
+
 	public void addTag(Tag tag)
 	{
 		tags.add(tag);

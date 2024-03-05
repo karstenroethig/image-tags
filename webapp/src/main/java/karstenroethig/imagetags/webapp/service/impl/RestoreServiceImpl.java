@@ -271,6 +271,7 @@ public class RestoreServiceImpl
 			{
 				Album album = albumRepository.findOneByNameIgnoreCase(imageJson.getAlbum()).orElseThrow();
 				image.setAlbum(album);
+				image.setAlbumPage(imageJson.getAlbumPage());
 			}
 
 			imageRepository.save(image);

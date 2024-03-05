@@ -32,7 +32,11 @@ public class ImageDto extends AbstractDtoId
 	private Integer resolutionHeight;
 	private ImageResolutionStatusEnum resolutionStatus;
 	private LocalDateTime createdDatetime;
+
 	private Set<TagDto> tags = new HashSet<>();
+
+	private AlbumDto album;
+	private Integer albumPage;
 
 	public void addTag(TagDto tag)
 	{

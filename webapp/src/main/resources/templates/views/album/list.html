@@ -69,11 +69,12 @@
 					</td>
 					<td>
 						<div class="btn-group">
-							<a th:href="@{/album/edit/{id}(id=${album.id})}" class="btn btn-outline-secondary btn-sm" th:text="#{common.button.edit.label}">Edit</a>
+							<a th:href="@{/album/show/{id}(id=${album.id})}" class="btn btn-outline-secondary btn-sm" th:text="#{common.button.show.label}">Show</a>
 							<button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 								<span class="sr-only">Toggle Dropdown</span>
 							</button>
 							<div class="dropdown-menu dropdown-menu-end">
+								<a th:href="@{/album/edit/{id}(id=${album.id})}" class="dropdown-item" th:text="#{common.button.edit.label}">Edit</a>
 								<a href="" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#deleteModal" th:attr="data-id=${album.id}" th:text="#{common.button.delete.label}">Delete</a>
 							</div>
 						</div>

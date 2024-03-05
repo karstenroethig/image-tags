@@ -362,7 +362,10 @@ public class BackupServiceImpl
 			imageJson.setTags(tags);
 
 		if (image.getAlbum() != null)
+		{
 			imageJson.setAlbum(image.getAlbum().getName());
+			imageJson.setAlbumPage(image.getAlbumPage());
+		}
 
 		return imageJson;
 	}

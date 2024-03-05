@@ -18,6 +18,7 @@ public enum ViewEnum
 	IMAGE_SHOW(ControllerEnum.IMAGE, ActionEnum.SHOW),
 
 	ALBUM_LIST(ControllerEnum.ALBUM, ActionEnum.LIST),
+	ALBUM_SHOW(ControllerEnum.ALBUM, ActionEnum.SHOW),
 	ALBUM_CREATE(ControllerEnum.ALBUM, ActionEnum.CREATE),
 	ALBUM_EDIT(ControllerEnum.ALBUM, ActionEnum.EDIT),
 
