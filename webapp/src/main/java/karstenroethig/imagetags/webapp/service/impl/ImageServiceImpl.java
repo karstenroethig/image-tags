@@ -222,6 +222,13 @@ public class ImageServiceImpl
 				image.addTag(tagService.transform(tag));
 		}
 
+		// assign the NEW tag if no tags have been set
+		if (image.getTags().isEmpty())
+		{
+			Tag tagNew = tagService.findOrCreate(TagServiceImpl.TAG_NEW);
+			image.addTag(tagNew);
+		}
+
 		return image;
 	}
 

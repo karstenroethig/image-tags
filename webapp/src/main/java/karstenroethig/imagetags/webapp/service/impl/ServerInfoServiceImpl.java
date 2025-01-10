@@ -68,7 +68,7 @@ public class ServerInfoServiceImpl implements ApplicationContextAware
 		systemInfo.setUserTimezone(System.getProperty("user.timezone"));
 
 		if (System.getProperty("user.country") != null && System.getProperty("user.language") != null)
-			systemInfo.setUserLocale(new Locale(System.getProperty("user.country"), System.getProperty("user.language")).toString());
+			systemInfo.setUserLocale(String.format("%s_%s", System.getProperty("user.country"), System.getProperty("user.language")));
 
 		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
 		systemInfo.setInputArguments(runtimeMxBean.getInputArguments());
