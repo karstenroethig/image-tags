@@ -47,7 +47,7 @@
 			<column name="file_extension"    value="png"/>
 			<column name="file_size"         value="75315"/>
 			<column name="hash"              value="a175f61fca912ec49ce9379f02dbebfb"/>
-			<column name="import_path"       value="abc/123/test.png"/>
+			<column name="description"       value="abc/123/test.png"/>
 			<column name="thumb_status"      value="THUMB_120_120"/>
 			<column name="resolution_width"  value="720"/>
 			<column name="resolution_height" value="540"/>

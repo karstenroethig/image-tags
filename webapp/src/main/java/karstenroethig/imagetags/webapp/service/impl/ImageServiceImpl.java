@@ -189,7 +189,7 @@ public class ImageServiceImpl
 		image.setExtension(imageDto.getExtension());
 		image.setSize(imageDto.getSize());
 		image.setHash(imageDto.getHash());
-		image.setImportPath(imageDto.getImportPath());
+		image.setDescription(imageDto.getDescription());
 		image.setThumbStatus(imageDto.getThumbStatus());
 		image.setResolutionWidth(imageDto.getResolutionWidth());
 		image.setResolutionHeight(imageDto.getResolutionHeight());
@@ -246,7 +246,7 @@ public class ImageServiceImpl
 		imageDto.setSize(image.getSize());
 		imageDto.setSizeFormatted(FilesizeUtils.formatFilesize(image.getSize()));
 		imageDto.setHash(image.getHash());
-		imageDto.setImportPath(image.getImportPath());
+		imageDto.setDescription(image.getDescription());
 		imageDto.setThumbStatus(image.getThumbStatus());
 		imageDto.setResolutionWidth(image.getResolutionWidth());
 		imageDto.setResolutionHeight(image.getResolutionHeight());

@@ -28,5 +28,31 @@
 
 	</div>
 
+	<div th:fragment="imageDescriptionEditDialog-fragment (id, action, imageId, description)">
+
+		<div class="modal fade imageDescriptionEditModal" th:id="${id}" tabindex="-1" role="dialog" th:aria-labelledby="${id+'Label'}" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+
+					<form th:action="${action}" action="#" method="post" autocomplete="off">
+						<div class="modal-header">
+							<h5 class="modal-title" th:id="${id+'Label'}">Edit description</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<input type="hidden" name="id" th:value="${imageId}"/>
+							<textarea class="form-control" name="description" id="description" rows="5" th:text="${description}"></textarea>
+						</div>
+						<div class="modal-footer">
+							<button type="submit" class="btn btn-primary" th:text="#{common.button.save.label}">Save</button>
+							<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" th:text="#{common.button.cancel.label}">Cancel</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
 </body>
 </html>

@@ -180,7 +180,7 @@ public class ImageImportServiceImpl
 		image.setExtension(extension);
 		image.setSize(Files.size(imagePath));
 		image.setThumbStatus(ImageThumbStatusEnum.NO_THUMB);
-		image.setImportPath(findRelativeImportPath(imagePath));
+		image.setDescription(findRelativeImportPath(imagePath));
 		image.setCreatedDatetime(LocalDateTime.now());
 
 		try (InputStream inputStream = Files.newInputStream(imagePath))

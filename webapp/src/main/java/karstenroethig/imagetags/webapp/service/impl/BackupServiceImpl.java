@@ -293,7 +293,7 @@ public class BackupServiceImpl
 		imageJson.setExtension(image.getExtension());
 		imageJson.setSize(image.getSize());
 		imageJson.setHash(image.getHash());
-		imageJson.setImportPath(image.getImportPath());
+		imageJson.setDescription(image.getDescription());
 		imageJson.setThumbStatus(image.getThumbStatus());
 		imageJson.setResolutionWidth(image.getResolutionWidth());
 		imageJson.setResolutionHeight(image.getResolutionHeight());
