@@ -228,7 +228,7 @@ public class RestoreServiceImpl
 			image.setExtension(imageJson.getExtension());
 			image.setSize(imageJson.getSize());
 			image.setHash(imageJson.getHash());
-			image.setImportPath(imageJson.getImportPath());
+			image.setDescription(imageJson.getDescription());
 			image.setThumbStatus(imageJson.getThumbStatus());
 			image.setResolutionWidth(imageJson.getResolutionWidth());
 			image.setResolutionHeight(imageJson.getResolutionHeight());

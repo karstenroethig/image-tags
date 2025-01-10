@@ -17,7 +17,7 @@ public class ImageJson
 	private String extension;
 	private Long size;
 	private String hash;
-	private String importPath;
+	private String description;
 	private ImageThumbStatusEnum thumbStatus;
 	private Integer resolutionWidth;
 	private Integer resolutionHeight;

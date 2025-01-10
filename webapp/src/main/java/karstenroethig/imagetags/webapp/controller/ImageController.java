@@ -34,6 +34,7 @@ import karstenroethig.imagetags.webapp.controller.util.AttributeNames;
 import karstenroethig.imagetags.webapp.controller.util.UrlMappings;
 import karstenroethig.imagetags.webapp.controller.util.ViewEnum;
 import karstenroethig.imagetags.webapp.model.domain.Image_;
+import karstenroethig.imagetags.webapp.model.dto.ImageDescriptionUpdateDto;
 import karstenroethig.imagetags.webapp.model.dto.ImageDto;
 import karstenroethig.imagetags.webapp.model.dto.ImageTagsUpdateDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
@@ -139,6 +140,42 @@ public class ImageController extends AbstractController
 			throw new NotFoundException(String.valueOf(id));
 
 		image.setTags(imageTagsUpdate.getTags());
+
+		if (!validate(image, bindingResult))
+		{
+			model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.IMAGE_UPDATE_INVALID));
+			addBasicAttributes(model);
+			return ViewEnum.IMAGE_SHOW.getViewName();
+		}
+
+		ImageDto updatedImage = imageService.update(image);
+		if (updatedImage != null)
+		{
+//			redirectAttributes.addFlashAttribute(AttributeNames.MESSAGES,
+//					Messages.createWithSuccess(MessageKeyEnum.IMAGE_UPDATE_SUCCESS));
+			if (page == null)
+				return UrlMappings.redirectWithId(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_SHOW, updatedImage.getId());
+			else
+				return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST)
+					+ String.format("?page=%s&size=1", page);
+		}
+
+		model.addAttribute(AttributeNames.MESSAGES, Messages.createWithError(MessageKeyEnum.IMAGE_UPDATE_ERROR));
+		addBasicAttributes(model);
+		return ViewEnum.IMAGE_SHOW.getViewName();
+	}
+
+	@PostMapping(value = UrlMappings.ACTION_UPDATE + "/description")
+	public String updateDescription(@ModelAttribute(AttributeNames.IMAGE) @Valid ImageDescriptionUpdateDto imageDescriptionUpdate,
+		@RequestParam(name = "page", required = false) Integer page,
+		BindingResult bindingResult, final RedirectAttributes redirectAttributes, Model model)
+	{
+		Long id = imageDescriptionUpdate.getId();
+		ImageDto image = imageService.find(id);
+		if (image == null)
+			throw new NotFoundException(String.valueOf(id));
+
+		image.setDescription(imageDescriptionUpdate.getDescription());
 
 		if (!validate(image, bindingResult))
 		{

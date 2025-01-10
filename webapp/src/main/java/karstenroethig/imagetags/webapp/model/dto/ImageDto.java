@@ -26,7 +26,7 @@ public class ImageDto extends AbstractDtoId
 	private Long size;
 	private String sizeFormatted;
 	private String hash;
-	private String importPath;
+	private String description;
 	private ImageThumbStatusEnum thumbStatus;
 	private Integer resolutionWidth;
 	private Integer resolutionHeight;

@@ -59,14 +59,19 @@
 							<span th:if="${image.resolutionWidth &lt; 1}">?</span>
 						</p>
 					</div>
-					<div class="card-footer" th:if="${image.importPath != null}">
-						<p class="lead fst-italic" th:text="${image.importPath}">[importPath]</p>
+					<div class="card-footer">
+						<p class="lead fst-italic" th:if="${image.description != null}" th:text="${image.description}">[description]</p>
+						<a href="" data-bs-toggle="modal" data-bs-target="#imageDescriptionEditModal" title="Edit description">
+							<i class="fa-solid fa-pen text-muted"></i>
+						</a>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<div th:replace="~{fragments/dialogs :: deleteDialog-fragment(id='deleteModal', controller='image', title=#{image.deletePopup.title}, question=#{image.deletePopup.question})}"></div>
+
+		<div th:replace="~{fragments/dialogs :: imageDescriptionEditDialog-fragment(id='imageDescriptionEditModal', action=${page==null} ? @{/image/update/description} : @{/image/update/description?page={page}(page=${page.number})}, imageId=${image.id}, description=${image.description})}"></div>
 
 	</div>
 

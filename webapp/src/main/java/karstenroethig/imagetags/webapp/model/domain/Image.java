@@ -48,8 +48,8 @@ public class Image extends AbstractEntityId
 	@Column(name = "hash", length = 256, nullable = false)
 	private String hash;
 
-	@Column(name = "import_path", length = 256, nullable = true)
-	private String importPath;
+	@Column(name = "description", length = 256, nullable = true)
+	private String description;
 
 	@Column(name = "thumb_status", length = 191, nullable = false)
 	@Enumerated(EnumType.STRING)
