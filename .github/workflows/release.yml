@@ -33,7 +33,7 @@ jobs:
         run: mvn --batch-mode --update-snapshots package
 
       - name: Create GitHub Release
-        uses: ncipollo/release-action@v1.14.0
+        uses: ncipollo/release-action@v1.15.0
         with:
           artifacts: "distribution/target/*.tar.gz,distribution/target/*.zip"
           body: "TODO Document me!"
