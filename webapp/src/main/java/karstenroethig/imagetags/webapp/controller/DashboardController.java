@@ -37,7 +37,7 @@ public class DashboardController
 		searchParams.setTags(List.of(tagService.findOrCreateDto(TagServiceImpl.TAG_NEW)));
 		long untaggedImages = imageService.countBySearchParams(searchParams);
 
-		String totalFileSize = imageService.findSizeBySearchParams(new ImageSearchDto());
+		String totalFileSize = imageService.findSizeFormattedBySearchParams(new ImageSearchDto());
 
 		model.addAttribute("statsTotalImages", totalImages);
 		model.addAttribute("statsUntaggedImages", untaggedImages);

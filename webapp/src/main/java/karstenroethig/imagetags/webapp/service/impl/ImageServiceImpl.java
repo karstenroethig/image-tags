@@ -154,7 +154,7 @@ public class ImageServiceImpl
 		return page.map(this::transform);
 	}
 
-	public String findSizeBySearchParams(ImageSearchDto imageSearchDto)
+	public Long findSizeBySearchParams(ImageSearchDto imageSearchDto)
 	{
 		Specification<Image> specification = ImageSpecifications.matchesSearchParam(imageSearchDto);
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -165,6 +165,12 @@ public class ImageServiceImpl
 			query.where(predicate);
 		Long fileSize = entityManager.createQuery(query.select(builder.sum(root.<Long>get(Image_.SIZE)))).getSingleResult();
 
+		return fileSize != null ? fileSize : 0l;
+	}
+
+	public String findSizeFormattedBySearchParams(ImageSearchDto imageSearchDto)
+	{
+		Long fileSize = findSizeBySearchParams(imageSearchDto);
 		return FilesizeUtils.formatFilesize(fileSize != null ? fileSize : 0);
 	}
 

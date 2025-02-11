@@ -14,6 +14,7 @@ import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import karstenroethig.imagetags.webapp.model.enums.TagTypeEnum;
 import karstenroethig.imagetags.webapp.repository.TagRepository;
+import karstenroethig.imagetags.webapp.repository.specification.TagSpecifications;
 import karstenroethig.imagetags.webapp.util.MessageKeyEnum;
 import karstenroethig.imagetags.webapp.util.validation.ValidationException;
 import karstenroethig.imagetags.webapp.util.validation.ValidationResult;
@@ -137,9 +138,21 @@ public class TagServiceImpl
 		return tagRepository.count();
 	}
 
+	public long count(TagTypeEnum type)
+	{
+		return tagRepository.count(TagSpecifications.matchesType(type));
+	}
+
 	public List<TagDto> findAll()
 	{
 		Page<Tag> page = tagRepository.findAll(Pageable.unpaged());
+		Page<TagDto> pageDto = page.map(this::transform);
+		return pageDto.getContent();
+	}
+
+	public List<TagDto> findAll(TagTypeEnum type)
+	{
+		Page<Tag> page = tagRepository.findAll(TagSpecifications.matchesType(type), Pageable.unpaged());
 		Page<TagDto> pageDto = page.map(this::transform);
 		return pageDto.getContent();
 	}

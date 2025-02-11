@@ -1,0 +1,37 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{layout :: layout-fragment(
+							~{::title},
+							~{::content},
+							null,
+							~{:: #additionalJs},
+							'stats'
+							)}">
+<head>
+	<title th:text="#{application.title-pattern(#{application.name}, 'Stats')}"></title>
+</head>
+<body>
+
+	<div th:fragment="content">
+
+		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h1 class="h2">Stats: Most used tags (category)</h1>
+		</div>
+
+		<div th:replace="~{fragments/messages :: messages-fragment(${messages})}"></div>
+
+		<div class="row">
+			<div class="col-sm-12" id="chartDiv" th:style="${'height: ' + (numberOfTags * 50 + 180) + 'px;'}">
+			</div>
+		</div>
+
+	</div>
+
+	<th:block id="additionalJs">
+		<script th:src="@{/js/plotly-3.0.0.min.js}"></script>
+		<script th:src="@{/js/stats-most-used-tags-category.js}"></script>
+	</th:block>
+
+</body>
+</html>

@@ -17,6 +17,11 @@ public enum ViewEnum
 	IMAGE_LIST(ControllerEnum.IMAGE, ActionEnum.LIST),
 	IMAGE_SHOW(ControllerEnum.IMAGE, ActionEnum.SHOW),
 
+	STATS_MOST_USED_TAGS_PERSON(ControllerEnum.STATS, "/most-used-tags-person"),
+	STATS_MOST_USED_TAGS_CATEGORY(ControllerEnum.STATS, "/most-used-tags-category"),
+	STATS_MOST_USED_FILESIZE_PER_TAG_PERSON(ControllerEnum.STATS, "/most-used-filesize-per-tag-person"),
+	STATS_MOST_USED_FILESIZE_PER_TAG_CATEGORY(ControllerEnum.STATS, "/most-used-filesize-per-tag-category"),
+
 	BACKUP_INDEX(ControllerEnum.BACKUP, "/index"),
 	BACKUP_RESTORE(ControllerEnum.BACKUP, "/restore"),
 	BACKUP_RESTORE_STATUS(ControllerEnum.BACKUP, "/restore-status");
@@ -30,6 +35,7 @@ public enum ViewEnum
 	{
 		TAG,
 		IMAGE,
+		STATS,
 		BACKUP;
 
 		private String path = null;

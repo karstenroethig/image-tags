@@ -18,11 +18,12 @@ import karstenroethig.imagetags.webapp.model.domain.Image_;
 import karstenroethig.imagetags.webapp.model.domain.Tag;
 import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ImageSpecifications
 {
-	private ImageSpecifications() {}
-
 	public static Specification<Image> matchesId(Long id)
 	{
 		return (Root<Image> root, CriteriaQuery<?> query, CriteriaBuilder cb) ->

@@ -30,6 +30,34 @@
 					</li>
 					<li class="nav-item dropdown">
 						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+							th:classappend="${#strings.equals(menu,'stats')} ? active">
+							<i class="fa-solid fa-chart-pie"></i>
+						</a>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" th:href="@{/stats/most-used-tags-person}">
+									most used tags (person)
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" th:href="@{/stats/most-used-tags-category}">
+									most used tags (category)
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" th:href="@{/stats/most-used-filesize-per-tag-person}">
+									most used file size per tag (person)
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" th:href="@{/stats/most-used-filesize-per-tag-category}">
+									most used file size per tag (category)
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
 							th:classappend="${#strings.equals(menu,'settings')} ? active">
 							<i class="fa-solid fa-gears"></i>
 						</a>

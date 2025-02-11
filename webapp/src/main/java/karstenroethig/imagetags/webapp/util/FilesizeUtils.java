@@ -35,4 +35,10 @@ public class FilesizeUtils
 
 		return LITTLE_SIZE_FORMAT.format(bytes) + " Byte(s)";
 	}
+
+	public static float bytesToMegabytes(long bytes)
+	{
+		float mb = (float)bytes / MB;
+		return mb;
+	}
 }
