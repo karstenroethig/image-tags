@@ -39,7 +39,9 @@
 							<input type="hidden" th:field="*{id}"/>
 							<div class="mb-3">
 								<select th:field="*{tags}" class="form-control search-tags-input" size="1" multiple="multiple">
-									<option th:each="tag : ${allTags}" th:value="${{tag}}" th:text="${tag.name}">[name]</option>
+									<option th:each="tag : ${allTags}" th:value="${{tag}}"
+									th:attr="data-type=${tag.type.name()},data-typetranslated=${#messages.msg('tag.type.'+tag.type.name()+'.label')}"
+									th:text="${tag.name}">[name]</option>
 								</select>
 							</div>
 							<button type="submit" class="btn btn-primary">Save</button>

@@ -6,16 +6,8 @@
 	cursor: pointer;
 }
 
-.tag-type-category {
-	background-color: #80bdff;
-}
-
-.tag-type-person {
-	background-color: #957bbe;
-}
-
-.tag-type-album {
-	background-color: #563d7c;
+.selectize-control.multi .selectize-input > div.person {
+	background-color: #8ad1e7;
 }
 
 .img-fit {

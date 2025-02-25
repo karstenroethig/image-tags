@@ -5,7 +5,20 @@ $( document ).ready( function() {
 	$('[data-bs-toggle="tooltip"]').tooltip();
 
 	$('.search-tags-input').selectize({
-		persist: false
+		persist: false,
+		optgroupField: 'typetranslated',
+		optionGroupRegister: function (optgroup) {
+			var group = { label: 'Type: ' + optgroup};
+			group[this.settings.optgroupValueField] = optgroup;
+			return group;
+		},
+		render: {
+			item: function (item, escape) {
+				return (
+					'<div class="item ' + (item.type ? item.type.toLowerCase() : '') + '">' + escape(item.text) + '</div>'
+				);
+			}
+		}
 	});
 
 	$('.search-tags-input_').select2({
