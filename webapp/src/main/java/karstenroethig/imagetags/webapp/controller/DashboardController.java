@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import karstenroethig.imagetags.webapp.controller.util.UrlMappings;
 import karstenroethig.imagetags.webapp.controller.util.ViewEnum;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
+import karstenroethig.imagetags.webapp.model.enums.TagTypeEnum;
 import karstenroethig.imagetags.webapp.service.impl.ImageServiceImpl;
 import karstenroethig.imagetags.webapp.service.impl.TagServiceImpl;
 
@@ -24,9 +25,16 @@ public class DashboardController
 	@GetMapping(value = {UrlMappings.HOME, UrlMappings.DASHBOARD})
 	public String dashborad(Model model)
 	{
+		addAttributesForTagCards(model);
 		addAttributesForStatsCard(model);
 
 		return ViewEnum.DASHBOARD.getViewName();
+	}
+
+	private void addAttributesForTagCards(Model model)
+	{
+		model.addAttribute("allCategoryTags", tagService.findAll(TagTypeEnum.CATEGORY));
+		model.addAttribute("allPersonTags", tagService.findAll(TagTypeEnum.PERSON));
 	}
 
 	private void addAttributesForStatsCard(Model model)

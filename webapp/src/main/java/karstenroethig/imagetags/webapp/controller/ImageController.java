@@ -1,6 +1,7 @@
 package karstenroethig.imagetags.webapp.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -37,6 +38,7 @@ import karstenroethig.imagetags.webapp.model.domain.Image_;
 import karstenroethig.imagetags.webapp.model.dto.ImageDescriptionUpdateDto;
 import karstenroethig.imagetags.webapp.model.dto.ImageDto;
 import karstenroethig.imagetags.webapp.model.dto.ImageTagsUpdateDto;
+import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import karstenroethig.imagetags.webapp.service.impl.ImageServiceImpl;
 import karstenroethig.imagetags.webapp.service.impl.StorageServiceImpl;
@@ -79,6 +81,18 @@ public class ImageController extends AbstractController
 	public String search(@ModelAttribute(AttributeNames.IMAGE_SEARCH_PARAMS) ImageSearchDto imageSearchDto, Model model)
 	{
 		imageSearchBean.setImageSearchDto(imageSearchDto);
+		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST);
+	}
+
+	@GetMapping(value = UrlMappings.ACTION_SEARCH + "/tag/{id}")
+	public String searchByTag(@PathVariable("id") Long id, Model model)
+	{
+		TagDto tag = new TagDto();
+		tag.setId(id);
+
+		imageSearchBean.clear();
+		imageSearchBean.getImageSearchDto().setTags(List.of(tag));
+
 		return UrlMappings.redirect(UrlMappings.CONTROLLER_IMAGE, UrlMappings.ACTION_LIST);
 	}
 

@@ -26,9 +26,26 @@
 			<div class="col-lg-6">
 
 				<div class="card mb-3">
-					<h3 class="card-header" th:text="#{dashboard.card.welcome.title}">Welcome</h3>
+					<h3 class="card-header">Categories</h3>
 					<div class="card-body">
-						<p class="card-text lead" th:text="#{dashboard.card.welcome.text}">[text]</p>
+						<p class="card-text">
+							<a th:each="tag : ${allCategoryTags}"
+								th:href="@{/image/search/tag/{id}(id=${tag.id})}"
+								class="me-1"
+								th:text="${tag.name}">[name]</a>
+						</p>
+					</div>
+				</div>
+
+				<div class="card mb-3">
+					<h3 class="card-header">Persons</h3>
+					<div class="card-body">
+						<p class="card-text">
+							<a th:each="tag : ${allPersonTags}"
+								th:href="@{/image/search/tag/{id}(id=${tag.id})}"
+								class="me-1"
+								th:text="${tag.name}">[name]</a>
+						</p>
 					</div>
 				</div>
 
