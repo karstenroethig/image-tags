@@ -18,7 +18,8 @@ $( document ).ready( function() {
 					'<div class="item ' + (item.type ? item.type.toLowerCase() : '') + '">' + escape(item.text) + '</div>'
 				);
 			}
-		}
+		},
+		sortField: 'text'
 	});
 
 	$('.search-tags-input_').select2({

@@ -1,5 +1,6 @@
 package karstenroethig.imagetags.webapp.controller;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import karstenroethig.imagetags.webapp.controller.util.UrlMappings;
 import karstenroethig.imagetags.webapp.controller.util.ViewEnum;
+import karstenroethig.imagetags.webapp.model.dto.TagDto;
 import karstenroethig.imagetags.webapp.model.dto.search.ImageSearchDto;
 import karstenroethig.imagetags.webapp.model.enums.TagTypeEnum;
 import karstenroethig.imagetags.webapp.service.impl.ImageServiceImpl;
@@ -33,8 +35,16 @@ public class DashboardController
 
 	private void addAttributesForTagCards(Model model)
 	{
-		model.addAttribute("allCategoryTags", tagService.findAll(TagTypeEnum.CATEGORY));
-		model.addAttribute("allPersonTags", tagService.findAll(TagTypeEnum.PERSON));
+		List<TagDto> allCategoryTags = tagService.findAll(TagTypeEnum.CATEGORY).stream()
+			.sorted(Comparator.comparing(TagDto::getName))
+			.toList();
+
+		List<TagDto> allPersonTags = tagService.findAll(TagTypeEnum.PERSON).stream()
+			.sorted(Comparator.comparing(TagDto::getName))
+			.toList();
+
+		model.addAttribute("allCategoryTags", allCategoryTags);
+		model.addAttribute("allPersonTags", allPersonTags);
 	}
 
 	private void addAttributesForStatsCard(Model model)

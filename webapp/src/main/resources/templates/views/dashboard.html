@@ -31,7 +31,7 @@
 						<p class="card-text">
 							<a th:each="tag : ${allCategoryTags}"
 								th:href="@{/image/search/tag/{id}(id=${tag.id})}"
-								class="me-1"
+								class="text-nowrap me-1"
 								th:text="${tag.name}">[name]</a>
 						</p>
 					</div>
@@ -43,7 +43,7 @@
 						<p class="card-text">
 							<a th:each="tag : ${allPersonTags}"
 								th:href="@{/image/search/tag/{id}(id=${tag.id})}"
-								class="me-1"
+								class="text-nowrap me-1"
 								th:text="${tag.name}">[name]</a>
 						</p>
 					</div>
