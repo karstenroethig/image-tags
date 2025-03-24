@@ -39,7 +39,7 @@
 		<app.name.pretty>Image Tags</app.name.pretty>
 		<app.name.files>image-tags</app.name.files>
 
-		<spring.boot.version>3.4.3</spring.boot.version>
+		<spring.boot.version>3.4.4</spring.boot.version>
 	</properties>
 
 	<dependencyManagement>
