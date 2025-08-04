@@ -49,6 +49,18 @@
 					</div>
 				</div>
 
+				<div class="card mb-3">
+					<h3 class="card-header">Albums</h3>
+					<div class="card-body">
+						<p class="card-text d-flex flex-wrap">
+							<a th:each="tag : ${allAlbumTags}"
+								th:href="@{/image/search/tag/{id}(id=${tag.id})}"
+								class="text-nowrap me-1"
+								th:text="${tag.name}">[name]</a>
+						</p>
+					</div>
+				</div>
+
 			</div>
 
 			<div class="col-lg-6">

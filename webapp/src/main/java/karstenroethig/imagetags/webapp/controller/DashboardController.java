@@ -43,8 +43,13 @@ public class DashboardController
 			.sorted(Comparator.comparing(TagDto::getName))
 			.toList();
 
+		List<TagDto> allAlbumTags = tagService.findAll(TagTypeEnum.ALBUM).stream()
+			.sorted(Comparator.comparing(TagDto::getName))
+			.toList();
+
 		model.addAttribute("allCategoryTags", allCategoryTags);
 		model.addAttribute("allPersonTags", allPersonTags);
+		model.addAttribute("allAlbumTags", allAlbumTags);
 	}
 
 	private void addAttributesForStatsCard(Model model)
