@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch Application (dev)",
+            "request": "launch",
+            "mainClass": "karstenroethig.imagetags.webapp.Application",
+            "projectName": "image-tags-webapp",
+            "vmArgs": "-Dspring.profiles.active=dev -Djava.io.tmpdir=${workspaceFolder}/webapp/target",
+            "cwd": "${workspaceFolder}/webapp"
+        }
+    ]
+}
