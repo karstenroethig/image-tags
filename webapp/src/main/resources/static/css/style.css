@@ -6,8 +6,30 @@
 	cursor: pointer;
 }
 
+.tag-type-category {
+	background-color: #efefef;
+	color: #343a40;
+	border: 0 solid #dee2e6;
+}
+
+.tag-type-person {
+	background-color: #8ad1e7;
+	color: #343a40;
+	border: 0 solid #dee2e6;
+}
+
+.tag-type-album {
+	background-color: #e1c16e;
+	color: #343a40;
+	border: 0 solid #dee2e6;
+}
+
 .selectize-control.multi .selectize-input > div.person {
 	background-color: #8ad1e7;
+}
+
+.selectize-control.multi .selectize-input > div.album {
+	background-color: #e1c16e;
 }
 
 .img-fit {

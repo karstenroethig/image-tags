@@ -53,7 +53,7 @@
 						<span th:text="${tag.name}">[name]</span>
 					</td>
 					<td>
-						<span class="badge badge-secondary" th:classappend="${'tag-type-'+tag.type.name().toLowerCase()}" th:text="${#messages.msg('tag.type.'+tag.type.name()+'.label')}">[type]</span>
+						<span class="badge" th:classappend="${'tag-type-'+tag.type.name().toLowerCase()}" th:text="${#messages.msg('tag.type.'+tag.type.name()+'.label')}">[type]</span>
 					</td>
 					<td class="text-end ajaxFetchUsage" th:attr="data-id=${tag.id}">
 						<i class="fa fa-question" title="Ermittlung startet automatisch nach 5 Sekunden"></i>
