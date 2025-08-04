@@ -28,7 +28,7 @@
 				<div class="card mb-3">
 					<h3 class="card-header">Categories</h3>
 					<div class="card-body">
-						<p class="card-text">
+						<p class="card-text d-flex flex-wrap">
 							<a th:each="tag : ${allCategoryTags}"
 								th:href="@{/image/search/tag/{id}(id=${tag.id})}"
 								class="text-nowrap me-1"
@@ -40,7 +40,7 @@
 				<div class="card mb-3">
 					<h3 class="card-header">Persons</h3>
 					<div class="card-body">
-						<p class="card-text">
+						<p class="card-text d-flex flex-wrap">
 							<a th:each="tag : ${allPersonTags}"
 								th:href="@{/image/search/tag/{id}(id=${tag.id})}"
 								class="text-nowrap me-1"
