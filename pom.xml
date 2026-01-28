@@ -29,7 +29,10 @@
 	</prerequisites>
 
 	<properties>
-		<java.version>21</java.version>
+		<java.version>25</java.version>
+
+		<!-- Adding the `-proc:full` compiler option to turn on the full compilation processing (for Lombok annotations). -->
+		<maven.compiler.proc>full</maven.compiler.proc>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.build.outputEncoding>UTF-8</project.build.outputEncoding>
@@ -39,7 +42,7 @@
 		<app.name.pretty>Image Tags</app.name.pretty>
 		<app.name.files>image-tags</app.name.files>
 
-		<spring.boot.version>3.5.7</spring.boot.version>
+		<spring.boot.version>4.0.2</spring.boot.version>
 	</properties>
 
 	<dependencyManagement>
