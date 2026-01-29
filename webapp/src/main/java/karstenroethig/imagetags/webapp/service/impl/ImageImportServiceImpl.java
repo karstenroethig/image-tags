@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +55,7 @@ public class ImageImportServiceImpl
 
 		if (!Files.exists(importDirectory))
 		{
-			log.info("import of images skipped (directory '" + importDirectory + "' does not exist)");
+			log.info("import of images skipped (directory '{}' does not exist)", importDirectory);
 			return;
 		}
 
@@ -65,6 +65,7 @@ public class ImageImportServiceImpl
 			List<Path> allNewImages = Files.walk(importDirectory, FileVisitOption.FOLLOW_LINKS)
 				.sorted(Comparator.reverseOrder())
 				.filter(path -> isImageFile(path))
+				.filter(path -> !isInThumbsDirectory(path))
 //				.peek(System.out::println)
 				.collect(Collectors.toList());
 
@@ -96,29 +97,101 @@ public class ImageImportServiceImpl
 		{
 			for (Path imagePath : imagePaths)
 			{
-				currentFileCount++;
+				log.info("importing image file [{}/{}]: {}", ++currentFileCount, totalFileCount, imagePath);
 
-				currentStorage = storageService.findOrCreateStorage(currentStorage, Files.size(imagePath));
-
-				if (!currentStorage.getKey().equals(currentStorageKey))
+				String hash = null;
+				try (InputStream inputStream = Files.newInputStream(imagePath))
 				{
-					currentStorageKey = currentStorage.getKey();
-
-					IOUtils.closeQuietly(currentFileSystem);
-					storageService.createStorageFileIfItDoesNotExist(currentStorageKey, false);
-					Path storagePath = storageService.createStoragePath(currentStorageKey, false);
-					currentFileSystem = FileSystems.newFileSystem(storagePath);
-
-					IOUtils.closeQuietly(currentFileSystemThumbs);
-					storageService.createStorageFileIfItDoesNotExist(currentStorageKey, true);
-					storagePath = storageService.createStoragePath(currentStorageKey, true);
-					currentFileSystemThumbs = FileSystems.newFileSystem(storagePath);
+					hash = DigestUtils.md5Hex(inputStream);
 				}
 
-				Image image = importImage(imagePath, currentStorage, currentFileCount, totalFileCount, currentFileSystem, currentFileSystemThumbs);
+				Image existingImage = findImageByHash(hash);
 
-				if (image != null)
+				if (existingImage == null)
+				{
+					currentStorage = storageService.findOrCreateStorage(currentStorage, Files.size(imagePath));
+
+					if (!currentStorage.getKey().equals(currentStorageKey))
+					{
+						currentStorageKey = currentStorage.getKey();
+
+						IOUtils.closeQuietly(currentFileSystem);
+						storageService.createStorageFileIfItDoesNotExist(currentStorageKey, false);
+						Path storagePath = storageService.createStoragePath(currentStorageKey, false);
+						currentFileSystem = FileSystems.newFileSystem(storagePath);
+
+						IOUtils.closeQuietly(currentFileSystemThumbs);
+						storageService.createStorageFileIfItDoesNotExist(currentStorageKey, true);
+						storagePath = storageService.createStoragePath(currentStorageKey, true);
+						currentFileSystemThumbs = FileSystems.newFileSystem(storagePath);
+					}
+
+					Image image = importImage(imagePath, currentStorage, hash, currentFileSystem, currentFileSystemThumbs);
 					currentStorage = storageService.addAndSaveFilesize(currentStorage.getId(), image.getSize());
+				}
+				else
+				{
+					log.info("-> image {} already exists and will be ignored", imagePath);
+
+					String extension = FilenameUtils.getExtension(imagePath.getFileName().toString());
+					boolean newExtension = !Strings.CI.equals(extension, existingImage.getExtension());
+					if (newExtension)
+						log.info("-> image has new extension ({} -> {})", existingImage.getExtension(), extension);
+
+					String imageFileName = imagePath.getFileName().toString();
+					Path imageThumbPath = imagePath.getParent().resolve("thumbs", imageFileName);
+					boolean newThumbnail = Files.exists(imageThumbPath);
+					if (newThumbnail)
+						log.info("-> image has new thumbnail");
+
+					if (newExtension || newThumbnail)
+					{
+						log.info("-> data is being updated");
+
+						currentStorage = existingImage.getStorage();
+
+						if (!currentStorage.getKey().equals(currentStorageKey))
+						{
+							currentStorageKey = currentStorage.getKey();
+
+							IOUtils.closeQuietly(currentFileSystem);
+							storageService.createStorageFileIfItDoesNotExist(currentStorageKey, false);
+							Path storagePath = storageService.createStoragePath(currentStorageKey, false);
+							currentFileSystem = FileSystems.newFileSystem(storagePath);
+
+							IOUtils.closeQuietly(currentFileSystemThumbs);
+							storageService.createStorageFileIfItDoesNotExist(currentStorageKey, true);
+							storagePath = storageService.createStoragePath(currentStorageKey, true);
+							currentFileSystemThumbs = FileSystems.newFileSystem(storagePath);
+						}
+
+						if (newExtension)
+						{
+							String filenameOld = existingImage.getStorageFilename();
+							String filenameNew = Strings.CI.removeEnd(filenameOld, existingImage.getExtension()) + extension;
+
+							storageService.renameImage(filenameOld, filenameNew, currentFileSystem, false);
+							storageService.renameImage(filenameOld, filenameNew, currentFileSystemThumbs, true);
+
+							existingImage.setStorageFilename(filenameNew);
+							existingImage.setExtension(extension);
+						}
+
+						if (newThumbnail)
+						{
+							storageService.saveImage(imageThumbPath, existingImage.getStorageFilename(), currentFileSystemThumbs, true);
+
+							existingImage.setThumbStatus(ImageThumbStatusEnum.IMPORTED);
+
+							Files.delete(imageThumbPath);
+						}
+
+						imageRepository.save(existingImage);
+					}
+				}
+
+				// delete the source file
+				Files.delete(imagePath);
 			}
 		}
 		finally
@@ -128,21 +201,30 @@ public class ImageImportServiceImpl
 		}
 	}
 
-	private Image importImage(Path imagePath, Storage storage, int currentFileCount, int totalFileCount, FileSystem fileSystem, FileSystem fileSystemThumbs) throws IOException
+	private Image importImage(Path imagePath, Storage storage, String hash, FileSystem fileSystem, FileSystem fileSystemThumbs) throws IOException
 	{
-		log.info(String.format("importing image file [%s/%s]: %s", currentFileCount, totalFileCount, imagePath.toString()));
+		Image image = createImage(imagePath, hash);
 
-		Image image = createImage(imagePath);
+		// save new image in database
+		image.setStorage(storage);
+		imageRepository.save(image);
 
-		if (!doesImageExistInDatabase(image.getHash()))
+		// copy file
+		storageService.saveImage(imagePath, image.getStorageFilename(), fileSystem, false);
+
+		// thumbnail
+		String imageFileName = imagePath.getFileName().toString();
+		Path imageThumbPath = imagePath.getParent().resolve("thumbs", imageFileName);
+
+		if (Files.exists(imageThumbPath))
 		{
-			// save new image in database
-			image.setStorage(storage);
-			imageRepository.save(image);
-
-			// copy file
-			storageService.saveImage(imagePath, image.getStorageFilename(), fileSystem, false);
-
+			// copy thmubnail from inport directory
+			byte[] thumbData = Files.readAllBytes(imageThumbPath);
+			storageService.saveImage(thumbData, image.getStorageFilename(), fileSystemThumbs, true);
+			image.setThumbStatus(ImageThumbStatusEnum.IMPORTED);
+		}
+		else
+		{
 			// create thumbnail and copy it to the storage
 			try
 			{
@@ -155,21 +237,14 @@ public class ImageImportServiceImpl
 				log.warn(String.format("failed to generate thumbnail of image %s", imagePath.toString()), ex);
 				image.setThumbStatus(ImageThumbStatusEnum.GENERATION_ERROR);
 			}
-			imageRepository.save(image);
-		}
-		else
-		{
-			log.info(String.format("image %s already exists and will be ignored", imagePath.toString()));
-			image = null;
 		}
 
-		// delete the source file
-		Files.delete(imagePath);
+		imageRepository.save(image);
 
 		return image;
 	}
 
-	private Image createImage(Path imagePath) throws IOException
+	private Image createImage(Path imagePath, String hash) throws IOException
 	{
 		String extension = FilenameUtils.getExtension(imagePath.getFileName().toString());
 		String filename = String.format("%s.%s", UUID.randomUUID().toString(), extension);
@@ -182,11 +257,7 @@ public class ImageImportServiceImpl
 		image.setThumbStatus(ImageThumbStatusEnum.NO_THUMB);
 		image.setDescription(findRelativeImportPath(imagePath));
 		image.setCreatedDatetime(LocalDateTime.now());
-
-		try (InputStream inputStream = Files.newInputStream(imagePath))
-		{
-			image.setHash(DigestUtils.md5Hex(inputStream));
-		}
+		image.setHash(hash);
 
 		try
 		{
@@ -209,11 +280,10 @@ public class ImageImportServiceImpl
 		return image;
 	}
 
-	private boolean doesImageExistInDatabase(String hash)
+	private Image findImageByHash(String hash)
 	{
 		List<Image> images = imageRepository.findByHashIgnoreCase(hash);
-
-		return images != null && !images.isEmpty();
+		return images.stream().findFirst().orElse(null);
 	}
 
 	private void cleanupImportDirectory(Path importDirectory) throws IOException
@@ -235,10 +305,19 @@ public class ImageImportServiceImpl
 			return false;
 
 		String filename = path.getFileName().toString().toLowerCase();
-		if (StringUtils.startsWith(filename, "."))
+		if (Strings.CS.startsWith(filename, "."))
 			return false;
 
 		return FilenameUtils.isExtension(filename, IMAGE_FILE_EXTENSIONS);
+	}
+
+	private boolean isInThumbsDirectory(Path path)
+	{
+		if (path == null || Files.isDirectory(path))
+			return false;
+
+		Path parentPath = path.getParent();
+		return Strings.CS.equals(parentPath.getFileName().toString(), "thumbs");
 	}
 
 	private String findRelativeImportPath(Path filePath)

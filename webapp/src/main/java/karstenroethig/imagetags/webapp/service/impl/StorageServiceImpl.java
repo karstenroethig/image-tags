@@ -7,6 +7,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.UUID;
 import java.util.zip.Deflater;
@@ -33,7 +34,7 @@ import karstenroethig.imagetags.webapp.repository.StorageRepository;
 @Transactional
 public class StorageServiceImpl
 {
-	private static final long STORAGE_MAX_SIZE = 500000000l;
+	private static final long STORAGE_MAX_SIZE = 500_000_000l;
 	private static final String ROOT_PATH_DELIMITER = "/";
 
 	@Autowired private ApplicationProperties applicationProperties;
@@ -43,7 +44,7 @@ public class StorageServiceImpl
 	public void saveImage(Path imageFilePath, String storageFilename, FileSystem fileSystem, boolean thumbnail) throws IOException
 	{
 		Path path = fileSystem.getPath((thumbnail ? "/thumbs/" : "/") + storageFilename);
-		Files.copy(imageFilePath, path);
+		Files.copy(imageFilePath, path, StandardCopyOption.REPLACE_EXISTING);
 	}
 
 	public void saveImage(byte[] imageData, String storageFilename, FileSystem fileSystem, boolean thumbnail) throws IOException
@@ -91,6 +92,16 @@ public class StorageServiceImpl
 			Path pathToFileInArchive = storageFileSystem.getPath(thumbsPath + ROOT_PATH_DELIMITER + image.getStorageFilename());
 			return new ByteArrayResource(Files.readAllBytes(pathToFileInArchive));
 		}
+	}
+
+	public void renameImage(String storageFilenameOld, String storageFilenameNew, FileSystem fileSystem, boolean thumbnail) throws IOException
+	{
+		Path pathOld = fileSystem.getPath((thumbnail ? "/thumbs/" : "/") + storageFilenameOld);
+		if (!Files.exists(pathOld))
+			return;
+
+		Path pathNew = fileSystem.getPath((thumbnail ? "/thumbs/" : "/") + storageFilenameNew);
+		Files.move(pathOld, pathNew);
 	}
 
 	protected StorageDto transform(Storage storage)

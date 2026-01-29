@@ -4,5 +4,6 @@ public enum ImageThumbStatusEnum
 {
 	GENERATION_ERROR,
 	NO_THUMB,
-	THUMB_120_120;
+	THUMB_120_120,
+	IMPORTED;
 }

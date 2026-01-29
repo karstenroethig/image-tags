@@ -14,10 +14,6 @@ info:
 server:
   address: 127.0.0.1
   port: 8080
-  error:
-    whitelabel:
-      enabled: false
-    include-message: always
 
 spring:
 
@@ -50,6 +46,10 @@ spring:
           content:
             enabled: true
             paths: /css/**, /images/**, /js/**
+    error:
+      whitelabel:
+        enabled: false
+      include-message: always
 
   jackson:
     default-property-inclusion: NON_NULL
