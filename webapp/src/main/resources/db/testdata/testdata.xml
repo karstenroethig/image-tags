@@ -65,8 +65,8 @@
 
 		<insert tableName="image">
 			<column name="storage_id"        valueNumeric="select id from storage where storage_key = '6b9070cc-2c07-4f64-ac44-6b713bf91dcd'"/>
-			<column name="storage_filename"  value="000000000002.jpg"/>
-			<column name="file_extension"    value="jpg"/>
+			<column name="storage_filename"  value="000000000002.jpeg"/>
+			<column name="file_extension"    value="jpeg"/>
 			<column name="file_size"         value="74479"/>
 			<column name="hash"              value="3773af58a5b072a094c53f628e7160fa"/>
 			<column name="thumb_status"      value="THUMB_120_120"/>

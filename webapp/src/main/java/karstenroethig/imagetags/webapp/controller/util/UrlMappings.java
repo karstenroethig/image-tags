@@ -1,6 +1,7 @@
 package karstenroethig.imagetags.webapp.controller.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 public class UrlMappings
 {
@@ -35,7 +36,7 @@ public class UrlMappings
 	public static String redirectWithId(String controllerPath, String actionPath, Long id)
 	{
 		String idString = id == null ? StringUtils.EMPTY : id.toString();
-		String path = StringUtils.replace(controllerPath + actionPath, "{id}", idString);
+		String path = Strings.CS.replace(controllerPath + actionPath, "{id}", idString);
 		return redirect(path);
 	}
 

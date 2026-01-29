@@ -1,6 +1,7 @@
 package karstenroethig.imagetags.webapp.controller.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import lombok.Getter;
 
@@ -101,6 +102,6 @@ public enum ViewEnum
 		if (path != null)
 			newViewName.append(path);
 
-		viewName = StringUtils.removeStart(newViewName.toString(), "/"); // just in case if there is no view sub-directory
+		viewName = Strings.CS.removeStart(newViewName.toString(), "/"); // just in case if there is no view sub-directory
 	}
 }

@@ -52,10 +52,10 @@
 			<artifactId>spring-boot-jackson2</artifactId>
 		</dependency>
 
-		<!-- JDBC driver for H2 -->
+		<!-- JDBC driver for H2 + H2-Console -->
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-h2console</artifactId>
 		</dependency>
 
 		<!-- DB Connection Pooling -->
